@@ -176,6 +176,8 @@ img {
 
 .camille-photo {
     width: 100%;
+    max-width: 260px;   /* tu peux ajouter ça si tu veux éviter qu’elle prenne trop de place */
+    height: auto;
     border-radius: 10px;
     margin-bottom: 15px;
 }
