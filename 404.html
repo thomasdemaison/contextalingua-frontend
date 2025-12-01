@@ -1,54 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Page introuvable – Contexta Lingua</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: #f5f5f5;
-        display: flex;
-        height: 100vh;
-        align-items: center;
-        justify-content: center;
-        color: #333;
-        text-align: center;
-        padding: 20px;
-    }
-    .box {
-        background: white;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        max-width: 450px;
-    }
-    h1 {
-        margin-top: 0;
-        font-size: 36px;
-        color: #222;
-    }
-    p {
-        font-size: 18px;
-        margin-bottom: 25px;
-    }
-    a {
-        color: white;
-        background: #0078ff;
-        padding: 12px 22px;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-    a:hover { background: #005fcc; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page introuvable – ContextaLingua</title>
+    <meta name="description" content="La page que vous recherchez n'existe pas ou a été déplacée. Retournez à l'accueil de ContextaLingua.">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
-<div class="box">
-    <h1>404 – Page introuvable</h1>
-    <p>La page que vous recherchez n’existe pas ou a été déplacée.</p>
-    <a href="https://contextalingua.fr">Retour à l’accueil</a>
-</div>
+
+<header class="nav">
+    <div class="logo">Contexta<span>Lingua</span></div>
+    <nav>
+        <a href="produit.html">Produit</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-actions">
+        <a href="#" class="btn-secondary">Se connecter</a>
+        <a href="#" class="btn-primary">Commencer gratuitement</a>
+    </div>
+</header>
+
+<section class="hero" style="padding-top:120px; padding-bottom:80px; text-align:center;">
+    <div style="max-width:700px; margin:0 auto;">
+        <h1 style="font-size:52px; margin-bottom:10px;">404 — Page introuvable</h1>
+        <p class="subtitle" style="font-size:18px; line-height:1.6;">
+            La page que vous recherchez n’existe pas ou a été déplacée.<br>
+            Mais pas d’inquiétude : Camille est là pour vous remettre sur le bon chemin.
+        </p>
+
+        <div style="margin-top:40px;">
+            <img src="assets/img/camille.png" alt="Camille – Assistante IA"
+                 style="width:160px; border-radius:12px; opacity:0.95;">
+        </div>
+
+        <div style="background:#0a1020; padding:25px; margin-top:35px; border-radius:12px; color:#dbe1ea; text-align:left;">
+            <strong>Camille :</strong>
+            <p style="margin-top:8px; line-height:1.6;">
+                « J’ai cherché partout, mais cette page n'existe plus.
+                Je peux vous ramener à l’accueil ou vous aider à explorer nos fonctionnalités. »
+            </p>
+        </div>
+
+        <div style="margin-top:30px;">
+            <a href="index.html" class="btn-primary" style="padding:14px 28px; font-size:16px;">
+                Retour à l’accueil
+            </a>
+            <a href="produit.html" class="btn-outline" style="padding:14px 28px; font-size:16px; margin-left:10px;">
+                Découvrir le produit
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>© 2025 ContextaLingua — Tous droits réservés.</p>
+    <div class="footer-links">
+        <a href="produit.html">Produit</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Contact</a>
+    </div>
+</footer>
+
 </body>
 </html>
