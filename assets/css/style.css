@@ -124,10 +124,22 @@ img {
    HERO
 ------------------------------ */
 .hero {
+    padding: 120px 0 90px;     /* au lieu de 80px 0 40px par ex. */
     display: flex;
+    align-items: center;       /* centre verticalement texte + Camille */
     justify-content: space-between;
-    padding: 120px 60px;
-    background: radial-gradient(circle at 20% 20%, #091225, #060b17 60%);
+    gap: 48px;
+}
+
+.hero-content {
+    max-width: 720px;
+}
+
+/* sur écran très large, on évite que Camille prenne trop de place */
+@media (min-width: 1200px) {
+    .hero-camille {
+        flex: 0 0 320px;
+    }
 }
 
 .hero-left {
