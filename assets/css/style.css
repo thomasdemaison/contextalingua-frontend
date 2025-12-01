@@ -184,6 +184,12 @@ img {
     color: #e3e7f0;
 }
 
+.camille-img {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+}
+
 /* ------------------------------
    FEATURES
 ------------------------------ */
