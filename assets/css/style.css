@@ -337,6 +337,12 @@ p {
   background: #080f1d;
 }
 
+.use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+}
+
 /* -------- TAGS / LABELS -------- */
 
 .tag {
@@ -419,18 +425,20 @@ p {
 /* ------------------------------
    CTA FOOTER
 ------------------------------ */
-.cta-footer {
-    padding: 80px 60px;
-    background: var(--blue-gradient);
-    color: #fff;
-    text-align: center;
+.cta-section {
+    background: linear-gradient(90deg, #1464ff, #586BFF);
+    color: #ffffff;
+    padding: 72px 32px;
 }
 
-.cta-footer a {
-    margin-top: 20px;
-    display: inline-block;
+.cta-section .kicker,
+.cta-section .section-kicker {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 12px;
+    color: #d6e4ff; /* au lieu de rgba(255,255,255,0.4) par exemple */
 }
-
 /* ------------------------------
    FOOTER
 ------------------------------ */
