@@ -96,6 +96,20 @@ ul {
     align-items: baseline;
     gap: 4px;
 }
+.header-logo {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.header-logo .contexta {
+    color: #3b82f6; /* bleu */
+}
+
+.header-logo .lingua {
+    color: #ffffff; /* blanc */
+}
+
+
 
 .logo-main {
     color: #ffffff;
