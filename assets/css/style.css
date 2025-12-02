@@ -88,28 +88,25 @@ ul {
     gap: 32px;
 }
 
-.logo {
-    font-weight: 700;
-    font-size: 1.15rem;
-    letter-spacing: .03em;
+/* Logo du header */
+.header-logo {
     display: inline-flex;
     align-items: baseline;
     gap: 4px;
-}
-.header-logo {
     font-weight: 700;
     font-size: 1.4rem;
+    letter-spacing: .03em;
+    text-decoration: none;
 }
 
+/* Contexta en bleu, Lingua en blanc */
 .header-logo .contexta {
-    color: #3b82f6; /* bleu */
+    color: #3b82f6 !important;  /* bleu */
 }
 
 .header-logo .lingua {
-    color: #ffffff; /* blanc */
+    color: #ffffff !important;  /* blanc */
 }
-
-
 
 .logo-main {
     color: #ffffff;
