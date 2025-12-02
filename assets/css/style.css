@@ -824,21 +824,22 @@ a {
 ------------------------------------------ */
 
 .logo {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 4px;
-    font-weight: 600;
-    font-size: 22px;
-    letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .logo-main {
-    color: #ffffff;
+  color: #ffffff;         /* "Contexta" en blanc */
 }
 
 .logo-accent {
-    color: #0ea5e9;
+  color: #1da1ff;         /* "Lingua" en bleu */
 }
+
 
 /* -----------------------------------------
    Page Tarifs
