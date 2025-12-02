@@ -818,3 +818,168 @@ a {
         justify-content: center;
     }
 }
+
+/* -----------------------------------------
+   Header : logo cohérent sur toutes les pages
+------------------------------------------ */
+
+.logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+}
+
+.logo-main {
+    color: #ffffff;
+}
+
+.logo-accent {
+    color: #0ea5e9;
+}
+
+/* -----------------------------------------
+   Page Tarifs
+------------------------------------------ */
+
+.page-tarifs .tarifs-main {
+    padding: 80px 0 96px;
+}
+
+.tarifs-hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 72px;
+}
+
+.tarifs-copy {
+    flex: 1 1 0;
+    max-width: 720px;
+}
+
+.page-tarifs .page-title {
+    font-size: 40px;
+    line-height: 1.15;
+    margin-bottom: 24px;
+}
+
+.page-tarifs .lead {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.tarifs-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    color: #d1d5db;
+    font-size: 15px;
+}
+
+.tarifs-highlights li + li {
+    margin-top: 4px;
+}
+
+/* Bloc "comment fonctionnent les crédits ?" */
+
+.tarifs-credits {
+    padding-top: 24px;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.tarifs-credits h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.tarifs-credits p {
+    color: #e5e7eb;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.credits-list {
+    margin: 0 0 12px 0;
+    padding-left: 20px;
+    color: #d1d5db;
+    font-size: 15px;
+}
+
+.credits-list li + li {
+    margin-top: 6px;
+}
+
+/* Carte Camille sur la page Tarifs */
+
+.tarifs-side {
+    flex: 0 0 340px;
+}
+
+.tarifs-camille-card {
+    background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 55%),
+                #020617;
+    border-radius: 28px;
+    padding: 24px 24px 22px;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.85);
+}
+
+.tarifs-camille-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    margin-bottom: 18px;
+}
+
+.tarifs-camille-body {
+    font-size: 14px;
+    color: #e5e7eb;
+}
+
+.tarifs-camille-name {
+    font-weight: 600;
+    margin: 0 0 2px;
+}
+
+.tarifs-camille-role {
+    margin: 0 0 10px;
+    color: #9ca3af;
+}
+
+.tarifs-camille-quote {
+    margin: 0 0 14px;
+    line-height: 1.7;
+}
+
+.tarifs-camille-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+.tarifs-camille-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive : empiler sur mobile */
+
+@media (max-width: 900px) {
+    .tarifs-hero {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .tarifs-side {
+        flex: 1 1 auto;
+        max-width: 420px;
+        width: 100%;
+    }
+}
