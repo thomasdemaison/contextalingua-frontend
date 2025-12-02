@@ -984,3 +984,294 @@ a {
         width: 100%;
     }
 }
+/* =========================================
+   PAGE TARIFS
+   ========================================= */
+
+.page-tarifs main {
+    padding-bottom: 80px;
+}
+
+/* Hero Tarifs */
+
+.hero--tarifs {
+    padding: 80px 0 40px;
+}
+
+.page-tarifs .hero-layout {
+    align-items: flex-start;
+}
+
+.page-tarifs .hero-content h1 {
+    max-width: 32rem;
+}
+
+.hero-subtitle {
+    margin-top: 16px;
+    color: #b3bed8;
+    line-height: 1.6;
+}
+
+.hero-bullets {
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+    color: #c2cbe3;
+    font-size: 0.98rem;
+}
+
+.hero-bullets li {
+    margin-bottom: 6px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.hero-bullets li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #27c3ff;
+}
+
+/* Carte Camille dans le hero Tarifs */
+
+.page-tarifs .camille-card {
+    max-width: 320px;
+    margin-left: auto;
+}
+
+.camille-name {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.camille-name span {
+    font-weight: 400;
+    color: #8d9bc0;
+}
+
+.camille-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #71c5ff;
+    text-decoration: none;
+}
+
+.camille-link:hover {
+    text-decoration: underline;
+}
+
+/* Sections de pricing */
+
+.pricing-section {
+    padding: 60px 0 40px;
+}
+
+.pricing-header {
+    max-width: 680px;
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.pricing-title {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.pricing-subtitle {
+    color: #b3bed8;
+    line-height: 1.6;
+    font-size: 0.98rem;
+}
+
+/* Grille de cartes tarifs */
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+}
+
+.pricing-card {
+    background: #060d1d;
+    border-radius: 18px;
+    padding: 22px 22px 26px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+}
+
+.pricing-card-title {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+}
+
+.pricing-price {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.pricing-caption {
+    color: #9ea9c7;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #c2cbe3;
+    font-size: 0.9rem;
+}
+
+.pricing-features li {
+    margin-bottom: 6px;
+}
+
+.pricing-card--highlight {
+    position: relative;
+    border: 1px solid rgba(69, 182, 255, 0.8);
+    box-shadow: 0 24px 60px rgba(4, 155, 255, 0.4);
+}
+
+.pricing-badge {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #1fb5ff, #7b5cff);
+}
+
+/* Note de bas de section */
+
+.pricing-footnote {
+    margin-top: 18px;
+    color: #7f8ab0;
+    font-size: 0.85rem;
+}
+
+/* Bloc langues */
+
+.pricing-section--languages {
+    padding-bottom: 70px;
+}
+
+.pricing-languages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.pricing-languages-card {
+    background: #050c1d;
+    border-radius: 18px;
+    padding: 22px 22px 26px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pricing-languages-card h3 {
+    margin-bottom: 8px;
+}
+
+.pricing-languages-card p {
+    color: #b3bed8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.language-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px;
+    color: #c2cbe3;
+    font-size: 0.9rem;
+}
+
+.language-list li {
+    margin-bottom: 4px;
+}
+
+.language-note {
+    color: #8d9bc0;
+    font-size: 0.85rem;
+}
+
+/* CTA final */
+
+.cta-strip {
+    padding: 60px 0 70px;
+    background: radial-gradient(circle at top left, #257cff, #4b36ff);
+}
+
+.cta-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.cta-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 6px;
+}
+
+.cta-title {
+    font-size: 1.6rem;
+    max-width: 40rem;
+}
+
+/* Footer sur fond sombre classique (réutilisable) */
+
+.site-footer {
+    background: #020513;
+    padding: 24px 0 30px;
+}
+
+.footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: #7f8ab0;
+}
+
+.footer-nav a {
+    color: #a4aecb;
+    text-decoration: none;
+    margin-left: 16px;
+    font-size: 0.86rem;
+}
+
+.footer-nav a:hover {
+    color: #ffffff;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .hero--tarifs {
+        padding-top: 56px;
+    }
+
+    .cta-strip-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
