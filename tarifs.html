@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Tarifs – ContextaLingua</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="page-tarifs">
+<body class="page page-tarifs">
 <header class="site-header">
     <div class="container header-inner">
-        <a href="index.html" class="site-logo">
-            Contexta<span>Lingua</span>
+        <a href="index.html" class="logo">
+            <span class="logo-main">Contexta</span><span class="logo-accent">Lingua</span>
         </a>
         <nav class="main-nav">
-            <a href="produit.html">Produit</a>
-            <a href="tarifs.html" class="active">Tarifs</a>
-            <a href="faq.html">FAQ</a>
-            <a href="contact.html">Contact</a>
+            <a href="produit.html" class="nav-link">Produit</a>
+            <a href="tarifs.html" class="nav-link active">Tarifs</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+            <a href="contact.html" class="nav-link">Contact</a>
         </nav>
         <div class="header-actions">
             <a href="#" class="btn btn-ghost">Se connecter</a>
@@ -27,35 +27,33 @@
 
 <main>
     <!-- HERO TARIFS -->
-    <section class="pricing-hero">
-        <div class="container pricing-hero-grid">
-            <div class="pricing-hero-copy">
-                <p class="section-kicker">Tarifs</p>
-                <h1 class="pricing-title">
-                    Des tarifs simples, pensés pour vos textes,<br>
-                    pas pour les lignes de contrat.
-                </h1>
-                <p class="pricing-lead">
+    <section class="hero hero-inner">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <p class="eyebrow">Tarifs</p>
+                <h1>Des tarifs simples, pensés pour vos textes, pas pour les lignes de contrat.</h1>
+                <p class="hero-subtitle">
                     Vous chargez vos crédits, je m’occupe de vos messages. Langues Premium ou Standard,
                     mode accompagné ou expert&nbsp;: vous ne payez que ce que vous utilisez, sans frais cachés.
                 </p>
-                <ul class="pricing-bullets">
-                    <li>✓ Aucune mise en place</li>
-                    <li>✓ Arrêt possible à tout moment</li>
-                    <li>✓ Crédits utilisables sur tous les cas d’usage</li>
+                <ul class="list-check">
+                    <li>Aucune mise en place</li>
+                    <li>Arrêt possible à tout moment</li>
+                    <li>Crédits utilisables sur tous les cas d’usage</li>
                 </ul>
             </div>
 
             <aside class="camille-card">
                 <div class="camille-photo-wrapper">
-                    <img src="assets/img/camille.png" alt="Camille, votre assistante multilingue" class="camille-photo">
+                    <img src="assets/img/camille.png" alt="Camille, votre assistante multilingue"
+                         class="camille-photo">
                 </div>
                 <div class="camille-text">
-                    <h3 class="camille-name">Camille</h3>
+                    <h3>Camille</h3>
                     <p class="camille-role">Votre assistante multilingue</p>
                     <p class="camille-quote">
-                        «&nbsp;Je préfère des tarifs clairs&nbsp;: vous savez à l’avance combien de textes vous pouvez
-                        générer et comment les crédits sont consommés. Le but, c’est que vous gardiez la main sur votre budget.&nbsp;»
+                        « Je préfère des tarifs clairs&nbsp;: vous savez à l’avance combien de textes vous pouvez
+                        générer et comment les crédits sont consommés. »
                     </p>
                     <a href="#" class="camille-link">Ouvrir un compte gratuit</a>
                 </div>
@@ -63,23 +61,173 @@
         </div>
     </section>
 
-    <!-- LANGUES / CRÉDITS / QUALITÉ -->
-    <section class="pricing-languages">
+    <!-- FONCTIONNEMENT CRÉDITS -->
+    <section class="section">
         <div class="container">
-            <h2 class="section-title">Langues, crédits et niveaux de qualité</h2>
-            <p class="section-subtitle">
-                Toutes les langues ne demandent pas le même niveau d’exigence. Les crédits reflètent la qualité visée
-                et le travail de calibration derrière chaque langue.
+            <h2>Comment fonctionnent les crédits&nbsp;?</h2>
+            <p class="section-intro">
+                Chaque génération de texte consomme un certain nombre de crédits. L’objectif est
+                de garder un système lisible, que vous soyez seul ou en équipe.
             </p>
 
-            <div class="language-grid">
-                <article class="language-card">
-                    <h3>Langues Premium – 2 crédits</h3>
+            <div class="grid grid-2">
+                <div>
+                    <h3>Principe général</h3>
                     <p>
-                        Rendu natif, expressions usuelles, ton professionnel adapté aux échanges clients
-                        et aux documents sensibles.
+                        Vous chargez un portefeuille de crédits. Chaque texte généré consomme 1 ou 2 crédits
+                        selon la langue. Les crédits sont partagés entre les cas d’usage (recouvrement,
+                        commercial, administratif, etc.).
                     </p>
-                    <ul class="language-list">
+                    <p>
+                        Vous pouvez combiner <strong>achat d’unités</strong> et <strong>abonnements mensuels</strong>
+                        selon votre volume.
+                    </p>
+                </div>
+                <div class="card info-card">
+                    <h3>Résumé</h3>
+                    <ul class="list-check">
+                        <li>1 texte Standard = <strong>1 crédit</strong></li>
+                        <li>1 texte Premium = <strong>2 crédits</strong></li>
+                        <li>Langues en version bêta = <strong>1 crédit</strong></li>
+                        <li>Crédits valables sur tous les modes (accompagné &amp; expert)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PACKS DE CRÉDITS -->
+    <section class="section section-alt">
+        <div class="container">
+            <h2>Packs de crédits à la carte</h2>
+            <p class="section-intro">
+                Idéal pour commencer ou pour des besoins ponctuels. Vous rechargez quand vous le souhaitez,
+                sans engagement.
+            </p>
+
+            <div class="grid grid-3 pricing-grid">
+                <!-- Petit pack -->
+                <article class="card pricing-card">
+                    <h3>Pack Découverte</h3>
+                    <p class="pricing-price">10&nbsp;€</p>
+                    <p class="pricing-credits">≈ 20 crédits</p>
+                    <p class="pricing-note">Parfait pour tester quelques cas d’usage ciblés.</p>
+                    <ul class="pricing-list">
+                        <li>Sans engagement</li>
+                        <li>Accès à toutes les langues</li>
+                        <li>Idéal pour 10 à 20 textes courts</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">Choisir ce pack</a>
+                </article>
+
+                <!-- Moyen pack -->
+                <article class="card pricing-card pricing-card-highlight">
+                    <div class="badge">Le plus choisi</div>
+                    <h3>Pack Pro</h3>
+                    <p class="pricing-price">30&nbsp;€</p>
+                    <p class="pricing-credits">≈ 70 crédits</p>
+                    <p class="pricing-note">Pour un suivi régulier de vos dossiers et relances.</p>
+                    <ul class="pricing-list">
+                        <li>Tarif au crédit plus avantageux</li>
+                        <li>Utilisable par toute votre équipe</li>
+                        <li>Convient pour 1 à 2 campagnes par mois</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full">Choisir ce pack</a>
+                </article>
+
+                <!-- Grand pack -->
+                <article class="card pricing-card">
+                    <h3>Pack Équipe</h3>
+                    <p class="pricing-price">50&nbsp;€</p>
+                    <p class="pricing-credits">≈ 130 crédits</p>
+                    <p class="pricing-note">Pour les structures qui gèrent plusieurs pays ou marques.</p>
+                    <ul class="pricing-list">
+                        <li>Meilleur prix au crédit</li>
+                        <li>Gestion multi-utilisateurs</li>
+                        <li>Idéal pour un volume soutenu</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">Choisir ce pack</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABONNEMENTS -->
+    <section class="section">
+        <div class="container">
+            <h2>Abonnements mensuels</h2>
+            <p class="section-intro">
+                Pour les équipes qui produisent régulièrement des textes multilingues. Vos crédits sont
+                rechargés chaque mois, vous gardez le contrôle sur votre budget.
+            </p>
+
+            <div class="grid grid-4 pricing-grid">
+                <article class="card pricing-card">
+                    <h3>Essentiel</h3>
+                    <p class="pricing-price">30&nbsp;€ / mois</p>
+                    <p class="pricing-credits">≈ 70 crédits / mois</p>
+                    <ul class="pricing-list">
+                        <li>Idéal pour les indépendants</li>
+                        <li>Support e-mail</li>
+                        <li>Sans engagement, résiliable à tout moment</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">Choisir Essentiel</a>
+                </article>
+
+                <article class="card pricing-card pricing-card-highlight">
+                    <div class="badge">Recommandé</div>
+                    <h3>Équipe</h3>
+                    <p class="pricing-price">60&nbsp;€ / mois</p>
+                    <p class="pricing-credits">≈ 150 crédits / mois</p>
+                    <ul class="pricing-list">
+                        <li>Jusqu’à 5 utilisateurs</li>
+                        <li>Priorité sur le support</li>
+                        <li>Parfait pour les PME</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full">Choisir Équipe</a>
+                </article>
+
+                <article class="card pricing-card">
+                    <h3>Business</h3>
+                    <p class="pricing-price">150&nbsp;€ / mois</p>
+                    <p class="pricing-credits">≈ 400 crédits / mois</p>
+                    <ul class="pricing-list">
+                        <li>Utilisation multi-départements</li>
+                        <li>Accompagnement onboarding</li>
+                        <li>Rapports d’usage mensuels</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">Choisir Business</a>
+                </article>
+
+                <article class="card pricing-card">
+                    <h3>Sur mesure</h3>
+                    <p class="pricing-price">Sur devis</p>
+                    <p class="pricing-credits">Volumes élevés &amp; intégration</p>
+                    <ul class="pricing-list">
+                        <li>Intégration API ou outils internes</li>
+                        <li>Politique de crédits adaptée</li>
+                        <li>Accompagnement projet</li>
+                    </ul>
+                    <a href="contact.html" class="btn btn-secondary btn-full">Parler d’un projet</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- LANGUES / NIVEAUX -->
+    <section class="section section-alt">
+        <div class="container">
+            <h2>Langues, crédits et niveaux de qualité</h2>
+            <p class="section-intro">
+                Toutes les langues ne demandent pas le même niveau d’exigence. Les crédits reflètent
+                la qualité attendue et le travail de calibration derrière chaque langue.
+            </p>
+
+            <div class="grid grid-3 lang-grid">
+                <article class="card lang-card">
+                    <h3>Langues Premium – 2 crédits</h3>
+                    <p>Rendu natif, expressions usuelles, ton professionnel adapté aux échanges clients.</p>
+                    <ul>
                         <li>Français</li>
                         <li>Anglais (US / UK)</li>
                         <li>Espagnol</li>
@@ -91,13 +239,10 @@
                     </ul>
                 </article>
 
-                <article class="language-card">
+                <article class="card lang-card">
                     <h3>Langues Standard – 1 crédit</h3>
-                    <p>
-                        Excellent rapport précision / coût pour les usages courants
-                        (relances, messages d’information, échanges internes…).
-                    </p>
-                    <ul class="language-list">
+                    <p>Excellent rapport précision / coût pour les usages courants.</p>
+                    <ul>
                         <li>Polonais</li>
                         <li>Roumain</li>
                         <li>Suédois</li>
@@ -109,152 +254,35 @@
                     </ul>
                 </article>
 
-                <article class="language-card">
+                <article class="card lang-card">
                     <h3>Langues en version bêta – 1 crédit</h3>
-                    <p>
-                        Langues disponibles mais encore en cours de réglage fin. Elles sont clairement indiquées
-                        comme «&nbsp;bêta&nbsp;» dans l’interface.
-                    </p>
-                    <ul class="language-list">
+                    <p>Langues disponibles mais encore en cours de réglage fin.</p>
+                    <ul>
                         <li>Certaines langues asiatiques</li>
                         <li>Certains dialectes ou variantes régionales</li>
                         <li>Langues à faible volume d’usage pro</li>
                     </ul>
-                    <p class="language-footnote">
-                        Lorsque le niveau de qualité atteint le standard Premium, la langue sort de la bêta
-                        et bascule dans la grille correspondante.
+                    <p class="lang-note">
+                        Lorsqu’une langue atteint le niveau Premium, elle sort de la bêta et rejoint la
+                        grille correspondante.
                     </p>
                 </article>
             </div>
         </div>
     </section>
 
-    <!-- PACKS DE CRÉDITS -->
-    <section class="pricing-section">
-        <div class="container">
-            <h2 class="section-title">Crédits à l’unité</h2>
-            <p class="section-subtitle">
-                Idéal pour démarrer, tester Camille ou couvrir un besoin ponctuel. Un crédit permet de générer
-                un texte en langue Standard (2 crédits pour une langue Premium).
-            </p>
-
-            <div class="pricing-grid">
-                <article class="pricing-card">
-                    <p class="pricing-label">Pack Découverte</p>
-                    <p class="pricing-price">10&nbsp;€</p>
-                    <p class="pricing-credits">20 crédits</p>
-                    <p class="pricing-note">Parfait pour quelques relances ou messages sensibles.</p>
-                    <ul class="pricing-features">
-                        <li>Sans engagement</li>
-                        <li>Valable sur toutes les langues</li>
-                        <li>Utilisable en mode accompagné ou expert</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Choisir ce pack</a>
-                </article>
-
-                <article class="pricing-card">
-                    <p class="pricing-label">Pack Confort</p>
-                    <p class="pricing-price">30&nbsp;€</p>
-                    <p class="pricing-credits">70 crédits</p>
-                    <p class="pricing-note">Pour un usage régulier sur un ou plusieurs pays.</p>
-                    <ul class="pricing-features">
-                        <li>Crédits mutualisés pour toute l’équipe</li>
-                        <li>Relances, réponses clients, messages internes…</li>
-                        <li>Facture unique, sans frais cachés</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary full-width">Choisir ce pack</a>
-                </article>
-
-                <article class="pricing-card">
-                    <p class="pricing-label">Pack Intensif</p>
-                    <p class="pricing-price">50&nbsp;€</p>
-                    <p class="pricing-credits">130 crédits</p>
-                    <p class="pricing-note">Adapté aux périodes de forte activité.</p>
-                    <ul class="pricing-features">
-                        <li>Volume optimisé pour campagnes multi-pays</li>
-                        <li>Crédits utilisables sur tous les cas d’usage</li>
-                        <li>Idéal avant de basculer sur un abonnement</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Choisir ce pack</a>
-                </article>
-            </div>
-
-            <p class="pricing-footnote">
-                Les crédits ne sont pas expirés brutalement&nbsp;: ils se consomment en priorité avant les
-                nouvelles recharges. Vous gardez toujours la main sur votre volume.
-            </p>
-        </div>
-    </section>
-
-    <!-- ABONNEMENTS MENSUELS -->
-    <section class="pricing-section">
-        <div class="container">
-            <h2 class="section-title">Abonnements mensuels</h2>
-            <p class="section-subtitle">
-                Pour les équipes qui utilisent Camille au quotidien. Les crédits se renouvellent chaque mois
-                et peuvent être combinés avec des packs à l’unité en cas de pic d’activité.
-            </p>
-
-            <div class="pricing-grid pricing-grid-subscriptions">
-                <article class="pricing-card">
-                    <p class="pricing-label">Solo</p>
-                    <p class="pricing-price">30&nbsp;€/mois</p>
-                    <p class="pricing-credits">50 crédits / mois</p>
-                    <ul class="pricing-features">
-                        <li>Pour les indépendants et petites structures</li>
-                        <li>Recouvrement, réponses clients, messages internes</li>
-                        <li>Résiliation possible à tout moment</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Choisir ce forfait</a>
-                </article>
-
-                <article class="pricing-card">
-                    <p class="pricing-label">Équipe</p>
-                    <p class="pricing-price">60&nbsp;€/mois</p>
-                    <p class="pricing-credits">120 crédits / mois</p>
-                    <ul class="pricing-features">
-                        <li>Pour les PME avec plusieurs utilisateurs</li>
-                        <li>Crédits partagés entre les collaborateurs</li>
-                        <li>Support prioritaire par e-mail</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary full-width">Choisir ce forfait</a>
-                </article>
-
-                <article class="pricing-card">
-                    <p class="pricing-label">Business</p>
-                    <p class="pricing-price">100&nbsp;€/mois</p>
-                    <p class="pricing-credits">250 crédits / mois</p>
-                    <ul class="pricing-features">
-                        <li>Pour les équipes recouvrement & commerciales</li>
-                        <li>Suivi dédié de la consommation</li>
-                        <li>Suggestions d’optimisation des flux</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Choisir ce forfait</a>
-                </article>
-
-                <article class="pricing-card">
-                    <p class="pricing-label">Pro+</p>
-                    <p class="pricing-price">150&nbsp;€/mois</p>
-                    <p class="pricing-credits">400 crédits / mois</p>
-                    <ul class="pricing-features">
-                        <li>Pour les réseaux ou groupes multi-pays</li>
-                        <li>Accompagnement à la mise en place des usages</li>
-                        <li>Possibilité d’intégration à vos outils (sur devis)</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Choisir ce forfait</a>
-                </article>
-            </div>
-
-            <div class="pricing-custom">
-                <h3>Volumes importants ou projet d’intégration&nbsp;?</h3>
-                <p>
-                    Pour un volume supérieur, une intégration à vos outils (CRM, logiciel de recouvrement, portail client)
-                    ou un accompagnement spécifique, nous pouvons définir une grille sur-mesure.
+    <!-- CTA FINAL -->
+    <section class="cta-band">
+        <div class="container cta-band-inner">
+            <div>
+                <p class="eyebrow light">Prêt à démarrer&nbsp;?</p>
+                <h2>Chargez quelques crédits et laissez-moi m’occuper de vos textes.</h2>
+                <p class="cta-band-text">
+                    Vous pouvez commencer avec un petit pack, tester les usages qui comptent le plus
+                    pour vous, puis faire évoluer la formule ensuite.
                 </p>
-                <a href="contact.html" class="btn btn-outline-light">
-                    Discuter d’une offre sur devis
-                </a>
             </div>
+            <a href="#" class="btn btn-primary btn-large">Commencer avec 10&nbsp;€</a>
         </div>
     </section>
 </main>
