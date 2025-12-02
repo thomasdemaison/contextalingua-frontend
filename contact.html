@@ -2,92 +2,100 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact – ContextaLingua</title>
-    <meta name="description" content="Contactez ContextaLingua pour une démonstration, des questions sur la plateforme de traduction contextuelle ou un projet spécifique de recouvrement multilingue.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-
-<header class="nav">
-    <div class="logo">Contexta<span>Lingua</span></div>
-    <nav>
-        <a href="produit.html">Produit</a>
-        <a href="tarifs.html">Tarifs</a>
-        <a href="faq.html">FAQ</a>
-        <a href="contact.html">Contact</a>
-    </nav>
-    <div class="nav-actions">
-        <a href="#" class="btn-secondary">Se connecter</a>
-        <a href="#" class="btn-primary">Commencer gratuitement</a>
+<body class="page page-contact">
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="logo">
+            <span class="logo-main">Contexta</span><span class="logo-accent">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="produit.html" class="nav-link">Produit</a>
+            <a href="tarifs.html" class="nav-link">Tarifs</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+            <a href="contact.html" class="nav-link active">Contact</a>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-ghost">Se connecter</a>
+            <a href="#" class="btn btn-primary">Commencer gratuitement</a>
+        </div>
     </div>
 </header>
 
-<section class="hero" style="padding-top:80px;padding-bottom:40px;">
-    <div class="hero-left" style="max-width:60%;">
-        <h1>Entrer en contact avec ContextaLingua.</h1>
-        <p class="subtitle">
-            Une question sur la plateforme ? Un besoin spécifique autour du recouvrement
-            multilingue ou d’un autre domaine (commercial, comptable…) ? Laissez-nous un
-            message, nous revenons vers vous rapidement.
-        </p>
-    </div>
-</section>
+<main>
+    <section class="hero hero-inner">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="hero-content">
+                <p class="eyebrow">Contact</p>
+                <h1>Expliquez-moi votre contexte, je vous réponds en direct.</h1>
+                <p class="hero-subtitle">
+                    Un projet de recouvrement multilingue, une équipe à équiper, une intégration à étudier&nbsp;?
+                    Donnez-moi quelques éléments, je reviens vers vous avec des pistes concrètes.
+                </p>
+            </div>
+        </div>
+    </section>
 
-<section class="features" style="background:#0a1020;">
-    <h2>Formulaire de contact</h2>
-    <div class="feature-grid" style="justify-content:center;">
-        <div class="feature-card" style="max-width:600px;width:100%;">
-            <form>
-                <div style="margin-bottom:15px;">
-                    <label for="name"><strong>Nom / Prénom</strong></label><br>
-                    <input id="name" type="text" placeholder="Votre nom" style="width:100%;padding:10px;border-radius:6px;border:1px solid #20263a;background:#050814;color:#e6e9ee;margin-top:5px;">
-                </div>
-
-                <div style="margin-bottom:15px;">
-                    <label for="company"><strong>Entreprise</strong></label><br>
-                    <input id="company" type="text" placeholder="Nom de votre structure" style="width:100%;padding:10px;border-radius:6px;border:1px solid #20263a;background:#050814;color:#e6e9ee;margin-top:5px;">
-                </div>
-
-                <div style="margin-bottom:15px;">
-                    <label for="email"><strong>Email</strong></label><br>
-                    <input id="email" type="email" placeholder="vous@exemple.com" style="width:100%;padding:10px;border-radius:6px;border:1px solid #20263a;background:#050814;color:#e6e9ee;margin-top:5px;">
-                </div>
-
-                <div style="margin-bottom:15px;">
-                    <label for="topic"><strong>Sujet</strong></label><br>
-                    <select id="topic" style="width:100%;padding:10px;border-radius:6px;border:1px solid #20263a;background:#050814;color:#e6e9ee;margin-top:5px;">
-                        <option>Demande d’information</option>
-                        <option>Demander une démonstration</option>
-                        <option>Projet recouvrement multilingue</option>
-                        <option>Autre besoin (commercial, comptable, support…)</option>
-                    </select>
-                </div>
-
-                <div style="margin-bottom:20px;">
-                    <label for="message"><strong>Message</strong></label><br>
-                    <textarea id="message" rows="5" placeholder="Décrivez votre besoin ou votre projet…" style="width:100%;padding:10px;border-radius:6px;border:1px solid #20263a;background:#050814;color:#e6e9ee;margin-top:5px;"></textarea>
-                </div>
-
-                <button type="submit" class="btn-primary">Envoyer le message</button>
-                <p style="margin-top:10px;font-size:13px;color:#aab1bd;">
-                    Ce formulaire est une première version. La connexion à vos outils (CRM, e-mailing, etc.)
-                    pourra être ajoutée ultérieurement.
+    <section class="section">
+        <div class="container contact-grid">
+            <form class="card contact-form">
+                <h2>Écrire à Camille</h2>
+                <label class="form-field">
+                    <span>Nom / Prénom</span>
+                    <input type="text" name="name" required>
+                </label>
+                <label class="form-field">
+                    <span>Organisation</span>
+                    <input type="text" name="company">
+                </label>
+                <label class="form-field">
+                    <span>E-mail</span>
+                    <input type="email" name="email" required>
+                </label>
+                <label class="form-field">
+                    <span>Objet</span>
+                    <input type="text" name="subject" placeholder="Projet, question, partenariat…">
+                </label>
+                <label class="form-field">
+                    <span>Message</span>
+                    <textarea name="message" rows="6" placeholder="Décrivez votre contexte, vos langues cibles, vos volumes…"></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary btn-full">Envoyer le message</button>
+                <p class="form-note">
+                    Les informations transmises servent uniquement à répondre à votre message.
                 </p>
             </form>
-        </div>
-    </div>
-</section>
 
-<footer class="footer">
-    <p>© 2025 ContextaLingua — Tous droits réservés.</p>
-    <div class="footer-links">
-        <a href="produit.html">Produit</a>
-        <a href="tarifs.html">Tarifs</a>
-        <a href="faq.html">FAQ</a>
-        <a href="contact.html">Contact</a>
+            <aside class="card contact-aside">
+                <h3>Quelques exemples de demandes</h3>
+                <ul class="list-check">
+                    <li>Mise en place d’un flux de recouvrement multilingue</li>
+                    <li>Accompagnement ponctuel sur un dossier sensible</li>
+                    <li>Équipement d’une équipe commerciale ou support</li>
+                    <li>Projet d’intégration avec vos outils internes</li>
+                </ul>
+                <p>
+                    Vous pouvez également me contacter pour discuter d’un partenariat ou d’une offre sur-mesure
+                    pour vos clients.
+                </p>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <p>© 2025 ContextaLingua — Tous droits réservés.</p>
+        <nav class="footer-nav">
+            <a href="produit.html">Produit</a>
+            <a href="tarifs.html">Tarifs</a>
+            <a href="faq.html">FAQ</a>
+            <a href="contact.html">Contact</a>
+        </nav>
     </div>
 </footer>
-
 </body>
 </html>
