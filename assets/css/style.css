@@ -460,3 +460,355 @@ a {
     font-size: 1.4rem;
   }
 }
+/* ===========================
+   PAGE TARIFS
+   =========================== */
+
+.pricing-hero {
+    padding: 80px 0 40px;
+    background: #050915;
+}
+
+.pricing-hero-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 60px;
+}
+
+.pricing-hero-text {
+    max-width: 640px;
+}
+
+.pricing-hero-text h1 {
+    font-size: 2.8rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.pricing-hero-text .lead {
+    font-size: 1.05rem;
+    color: #c5d2ff;
+    margin-bottom: 20px;
+}
+
+.pricing-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    font-size: 0.95rem;
+    color: #8f9bbd;
+}
+
+.pricing-hero-meta span::before {
+    content: "• ";
+    color: #3e8bff;
+}
+
+/* Carte Camille à droite du hero tarifs */
+
+.camille-card--pricing {
+    max-width: 320px;
+}
+
+.camille-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.camille-card-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 2px solid rgba(62,139,255,0.6);
+}
+
+.camille-card-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camille-card-name {
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.camille-card-role {
+    font-size: 0.9rem;
+    color: #9aa5ce;
+    margin: 0;
+}
+
+.camille-card-quote {
+    font-size: 0.95rem;
+    color: #c1caef;
+    margin-bottom: 16px;
+}
+
+/* Sections tarifs */
+
+.pricing-section {
+    padding: 60px 0;
+    background: #050915;
+}
+
+.pricing-section-alt {
+    background: #040814;
+}
+
+.pricing-section h2 {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.section-intro {
+    max-width: 640px;
+    color: #c2cbee;
+    margin-bottom: 32px;
+}
+
+/* Grille des offres */
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.pricing-card {
+    background: #080d1b;
+    border-radius: 18px;
+    padding: 24px 22px 26px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pricing-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pricing-card h3 {
+    font-size: 1.15rem;
+    margin: 0;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 600;
+}
+
+.badge-soft {
+    background: rgba(104, 120, 255, 0.12);
+    color: #c4cbff;
+}
+
+.badge-accent {
+    background: rgba(0, 199, 140, 0.14);
+    color: #5ee1b4;
+}
+
+.pricing-price {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.pricing-price span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #8e99c6;
+}
+
+.pricing-credits {
+    color: #c2cbee;
+    font-size: 0.98rem;
+}
+
+.pricing-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    font-size: 0.95rem;
+    color: #d1d7ff;
+}
+
+.pricing-list li {
+    margin-bottom: 6px;
+    position: relative;
+    padding-left: 16px;
+}
+
+.pricing-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #3e8bff;
+}
+
+.btn-block {
+    width: 100%;
+    text-align: center;
+}
+
+/* Grille "comment fonctionnent les crédits" */
+
+.credits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 26px;
+}
+
+.credits-item {
+    background: #080d1b;
+    border-radius: 18px;
+    padding: 20px 22px 22px;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+.credits-item h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.08rem;
+}
+
+.credits-item p {
+    color: #c6cff5;
+    font-size: 0.95rem;
+}
+
+.credits-note {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #9ea7d4;
+}
+
+/* FAQ tarifs courte */
+
+.pricing-faq {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 22px;
+}
+
+.faq-item {
+    background: #080d1b;
+    border-radius: 16px;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+.faq-item h3 {
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.faq-item p {
+    font-size: 0.95rem;
+    color: #c9d2ff;
+}
+
+/* CTA bas de page (déjà présent mais on s'assure du contraste) */
+
+.cta-section {
+    padding: 40px 0 32px;
+    background: linear-gradient(90deg, #1664ff, #5a5fff);
+}
+
+.cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.cta-text h2 {
+    font-size: 1.5rem;
+    max-width: 640px;
+    color: #ffffff;
+}
+
+.eyebrow-light {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(222,230,255,0.85);
+    margin-bottom: 6px;
+}
+
+.btn-light {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #0b1020;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+.btn-light:hover {
+    background: #f4f6ff;
+    color: #050915;
+}
+
+/* RESPONSIVE TARIFS */
+
+@media (max-width: 1024px) {
+    .pricing-hero-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pricing-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .credits-grid,
+    .pricing-faq {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pricing-hero-text h1 {
+        font-size: 2.2rem;
+    }
+
+    .cta-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cta-actions {
+        width: 100%;
+    }
+
+    .btn-light {
+        width: 100%;
+        justify-content: center;
+    }
+}
