@@ -2,143 +2,195 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produit – ContextaLingua</title>
-    <meta name="description" content="Découvrez ContextaLingua : une plateforme de traduction contextuelle professionnelle avec Camille, assistante IA. Deux modes d’utilisation, groupes de langues, gestion par crédits.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-
-<header class="nav">
-    <div class="logo">Contexta<span>Lingua</span></div>
-    <nav>
-        <a href="produit.html">Produit</a>
-        <a href="tarifs.html">Tarifs</a>
-        <a href="faq.html">FAQ</a>
-        <a href="contact.html">Contact</a>
-    </nav>
-    <div class="nav-actions">
-        <a href="#" class="btn-secondary">Se connecter</a>
-        <a href="#" class="btn-primary">Commencer gratuitement</a>
+<body class="page page-produit">
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="logo">
+            <span class="logo-main">Contexta</span><span class="logo-accent">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="produit.html" class="nav-link active">Produit</a>
+            <a href="tarifs.html" class="nav-link">Tarifs</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-ghost">Se connecter</a>
+            <a href="#" class="btn btn-primary">Commencer gratuitement</a>
+        </div>
     </div>
 </header>
 
-<section class="hero" style="padding-top:80px;padding-bottom:60px;">
-    <div class="hero-left" style="max-width:60%;">
-        <h1>Le gestionnaire de recouvrement multilingue, piloté par Camille.</h1>
-        <p class="subtitle">
-            ContextaLingua vous aide à rédiger des relances, mises en demeure et messages de suivi
-            dans la langue de votre client, avec le bon niveau de fermeté et de courtoisie.
-            Aujourd’hui centré sur le recouvrement, demain extensible aux domaines commercial,
-            comptable et administratif.
-        </p>
-        <div class="hero-buttons">
-            <a href="#" class="btn-primary">Essayer le mode accompagné</a>
-            <a href="#" class="btn-outline">Tester le mode expert</a>
-        </div>
-    </div>
-</section>
+<main>
+    <!-- HERO PRODUIT -->
+    <section class="hero hero-inner">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <p class="eyebrow">Produit</p>
+                <h1>Deux façons de travailler avec moi, pour des textes qui sonnent juste.</h1>
+                <p class="hero-subtitle">
+                    Que vous soyez à l’aise à l’écrit ou non, je vous aide à formuler des messages clairs,
+                    naturels et adaptés à votre relation client. Vous choisissez le mode qui vous convient,
+                    je m’occupe du reste.
+                </p>
+                <div class="hero-actions">
+                    <a href="tarifs.html" class="btn btn-primary">Voir les formules</a>
+                    <a href="#modes" class="btn btn-secondary">Découvrir les modes d’utilisation</a>
+                </div>
+            </div>
 
-<section class="features" style="background:#0a1020;">
-    <h2>Deux modes pour s’adapter à tous les profils</h2>
-    <div class="feature-grid">
-        <div class="feature-card">
-            <h3>Mode accompagné</h3>
-            <p>
-                Camille vous pose les bonnes questions : objectif de la relance, contexte,
-                relation avec le client, montant, historique des échanges, ton souhaité.
-                Vous répondez simplement, et elle construit un message professionnel, nuancé
-                et adapté à la culture de votre interlocuteur.
-            </p>
+            <aside class="camille-card">
+                <div class="camille-photo-wrapper">
+                    <img src="assets/img/camille.png" alt="Camille, votre assistante multilingue"
+                         class="camille-photo">
+                </div>
+                <div class="camille-text">
+                    <h3>Camille</h3>
+                    <p class="camille-role">Votre assistante multilingue</p>
+                    <p class="camille-quote">
+                        « Je vous aide à adapter vos messages à votre contexte métier, à votre interlocuteur
+                        et au niveau de fermeté ou de proximité que vous souhaitez. »
+                    </p>
+                </div>
+            </aside>
         </div>
-        <div class="feature-card">
-            <h3>Mode expert</h3>
-            <p>
-                Vous renseignez directement des champs structurés : contexte, ton, langue,
-                type de document (rappel, relance ferme, mise en demeure, négociation),
-                contraintes juridiques ou commerciales. En un clic, vous obtenez le texte final.
-            </p>
-        </div>
-        <div class="feature-card">
-            <h3>Guidage contextuel</h3>
-            <p>
-                Dans les deux modes, le moteur se base sur votre métier, vos règles de relance
-                et les usages du pays ciblé. Le but : rester ferme sur les enjeux de paiement
-                sans détériorer la relation client.
-            </p>
-        </div>
-    </div>
-</section>
+    </section>
 
-<section class="features">
-    <h2>Groupes de langues & qualité du rendu</h2>
-    <div class="feature-grid">
-        <div class="feature-card">
-            <h3>Groupes A / B / C – 2 crédits</h3>
-            <p>
-                Ces langues bénéficient d’un niveau natif, avec des expressions usuelles
-                et commerciales parfaitement maîtrisées. Idéales pour les relances importantes,
-                les dossiers sensibles ou les clients stratégiques. Chaque génération consomme
-                2 crédits.
+    <!-- MODES D’UTILISATION -->
+    <section id="modes" class="section">
+        <div class="container">
+            <h2>Deux modes d’utilisation, pour tous les profils</h2>
+            <p class="section-intro">
+                Vous pouvez alterner librement entre les modes. L’idée : vous garder la main sur le fond,
+                je vous aide à travailler la forme.
             </p>
-        </div>
-        <div class="feature-card">
-            <h3>Autres langues – 1 crédit</h3>
-            <p>
-                Les langues hors groupes A/B/C restent disponibles avec un rendu standard.
-                Elles sont parfaites pour des messages simples, des rappels courants ou des
-                échanges non critiques. Chaque génération consomme 1 crédit.
-            </p>
-        </div>
-        <div class="feature-card">
-            <h3>Langues en Bêta</h3>
-            <p>
-                Certaines langues sont taguées « Bêta » : la qualité est déjà exploitable
-                mais encore en amélioration. Elles fonctionnent au même coût qu’une langue
-                standard (1 crédit) et sont clairement indiquées dans l’interface.
-            </p>
-        </div>
-    </div>
-</section>
 
-<section class="features" style="background:#0a1020;">
-    <h2>Un flux de travail simple, en 3 étapes</h2>
-    <div class="feature-grid">
-        <div class="feature-card">
-            <h3>1. Choisir le type de document</h3>
-            <p>
-                Relance simple, relance ferme, mise en demeure, négociation de délais, message
-                de suivi… Vous sélectionnez le format adapté à votre situation.
-            </p>
-        </div>
-        <div class="feature-card">
-            <h3>2. Décrire le contexte</h3>
-            <p>
-                Mode accompagné : Camille vous interroge. Mode expert : vous remplissez
-                directement les champs. Le moteur comprend le contexte réel : enjeux, délais,
-                historique, sensibilité du dossier.
-            </p>
-        </div>
-        <div class="feature-card">
-            <h3>3. Générer, ajuster, envoyer</h3>
-            <p>
-                Vous obtenez une première version en quelques secondes. Vous pouvez la retoucher,
-                demander une variante plus ferme ou plus conciliante, puis l’intégrer dans vos
-                outils (mail, CRM, portail client…).
-            </p>
-        </div>
-    </div>
-</section>
+            <div class="grid grid-2">
+                <article class="card feature-card">
+                    <h3>Mode accompagné</h3>
+                    <p>
+                        Je vous pose quelques questions simples&nbsp;: qui est votre interlocuteur, quel est
+                        votre objectif, quel ton souhaitez-vous adopter, quels éléments ne doivent surtout
+                        pas être oubliés…
+                    </p>
+                    <p>
+                        Vous répondez comme vous parleriez à un collègue. À partir de vos réponses, je
+                        génère un message prêt à envoyer, dans la langue choisie, avec un style adapté
+                        (ferme mais respectueux, cordial, rassurant, etc.).
+                    </p>
+                    <ul class="list-check">
+                        <li>Idéal pour les relances sensibles ou stratégiques</li>
+                        <li>Parfait si vous manquez de temps ou d’aisance à l’écrit</li>
+                        <li>Historique des échanges pour suivre vos demandes</li>
+                    </ul>
+                </article>
 
-<footer class="footer">
-    <p>© 2025 ContextaLingua — Tous droits réservés.</p>
-    <div class="footer-links">
-        <a href="produit.html">Produit</a>
-        <a href="tarifs.html">Tarifs</a>
-        <a href="faq.html">FAQ</a>
-        <a href="contact.html">Contact</a>
+                <article class="card feature-card">
+                    <h3>Mode expert</h3>
+                    <p>
+                        Vous préférez aller droit au but&nbsp;? Le mode expert vous permet de renseigner
+                        directement des champs structurés&nbsp;: contexte, langue, ton, contraintes,
+                        références, éléments à citer…
+                    </p>
+                    <p>
+                        Je génère ensuite la version finale que vous pouvez ajuster au besoin, puis
+                        reutiliser comme modèle pour vos prochaines demandes.
+                    </p>
+                    <ul class="list-check">
+                        <li>Entrée rapide via des champs structurés</li>
+                        <li>Idéal pour les équipes habituées aux modèles</li>
+                        <li>Compatible avec des volumes importants de textes</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- CAS D’USAGE -->
+    <section class="section section-alt">
+        <div class="container">
+            <h2>Des cas d’usage concrets, bien au-delà de la simple traduction</h2>
+            <p class="section-intro">
+                Je m’adapte à vos besoins, qu’il s’agisse d’un message ponctuel ou d’un flux régulier
+                de communications multilingues.
+            </p>
+
+            <div class="grid grid-3">
+                <article class="card feature-card">
+                    <h3>Recouvrement &amp; finance</h3>
+                    <p>
+                        Relances de factures, mises en demeure, négociation de délais, messages de suivi&nbsp;:
+                        des formulations fermes mais respectueuses, dans la langue et la culture de vos clients.
+                    </p>
+                </article>
+
+                <article class="card feature-card">
+                    <h3>Relations commerciales</h3>
+                    <p>
+                        Réponses clients, propositions commerciales, relances de devis ou d’offres,
+                        annonces de hausse de tarifs&nbsp;: je vous aide à rester ferme sur le fond, tout en
+                        restant élégant sur la forme.
+                    </p>
+                </article>
+
+                <article class="card feature-card">
+                    <h3>Support &amp; administratif</h3>
+                    <p>
+                        Messages d’information, confirmations, demandes de pièces, rappels contractuels
+                        ou communications internes&nbsp;: un style clair, professionnel et respectueux.
+                    </p>
+                </article>
+
+                <article class="card feature-card">
+                    <h3>Contrats light &amp; documents sensibles</h3>
+                    <p>
+                        Clauses simples, accords de principe, avenants, résumés de contrats&nbsp;: je vous aide
+                        à formuler proprement, tout en gardant l’esprit que ce n’est pas un conseil juridique.
+                    </p>
+                </article>
+
+                <article class="card feature-card">
+                    <h3>Autres usages</h3>
+                    <p>
+                        Messages RH, achats, communication interne, comptes rendus, présentations… Dès lors
+                        qu’il ne s’agit pas de conseil réglementaire, je peux vous aider à clarifier et
+                        adapter vos textes.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="cta-band">
+        <div class="container cta-band-inner">
+            <div>
+                <p class="eyebrow light">Prêt à tester le produit&nbsp;?</p>
+                <h2>Créez votre espace et laissez-moi m’occuper de vos textes.</h2>
+                <p class="cta-band-text">
+                    Testez quelques cas d’usage, comparez avec vos messages actuels et voyez comment
+                    vos textes gagnent en clarté, en naturel et en impact.
+                </p>
+            </div>
+            <a href="#" class="btn btn-primary btn-large">Commencer gratuitement</a>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <p>© 2025 ContextaLingua — Tous droits réservés.</p>
+        <nav class="footer-nav">
+            <a href="produit.html">Produit</a>
+            <a href="tarifs.html">Tarifs</a>
+            <a href="faq.html">FAQ</a>
+            <a href="contact.html">Contact</a>
+        </nav>
     </div>
 </footer>
-
 </body>
 </html>
