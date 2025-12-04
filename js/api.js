@@ -1,16 +1,21 @@
 // js/api.js
+// ------------------------
+// Config API
+// ------------------------
+const API_BASE_URL = "http://localhost:4000/api";
 
-const API_BASE_URL = "http://localhost:4000/api"; // adapter quand tu déploieras l'API
-
-export async function apiRequest(endpoint, method = "GET", data = null, auth = false) {
+// ------------------------
+// Fonctions utilitaires
+// ------------------------
+async function apiRequest(endpoint, method = "GET", data = null, requireAuth = false) {
     const headers = { "Content-Type": "application/json" };
 
-    if (auth) {
+    if (requireAuth) {
         const token = localStorage.getItem("token");
         if (!token) {
-            const error = new Error("Authentification requise.");
-            error.status = 401;
-            throw error;
+            const err = new Error("Authentification requise.");
+            err.status = 401;
+            throw err;
         }
         headers["Authorization"] = `Bearer ${token}`;
     }
@@ -25,11 +30,11 @@ export async function apiRequest(endpoint, method = "GET", data = null, auth = f
     try {
         payload = await response.json();
     } catch {
-        // pas grave, on gère plus bas
+        // pas de body JSON, on laisse payload à null
     }
 
     if (!response.ok) {
-        const message = payload && payload.message ? payload.message : `HTTP ${response.status}`;
+        const message = payload && payload.message ? payload.message : `Erreur HTTP ${response.status}`;
         const err = new Error(message);
         err.status = response.status;
         throw err;
@@ -38,17 +43,17 @@ export async function apiRequest(endpoint, method = "GET", data = null, auth = f
     return payload;
 }
 
-export function saveAuth(token, user) {
+function saveAuth(token, user) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 }
 
-export function clearAuth() {
+function clearAuth() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 }
 
-export function getCurrentUser() {
+function getCurrentUser() {
     const raw = localStorage.getItem("user");
     if (!raw) return null;
     try {
