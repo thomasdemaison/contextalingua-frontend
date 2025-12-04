@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Interprétation ContextaLingua</title>
+</head>
+<body>
+  <h2>Camille — Interprétation</h2>
+
+  <textarea id="inputText" placeholder="Message reçu à analyser..." rows="6" cols="60"></textarea><br>
+  <input id="explanationLanguage" placeholder="Langue d'explication (ex: fr, en)" value="fr"><br>
+  <input id="context" placeholder="Contexte"><br>
+  <input id="recipientRole" placeholder="Votre rôle"><br>
+
+  <button id="sendBtn">Interpréter</button>
+
+  <hr>
+  <h3>Résultat :</h3>
+  <pre id="outputText"></pre>
+
+  <script type="module">
+    import { apiRequest } from "./js/api.js";
+
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const result = await apiRequest(
+        "/ai/interpret",
+        "POST",
+        {
+          inputText: document.getElementById("inputText").value,
+          explanationLanguage: document.getElementById("explanationLanguage").value,
+          context: document.getElementById("context").value,
+          recipientRole: document.getElementById("recipientRole").value
+        },
+        true
+      );
+
+      document.getElementById("outputText").textContent = result.outputText;
+    });
+  </script>
+</body>
+</html>
