@@ -53,6 +53,10 @@
                 </ul>
             </div>
 
+<h3 style="margin-top:30px;">Dernières opérations de crédits</h3>
+<div id="creditHistory">Chargement en cours...</div>
+
+            
             <!-- Carte ADMIN (sera affichée seulement si role === 'admin') -->
             <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
                 <h3 style="margin-bottom: 10px; color: var(--text-strong);">
@@ -87,6 +91,16 @@
                 </form>
             </div>
         </div>
+
+<div id="adminSection" style="display:none; margin-top:40px;">
+    <h3>⚙️ Administration – Gestion des crédits</h3>
+    <div style="margin-top:15px;">
+        <input type="email" id="creditUserEmail" placeholder="Email utilisateur" style="padding:8px;">
+        <input type="number" id="creditAmount" placeholder="Montant" style="padding:8px; width:100px;">
+        <button class="btn-primary" onclick="addCreditsToUser()">Ajouter des crédits</button>
+    </div>
+</div>
+        
     </section>
 </main>
 
