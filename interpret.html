@@ -1,41 +1,78 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="page">
 <head>
-  <meta charset="UTF-8">
-  <title>Interprétation ContextaLingua</title>
+    <meta charset="UTF-8">
+    <title>Interprétation – ContextaLingua</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <h2>Camille — Interprétation</h2>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="header-logo">
+            <span class="contexta">Contexta</span><span class="lingua">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+            <a href="generate.html" class="nav-link">Rédaction</a>
+            <a href="interpret.html" class="nav-link active">Interprétation</a>
+        </nav>
+        <div class="header-actions">
+            <span id="headerUserEmail" style="font-size:0.9rem; color: var(--text-muted);"></span>
+            <a href="#" class="btn btn-ghost" data-logout>Déconnexion</a>
+        </div>
+    </div>
+</header>
 
-  <textarea id="inputText" placeholder="Message reçu à analyser..." rows="6" cols="60"></textarea><br>
-  <input id="explanationLanguage" placeholder="Langue d'explication (ex: fr, en)" value="fr"><br>
-  <input id="context" placeholder="Contexte"><br>
-  <input id="recipientRole" placeholder="Votre rôle"><br>
+<main>
+    <section class="hero">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="card">
+                <h2 style="margin-bottom: 8px; color: var(--text-strong);">Camille — Mode interprétation</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
+                    Collez un message reçu pour en comprendre le sens, le ton et les implicites, dans la langue de votre choix.
+                </p>
 
-  <button id="sendBtn">Interpréter</button>
+                <div class="form-field">
+                    <span>Message reçu à analyser</span>
+                    <textarea id="intInputText" rows="6" placeholder="Collez ici l’email ou le message reçu…"></textarea>
+                </div>
 
-  <hr>
-  <h3>Résultat :</h3>
-  <pre id="outputText"></pre>
+                <div class="form-field">
+                    <span>Langue d’explication</span>
+                    <input id="intExplanationLanguage" placeholder="fr, en…" value="fr">
+                </div>
 
-  <script type="module">
-    import { apiRequest } from "./js/api.js";
+                <div class="form-field">
+                    <span>Contexte</span>
+                    <input id="intContext" placeholder="Relation avec l’expéditeur, situation…">
+                </div>
 
-    document.getElementById("sendBtn").addEventListener("click", async () => {
-      const result = await apiRequest(
-        "/ai/interpret",
-        "POST",
-        {
-          inputText: document.getElementById("inputText").value,
-          explanationLanguage: document.getElementById("explanationLanguage").value,
-          context: document.getElementById("context").value,
-          recipientRole: document.getElementById("recipientRole").value
-        },
-        true
-      );
+                <div class="form-field">
+                    <span>Votre rôle</span>
+                    <input id="intRecipientRole" placeholder="Dirigeant, consultant, responsable achat…">
+                </div>
 
-      document.getElementById("outputText").textContent = result.outputText;
-    });
-  </script>
+                <p id="intError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
+
+                <button id="intSubmit" class="btn btn-primary">Interpréter le message</button>
+
+                <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">Analyse de Camille</h3>
+                <pre id="intOutput" style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617; border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"></pre>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav">
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</footer>
+
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/interpret.js"></script>
 </body>
 </html>
