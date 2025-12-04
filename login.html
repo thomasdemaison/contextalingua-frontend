@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - ContextaLingua</title>
+</head>
+<body>
+    <h2>Connexion</h2>
+
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="password" id="password" placeholder="Mot de passe" required><br>
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <p id="errorMessage" style="color:red"></p>
+
+    <script type="module">
+        import { apiRequest } from "./js/api.js";
+
+        const form = document.getElementById("loginForm");
+        const error = document.getElementById("errorMessage");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            error.textContent = "";
+
+            try {
+                const data = await apiRequest(
+                    "/auth/login",
+                    "POST",
+                    {
+                        email: document.getElementById("email").value,
+                        password: document.getElementById("password").value
+                    }
+                );
+
+                // Store token + user
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                // Redirect
+                window.location.href = "dashboard.html";
+
+            } catch (err) {
+                error.textContent = "Échec de connexion.";
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
