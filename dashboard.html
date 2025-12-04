@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de Bord</title>
+</head>
+<body>
+
+  <h2>Tableau de bord</h2>
+
+  <div>
+    <p>Crédits restants : <span id="creditBalance">...</span></p>
+    <button onclick="window.location.href='generate.html'">✍ Rédaction</button>
+    <button onclick="window.location.href='interpret.html'">🔎 Interprétation</button>
+  </div>
+
+  <script type="module">
+    import { apiRequest } from "./js/api.js";
+
+    async function loadBalance() {
+      try {
+        const data = await apiRequest("/credits/balance", "GET", null, true);
+        document.getElementById("creditBalance").textContent = data.creditBalance;
+      } catch (e) {
+        alert("Session expirée — reconnectez-vous.");
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+    }
+
+    loadBalance();
+  </script>
+</body>
+</html>
