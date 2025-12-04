@@ -26,7 +26,7 @@
 <main>
     <section class="hero">
         <div class="container hero-grid hero-grid-simple">
-            <!-- Carte utilisateur "classique" -->
+            <!-- Carte utilisateur -->
             <div class="card" style="margin-bottom: 20px;">
                 <h2 style="margin-bottom: 10px; color: var(--text-strong);">Votre espace</h2>
                 <p style="color: var(--text-muted); font-size: 0.95rem;">
@@ -35,7 +35,7 @@
 
                 <div style="margin-top: 16px;">
                     <p style="font-size: 1.1rem;">
-                        Crédits disponibles : <strong id="creditBalance">...</strong>
+                        Crédits disponibles : <strong id="creditBalance">Chargement…</strong>
                     </p>
                 </div>
 
@@ -53,7 +53,7 @@
                 </ul>
             </div>
 
-            <!-- Carte ADMIN (masquée par défaut, affichée si role === 'admin') -->
+            <!-- Carte ADMIN (sera affichée seulement si role === 'admin') -->
             <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
                 <h3 style="margin-bottom: 10px; color: var(--text-strong);">
                     Administration – Gestion des crédits
