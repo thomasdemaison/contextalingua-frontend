@@ -1,0 +1,75 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="fr" class="page">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer un compte – ContextaLingua</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="header-logo">
+            <span class="contexta">Contexta</span><span class="lingua">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="produit.html" class="nav-link">Produit</a>
+            <a href="tarifs.html" class="nav-link">Tarifs</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+        </nav>
+        <div class="header-actions">
+            <a href="login.html" class="btn btn-ghost">Se connecter</a>
+            <a href="register.html" class="btn btn-primary">Commencer gratuitement</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="card" style="max-width: 460px; margin: 0 auto;">
+                <h2 style="margin-bottom: 12px; color: var(--text-strong);">Créer un compte</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                    Quelques secondes suffisent pour commencer à utiliser Camille.
+                </p>
+
+                <form id="registerForm">
+                    <div class="form-field">
+                        <span>Email</span>
+                        <input type="email" id="registerEmail" required placeholder="vous@exemple.com">
+                    </div>
+                    <div class="form-field">
+                        <span>Mot de passe</span>
+                        <input type="password" id="registerPassword" required placeholder="Choisissez un mot de passe">
+                    </div>
+                    <div class="form-field">
+                        <span>Langue préférée</span>
+                        <input type="text" id="registerLanguage" placeholder="fr, en…" value="fr">
+                    </div>
+
+                    <p id="registerError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
+
+                    <button type="submit" class="btn btn-primary btn-full">Créer mon compte</button>
+                </form>
+
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-muted);">
+                    Vous avez déjà un compte ?
+                    <a href="login.html" style="color: var(--accent-strong);">Se connecter</a>
+                </p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav">
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</footer>
+
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>
