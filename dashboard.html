@@ -35,7 +35,7 @@
 
                 <div style="margin-top: 16px;">
                     <p style="font-size: 1.1rem;">
-                        Crédits disponibles : <strong id="creditBalance">Chargement…</strong>
+                        Crédits disponibles : <strong id="creditBalance">…</strong>
                     </p>
                 </div>
 
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <!-- Carte "dernières opérations" -->
+            <!-- Carte opérations -->
             <div class="card">
                 <h3 style="margin-bottom: 10px; color: var(--text-strong);">Dernières opérations de crédits</h3>
                 <ul id="transactionsList" style="font-size: 0.9rem; color: var(--text-muted);">
@@ -53,33 +53,29 @@
                 </ul>
             </div>
 
-<h3 style="margin-top:30px;">Dernières opérations de crédits</h3>
-<div id="creditHistory">Chargement en cours...</div>
-
-            
-            <!-- Carte ADMIN (sera affichée seulement si role === 'admin') -->
+            <!-- Carte ADMIN -->
             <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
                 <h3 style="margin-bottom: 10px; color: var(--text-strong);">
                     Administration – Gestion des crédits
                 </h3>
                 <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px;">
-                    Depuis cet espace, vous pouvez ajuster les crédits d’un utilisateur, y compris votre propre compte.
+                    Ajustez les crédits d’un utilisateur, y compris votre propre compte.
                 </p>
 
                 <form id="adminCreditForm">
                     <div class="form-field">
-                        <span>Email de l’utilisateur à créditer</span>
+                        <span>Email de l’utilisateur</span>
                         <input type="email" id="adminEmail" placeholder="utilisateur@exemple.com" required>
                     </div>
 
                     <div class="form-field">
-                        <span>Montant de crédits</span>
-                        <input type="number" id="adminAmount" placeholder="Ex : 20 (ou -10 pour retirer)" required>
+                        <span>Montant de crédits (positif ou négatif)</span>
+                        <input type="number" id="adminAmount" placeholder="Ex : 20 ou -10" required>
                     </div>
 
                     <div class="form-field">
                         <span>Motif (optionnel)</span>
-                        <input type="text" id="adminDescription" placeholder="Offre promotionnelle, ajustement, test…">
+                        <input type="text" id="adminDescription" placeholder="Offre, ajustement, test…">
                     </div>
 
                     <p id="adminMessage"
@@ -91,16 +87,6 @@
                 </form>
             </div>
         </div>
-
-<div id="adminSection" style="display:none; margin-top:40px;">
-    <h3>⚙️ Administration – Gestion des crédits</h3>
-    <div style="margin-top:15px;">
-        <input type="email" id="creditUserEmail" placeholder="Email utilisateur" style="padding:8px;">
-        <input type="number" id="creditAmount" placeholder="Montant" style="padding:8px; width:100px;">
-        <button class="btn-primary" onclick="addCreditsToUser()">Ajouter des crédits</button>
-    </div>
-</div>
-        
     </section>
 </main>
 
@@ -113,7 +99,8 @@
     </div>
 </footer>
 
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/dashboard.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>
