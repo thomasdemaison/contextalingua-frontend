@@ -1,37 +1,44 @@
 // js/dashboard.js
 
+// On attend que le DOM soit prêt
 document.addEventListener("DOMContentLoaded", () => {
-    loadDashboard();
+    initDashboard();
 });
 
-async function loadDashboard() {
+async function initDashboard() {
     try {
-        // 1. Récupérer l'utilisateur authentifié
+        // 1) Vérifier qu'on a un token
+        const token = localStorage.getItem("token");
+        if (!token) {
+            // pas connecté → retour login
+            window.location.href = "login.html";
+            return;
+        }
+
+        // 2) Récupérer l'utilisateur courant via /auth/me
         const me = await apiRequest("/auth/me", "GET", null, true);
         const user = me.user;
 
-        // mettre à jour le localStorage avec les infos à jour
-        const token = localStorage.getItem("token");
-        if (token && user) {
-            saveAuth(token, user);
+        // Sauvegarde à jour dans le localStorage
+        saveAuth(token, user);
+
+        // Mise à jour de l’email dans le header
+        const headerEl = document.getElementById("headerUserEmail");
+        if (headerEl && user.email) {
+            headerEl.textContent = user.email;
         }
 
-        // 2. Afficher le solde de crédits
-        const balanceEl = document.getElementById("creditBalance");
-        if (balanceEl && typeof user.creditBalance === "number") {
-            balanceEl.textContent = user.creditBalance;
-        } else if (balanceEl) {
-            balanceEl.textContent = "—";
-        }
+        // 3) Afficher le solde de crédits via /credits/balance
+        await loadCreditBalance();
 
-        // 3. Charger les dernières opérations de crédits (si endpoint dispo)
+        // 4) Afficher les dernières opérations
         await loadCreditTransactions();
 
-        // 4. Activer le panneau admin si besoin
+        // 5) Activer le panneau admin si rôle = admin
         setupAdminPanel(user);
 
     } catch (err) {
-        console.error("Erreur dashboard :", err);
+        console.error("Erreur initDashboard :", err);
         if (err.status === 401) {
             clearAuth();
             window.location.href = "login.html";
@@ -39,15 +46,39 @@ async function loadDashboard() {
     }
 }
 
+// ------------------------------------
+// Solde de crédits
+// ------------------------------------
+async function loadCreditBalance() {
+    const el = document.getElementById("creditBalance");
+    if (!el) return;
+
+    try {
+        const data = await apiRequest("/credits/balance", "GET", null, true);
+        if (typeof data.creditBalance === "number") {
+            el.textContent = data.creditBalance;
+        } else {
+            el.textContent = "—";
+        }
+    } catch (err) {
+        console.error("Erreur /credits/balance :", err);
+        el.textContent = "—";
+    }
+}
+
+// ------------------------------------
+// Transactions / opérations récentes
+// ------------------------------------
 async function loadCreditTransactions() {
     const listEl = document.getElementById("transactionsList");
     if (!listEl) return;
 
     try {
-        const data = await apiRequest("/credits/transactions", "GET", null, true);
+        const data = await apiRequest("/credits/transactions?limit=5", "GET", null, true);
         const transactions = data.transactions || [];
 
         listEl.innerHTML = "";
+
         if (!transactions.length) {
             const li = document.createElement("li");
             li.textContent = "Aucune opération récente.";
@@ -62,7 +93,7 @@ async function loadCreditTransactions() {
             listEl.appendChild(li);
         });
     } catch (err) {
-        console.error("Erreur chargement transactions :", err);
+        console.error("Erreur /credits/transactions :", err);
         listEl.innerHTML = "";
         const li = document.createElement("li");
         li.textContent = "Impossible de charger les opérations.";
@@ -70,10 +101,14 @@ async function loadCreditTransactions() {
     }
 }
 
+// ------------------------------------
+// Panneau Admin : ajustement des crédits
+// ------------------------------------
 function setupAdminPanel(user) {
     const adminPanel = document.getElementById("adminPanel");
     if (!adminPanel) return;
 
+    // Si pas admin → panneau masqué
     if (!user || user.role !== "admin") {
         adminPanel.style.display = "none";
         return;
@@ -83,7 +118,6 @@ function setupAdminPanel(user) {
 
     const form = document.getElementById("adminCreditForm");
     const msg = document.getElementById("adminMessage");
-
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
@@ -96,6 +130,7 @@ function setupAdminPanel(user) {
         const email = document.getElementById("adminEmail").value.trim();
         const amountStr = document.getElementById("adminAmount").value;
         const description = document.getElementById("adminDescription").value.trim();
+
         const amount = Number(amountStr);
 
         if (!email || Number.isNaN(amount) || amount === 0) {
@@ -106,7 +141,7 @@ function setupAdminPanel(user) {
             return;
         }
 
-        try:
+        try {
             const result = await apiRequest(
                 "/admin/credits/grant",
                 "POST",
@@ -119,7 +154,7 @@ function setupAdminPanel(user) {
                 msg.style.color = "#4ade80";
             }
 
-            // si on se crédite soi-même, on met à jour l'affichage
+            // Si tu t'es crédité toi-même, on rafraîchit le solde
             const currentUser = getCurrentUser();
             if (currentUser && currentUser.email === email) {
                 const balanceEl = document.getElementById("creditBalance");
@@ -128,7 +163,7 @@ function setupAdminPanel(user) {
                 }
             }
         } catch (err) {
-            console.error("Erreur admin/credits/grant :", err);
+            console.error("Erreur /admin/credits/grant :", err);
             if (err.status === 401) {
                 clearAuth();
                 window.location.href = "login.html";
