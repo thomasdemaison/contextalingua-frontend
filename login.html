@@ -1,52 +1,70 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="page">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion - ContextaLingua</title>
+    <title>Connexion – ContextaLingua</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <h2>Connexion</h2>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="header-logo">
+            <span class="contexta">Contexta</span><span class="lingua">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="produit.html" class="nav-link">Produit</a>
+            <a href="tarifs.html" class="nav-link">Tarifs</a>
+            <a href="faq.html" class="nav-link">FAQ</a>
+        </nav>
+        <div class="header-actions">
+            <a href="login.html" class="btn btn-ghost">Se connecter</a>
+            <a href="register.html" class="btn btn-primary">Commencer gratuitement</a>
+        </div>
+    </div>
+</header>
 
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Mot de passe" required><br>
-        <button type="submit">Se connecter</button>
-    </form>
+<main>
+    <section class="hero">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="card" style="max-width: 460px; margin: 0 auto;">
+                <h2 style="margin-bottom: 12px; color: var(--text-strong);">Connexion</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                    Accédez à votre espace ContextaLingua.
+                </p>
 
-    <p id="errorMessage" style="color:red"></p>
+                <form id="loginForm">
+                    <div class="form-field">
+                        <span>Email</span>
+                        <input type="email" id="loginEmail" required placeholder="vous@exemple.com">
+                    </div>
+                    <div class="form-field">
+                        <span>Mot de passe</span>
+                        <input type="password" id="loginPassword" required placeholder="Votre mot de passe">
+                    </div>
 
-    <script type="module">
-        import { apiRequest } from "./js/api.js";
+                    <p id="loginError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
 
-        const form = document.getElementById("loginForm");
-        const error = document.getElementById("errorMessage");
+                    <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+                </form>
 
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            error.textContent = "";
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-muted);">
+                    Pas encore de compte ?
+                    <a href="register.html" style="color: var(--accent-strong);">Créer un compte</a>
+                </p>
+            </div>
+        </div>
+    </section>
+</main>
 
-            try {
-                const data = await apiRequest(
-                    "/auth/login",
-                    "POST",
-                    {
-                        email: document.getElementById("email").value,
-                        password: document.getElementById("password").value
-                    }
-                );
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav">
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</footer>
 
-                // Store token + user
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-
-                // Redirect
-                window.location.href = "dashboard.html";
-
-            } catch (err) {
-                error.textContent = "Échec de connexion.";
-                console.error(err);
-            }
-        });
-    </script>
+<script type="module" src="js/auth.js"></script>
 </body>
 </html>
