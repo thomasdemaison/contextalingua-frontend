@@ -1,115 +1,143 @@
-// -------------------------
-// Dashboard.js (Frontend)
-// -------------------------
+// js/dashboard.js
 
-const API_URL = "http://localhost:4000/api";
-
-// Vérifier connexion et récupérer profil
-document.addEventListener("DOMContentLoaded", async () => {
-    console.log("📌 Dashboard chargé");
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-        console.warn("⚠ Aucun token → redirection vers login");
-        window.location.href = "login.html";
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/auth/me`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-        console.log("👤 Profil utilisateur :", data);
-
-        if (!data.user) {
-            console.warn("⚠ Token expiré ou invalide");
-            window.location.href = "login.html";
-            return;
-        }
-
-        // 👉 Affichage du solde de crédits
-        document.getElementById("creditBalance").textContent = data.user.creditBalance;
-
-        // 👉 Si ADMIN → afficher panneau admin
-        if (data.user.role === "admin") {
-            document.getElementById("adminSection").style.display = "block";
-        }
-
-        loadCreditHistory();
-
-    } catch (err) {
-        console.error("❌ Erreur lors de /auth/me :", err);
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    loadDashboard();
 });
 
-
-// -------------------------
-// Charger l'historique des crédits
-// -------------------------
-
-async function loadCreditHistory() {
-    const token = localStorage.getItem("token");
-
+async function loadDashboard() {
     try {
-        const res = await fetch(`${API_URL}/credits/history`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
+        // 1. Récupérer l'utilisateur authentifié
+        const me = await apiRequest("/auth/me", "GET", null, true);
+        const user = me.user;
 
-        const operations = await res.json();
-        const container = document.getElementById("creditHistory");
-        container.innerHTML = "";
-
-        if (!operations || operations.length === 0) {
-            container.innerHTML = "<p>Aucune opération enregistrée.</p>";
-            return;
+        // mettre à jour le localStorage avec les infos à jour
+        const token = localStorage.getItem("token");
+        if (token && user) {
+            saveAuth(token, user);
         }
 
-        operations.forEach(op => {
-            const div = document.createElement("div");
-            div.classList.add("card");
-            div.style.marginBottom = "10px";
-            div.innerHTML = `
-                <p><strong>${op.change > 0 ? "Ajout" : "Déduction"} :</strong> ${op.change} crédits</p>
-                <p><small>${new Date(op.created_at).toLocaleString()}</small></p>
-            `;
-            container.appendChild(div);
-        });
+        // 2. Afficher le solde de crédits
+        const balanceEl = document.getElementById("creditBalance");
+        if (balanceEl && typeof user.creditBalance === "number") {
+            balanceEl.textContent = user.creditBalance;
+        } else if (balanceEl) {
+            balanceEl.textContent = "—";
+        }
+
+        // 3. Charger les dernières opérations de crédits (si endpoint dispo)
+        await loadCreditTransactions();
+
+        // 4. Activer le panneau admin si besoin
+        setupAdminPanel(user);
 
     } catch (err) {
-        console.error("❌ Erreur chargement historique :", err);
+        console.error("Erreur dashboard :", err);
+        if (err.status === 401) {
+            clearAuth();
+            window.location.href = "login.html";
+        }
     }
 }
 
-// -------------------------
-// ADMIN : Ajouter des crédits
-// -------------------------
-
-async function addCreditsToUser() {
-    const email = document.getElementById("creditUserEmail").value;
-    const amount = parseInt(document.getElementById("creditAmount").value);
-
-    if (!email || !amount) return alert("Email et montant requis.");
-
-    const token = localStorage.getItem("token");
+async function loadCreditTransactions() {
+    const listEl = document.getElementById("transactionsList");
+    if (!listEl) return;
 
     try {
-        const res = await fetch(`${API_URL}/admin/credits/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ email, amount })
+        const data = await apiRequest("/credits/transactions", "GET", null, true);
+        const transactions = data.transactions || [];
+
+        listEl.innerHTML = "";
+        if (!transactions.length) {
+            const li = document.createElement("li");
+            li.textContent = "Aucune opération récente.";
+            listEl.appendChild(li);
+            return;
+        }
+
+        transactions.forEach((tx) => {
+            const li = document.createElement("li");
+            const date = tx.createdAt ? new Date(tx.createdAt).toLocaleString() : "";
+            li.textContent = `${date} – ${tx.type} (${tx.amount}) : ${tx.description || ""}`;
+            listEl.appendChild(li);
         });
-
-        const result = await res.json();
-        alert(result.message || "Opération effectuée");
-
-        window.location.reload();
-
     } catch (err) {
-        console.error("❌ Erreur ajout crédits :", err);
+        console.error("Erreur chargement transactions :", err);
+        listEl.innerHTML = "";
+        const li = document.createElement("li");
+        li.textContent = "Impossible de charger les opérations.";
+        listEl.appendChild(li);
     }
+}
+
+function setupAdminPanel(user) {
+    const adminPanel = document.getElementById("adminPanel");
+    if (!adminPanel) return;
+
+    if (!user || user.role !== "admin") {
+        adminPanel.style.display = "none";
+        return;
+    }
+
+    adminPanel.style.display = "block";
+
+    const form = document.getElementById("adminCreditForm");
+    const msg = document.getElementById("adminMessage");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (msg) {
+            msg.textContent = "";
+            msg.style.color = "";
+        }
+
+        const email = document.getElementById("adminEmail").value.trim();
+        const amountStr = document.getElementById("adminAmount").value;
+        const description = document.getElementById("adminDescription").value.trim();
+        const amount = Number(amountStr);
+
+        if (!email || Number.isNaN(amount) || amount === 0) {
+            if (msg) {
+                msg.textContent = "Email et montant (non nul) sont obligatoires.";
+                msg.style.color = "var(--danger)";
+            }
+            return;
+        }
+
+        try:
+            const result = await apiRequest(
+                "/admin/credits/grant",
+                "POST",
+                { email, amount, description: description || undefined },
+                true
+            );
+
+            if (msg) {
+                msg.textContent = `Crédits mis à jour pour ${result.targetUser.email}. Nouveau solde : ${result.newBalance}.`;
+                msg.style.color = "#4ade80";
+            }
+
+            // si on se crédite soi-même, on met à jour l'affichage
+            const currentUser = getCurrentUser();
+            if (currentUser && currentUser.email === email) {
+                const balanceEl = document.getElementById("creditBalance");
+                if (balanceEl) {
+                    balanceEl.textContent = result.newBalance;
+                }
+            }
+        } catch (err) {
+            console.error("Erreur admin/credits/grant :", err);
+            if (err.status === 401) {
+                clearAuth();
+                window.location.href = "login.html";
+                return;
+            }
+            if (msg) {
+                msg.textContent = err.message || "Erreur lors de l’ajustement des crédits.";
+                msg.style.color = "var(--danger)";
+            }
+        }
+    });
 }
