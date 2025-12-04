@@ -26,6 +26,7 @@
 <main>
     <section class="hero">
         <div class="container hero-grid hero-grid-simple">
+            <!-- Carte utilisateur "classique" -->
             <div class="card" style="margin-bottom: 20px;">
                 <h2 style="margin-bottom: 10px; color: var(--text-strong);">Votre espace</h2>
                 <p style="color: var(--text-muted); font-size: 0.95rem;">
@@ -44,11 +45,46 @@
                 </div>
             </div>
 
+            <!-- Carte "dernières opérations" -->
             <div class="card">
                 <h3 style="margin-bottom: 10px; color: var(--text-strong);">Dernières opérations de crédits</h3>
                 <ul id="transactionsList" style="font-size: 0.9rem; color: var(--text-muted);">
                     <li>Chargement en cours…</li>
                 </ul>
+            </div>
+
+            <!-- Carte ADMIN (masquée par défaut, affichée si role === 'admin') -->
+            <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
+                <h3 style="margin-bottom: 10px; color: var(--text-strong);">
+                    Administration – Gestion des crédits
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px;">
+                    Depuis cet espace, vous pouvez ajuster les crédits d’un utilisateur, y compris votre propre compte.
+                </p>
+
+                <form id="adminCreditForm">
+                    <div class="form-field">
+                        <span>Email de l’utilisateur à créditer</span>
+                        <input type="email" id="adminEmail" placeholder="utilisateur@exemple.com" required>
+                    </div>
+
+                    <div class="form-field">
+                        <span>Montant de crédits</span>
+                        <input type="number" id="adminAmount" placeholder="Ex : 20 (ou -10 pour retirer)" required>
+                    </div>
+
+                    <div class="form-field">
+                        <span>Motif (optionnel)</span>
+                        <input type="text" id="adminDescription" placeholder="Offre promotionnelle, ajustement, test…">
+                    </div>
+
+                    <p id="adminMessage"
+                       style="font-size:0.9rem; min-height:1.2em; margin-bottom:8px;"></p>
+
+                    <button type="submit" class="btn btn-primary">
+                        Mettre à jour les crédits
+                    </button>
+                </form>
             </div>
         </div>
     </section>
