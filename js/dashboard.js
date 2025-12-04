@@ -1,20 +1,32 @@
 // js/dashboard.js
-import { apiRequest, clearAuth, getCurrentUser } from "./api.js";
+import { apiRequest, clearAuth, getCurrentUser, saveAuth } from "./api.js";
 
 async function loadDashboard() {
-    const user = getCurrentUser();
-    if (!user) {
+    const storedUser = getCurrentUser();
+    if (!storedUser) {
+        // Pas de user en localStorage => on renvoie vers login
         window.location.href = "login.html";
         return;
     }
 
     try {
-        // Solde
-        const balanceData = await apiRequest("/credits/balance", "GET", null, true);
-        const el = document.getElementById("creditBalance");
-        if (el) el.textContent = balanceData.creditBalance;
+        // 1) On récupère l'utilisateur à jour depuis le backend
+        const me = await apiRequest("/auth/me", "GET", null, true);
+        const user = me.user;
 
-        // Transactions récentes
+        // On met à jour le localStorage avec les infos fraîches (role, creditBalance, etc.)
+        const token = localStorage.getItem("token");
+        if (token && user) {
+            saveAuth(token, user);
+        }
+
+        // 2) Affichage du solde de crédits
+        const balanceEl = document.getElementById("creditBalance");
+        if (balanceEl && typeof user.creditBalance === "number") {
+            balanceEl.textContent = user.creditBalance;
+        }
+
+        // 3) Chargement des dernières opérations de crédits (optionnel)
         let transactionsData;
         try {
             transactionsData = await apiRequest("/credits/transactions", "GET", null, true);
@@ -40,7 +52,7 @@ async function loadDashboard() {
             }
         }
 
-        // Activer le panneau admin si besoin
+        // 4) Activation du panneau administrateur si role = admin
         setupAdminPanel(user);
 
     } catch (err) {
@@ -56,21 +68,21 @@ function setupAdminPanel(user) {
     const adminPanel = document.getElementById("adminPanel");
     if (!adminPanel) return;
 
-    // Afficher le panneau seulement si l'utilisateur est admin
-    if (user.role !== "admin") {
+    if (!user || user.role !== "admin") {
         adminPanel.style.display = "none";
         return;
     }
 
+    // L'utilisateur est admin : on affiche le bloc
     adminPanel.style.display = "block";
 
     const form = document.getElementById("adminCreditForm");
     const msg = document.getElementById("adminMessage");
-
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         if (msg) {
             msg.textContent = "";
             msg.style.color = "";
@@ -104,15 +116,15 @@ function setupAdminPanel(user) {
 
             if (msg) {
                 msg.textContent = `Crédits mis à jour pour ${result.targetUser.email}. Nouveau solde : ${result.newBalance}.`;
-                msg.style.color = "#4ade80"; // vert doux
+                msg.style.color = "#4ade80";
             }
 
-            // Si tu as crédité ton propre compte, on recharge le solde
-            const currentUser = getCurrentUser();
-            if (currentUser && currentUser.email === email) {
-                const balanceData = await apiRequest("/credits/balance", "GET", null, true);
-                const el = document.getElementById("creditBalance");
-                if (el) el.textContent = balanceData.creditBalance;
+            // Si tu t'es crédité toi-même, on met à jour le solde affiché
+            if (result.targetUser.email === user.email) {
+                const balanceEl = document.getElementById("creditBalance");
+                if (balanceEl) {
+                    balanceEl.textContent = result.newBalance;
+                }
             }
 
         } catch (err) {
