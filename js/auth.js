@@ -1,6 +1,13 @@
 // js/auth.js
-import { apiRequest, saveAuth, clearAuth, getCurrentUser } from "./api.js";
 
+document.addEventListener("DOMContentLoaded", () => {
+    setupLoginForm();
+    setupRegisterForm();
+    setupLogoutLinks();
+    updateHeaderUser();
+});
+
+// ----- Login -----
 function setupLoginForm() {
     const form = document.getElementById("loginForm");
     if (!form) return;
@@ -11,11 +18,12 @@ function setupLoginForm() {
         e.preventDefault();
         if (errorEl) errorEl.textContent = "";
 
-        const email = document.getElementById("loginEmail").value;
+        const email = document.getElementById("loginEmail").value.trim();
         const password = document.getElementById("loginPassword").value;
 
         try {
             const data = await apiRequest("/auth/login", "POST", { email, password });
+            // data = { token, user }
             saveAuth(data.token, data.user);
             window.location.href = "dashboard.html";
         } catch (err) {
@@ -25,6 +33,7 @@ function setupLoginForm() {
     });
 }
 
+// ----- Register -----
 function setupRegisterForm() {
     const form = document.getElementById("registerForm");
     if (!form) return;
@@ -35,7 +44,7 @@ function setupRegisterForm() {
         e.preventDefault();
         if (errorEl) errorEl.textContent = "";
 
-        const email = document.getElementById("registerEmail").value;
+        const email = document.getElementById("registerEmail").value.trim();
         const password = document.getElementById("registerPassword").value;
         const defaultLanguage = document.getElementById("registerLanguage").value || "fr";
 
@@ -45,6 +54,7 @@ function setupRegisterForm() {
                 password,
                 defaultLanguage
             });
+            // data = { token, user }
             saveAuth(data.token, data.user);
             window.location.href = "dashboard.html";
         } catch (err) {
@@ -54,9 +64,10 @@ function setupRegisterForm() {
     });
 }
 
+// ----- Déconnexion -----
 function setupLogoutLinks() {
     const links = document.querySelectorAll("[data-logout]");
-    links.forEach(link => {
+    links.forEach((link) => {
         link.addEventListener("click", (e) => {
             e.preventDefault();
             clearAuth();
@@ -65,6 +76,7 @@ function setupLogoutLinks() {
     });
 }
 
+// ----- Affichage email dans le header -----
 function updateHeaderUser() {
     const user = getCurrentUser();
     const el = document.getElementById("headerUserEmail");
@@ -72,10 +84,3 @@ function updateHeaderUser() {
         el.textContent = user.email;
     }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    setupLoginForm();
-    setupRegisterForm();
-    setupLogoutLinks();
-    updateHeaderUser();
-});
