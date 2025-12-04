@@ -1,34 +1,69 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="page">
 <head>
-  <meta charset="UTF-8">
-  <title>Tableau de Bord</title>
+    <meta charset="UTF-8">
+    <title>Tableau de bord – ContextaLingua</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="index.html" class="header-logo">
+            <span class="contexta">Contexta</span><span class="lingua">Lingua</span>
+        </a>
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-link active">Tableau de bord</a>
+            <a href="generate.html" class="nav-link">Rédaction</a>
+            <a href="interpret.html" class="nav-link">Interprétation</a>
+        </nav>
+        <div class="header-actions">
+            <span id="headerUserEmail" style="font-size:0.9rem; color: var(--text-muted);"></span>
+            <a href="#" class="btn btn-ghost" data-logout>Déconnexion</a>
+        </div>
+    </div>
+</header>
 
-  <h2>Tableau de bord</h2>
+<main>
+    <section class="hero">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 10px; color: var(--text-strong);">Votre espace</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    Suivez vos crédits et accédez rapidement aux modes rédaction et interprétation.
+                </p>
 
-  <div>
-    <p>Crédits restants : <span id="creditBalance">...</span></p>
-    <button onclick="window.location.href='generate.html'">✍ Rédaction</button>
-    <button onclick="window.location.href='interpret.html'">🔎 Interprétation</button>
-  </div>
+                <div style="margin-top: 16px;">
+                    <p style="font-size: 1.1rem;">
+                        Crédits disponibles : <strong id="creditBalance">...</strong>
+                    </p>
+                </div>
 
-  <script type="module">
-    import { apiRequest } from "./js/api.js";
+                <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
+                    <a href="generate.html" class="btn btn-primary">✍ Mode rédaction</a>
+                    <a href="interpret.html" class="btn btn-secondary">🔎 Mode interprétation</a>
+                </div>
+            </div>
 
-    async function loadBalance() {
-      try {
-        const data = await apiRequest("/credits/balance", "GET", null, true);
-        document.getElementById("creditBalance").textContent = data.creditBalance;
-      } catch (e) {
-        alert("Session expirée — reconnectez-vous.");
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
-      }
-    }
+            <div class="card">
+                <h3 style="margin-bottom: 10px; color: var(--text-strong);">Dernières opérations de crédits</h3>
+                <ul id="transactionsList" style="font-size: 0.9rem; color: var(--text-muted);">
+                    <li>Chargement en cours…</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
 
-    loadBalance();
-  </script>
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav">
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</footer>
+
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
