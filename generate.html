@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rédaction ContextaLingua</title>
+</head>
+<body>
+  <h2>Camille — Rédaction</h2>
+
+  <textarea id="inputText" placeholder="Texte à reformuler..." rows="6" cols="60"></textarea><br>
+  <input id="targetLanguage" placeholder="Langue cible (ex: fr, en, es)" value="fr"><br>
+  <input id="tone" placeholder="Ton souhaité"><br>
+  <input id="goal" placeholder="Objectif du message"><br>
+  <input id="recipientDescription" placeholder="Description du destinataire"><br>
+  
+  <button id="sendBtn">Générer</button>
+
+  <hr>
+  <h3>Résultat :</h3>
+  <pre id="outputText"></pre>
+
+  <script type="module">
+    import { apiRequest } from "./js/api.js";
+
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const result = await apiRequest(
+          "/ai/generate",
+          "POST",
+          {
+            inputText: document.getElementById("inputText").value,
+            targetLanguage: document.getElementById("targetLanguage").value,
+            tone: document.getElementById("tone").value,
+            goal: document.getElementById("goal").value,
+            recipientDescription: document.getElementById("recipientDescription").value
+          },
+          true
+      );
+
+      document.getElementById("outputText").textContent = result.outputText;
+    });
+  </script>
+</body>
+</html>
