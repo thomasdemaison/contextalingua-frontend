@@ -1,56 +1,76 @@
 // js/api.js
-// ------------------------
-// Config API
-// ------------------------
+
+// À adapter plus tard si tu as une URL de prod (Cloudflare)
+// Pour l’instant : backend local
 const API_BASE_URL = "http://localhost:4000/api";
 
-// ------------------------
-// Fonctions utilitaires
-// ------------------------
-async function apiRequest(endpoint, method = "GET", data = null, requireAuth = false) {
-    const headers = { "Content-Type": "application/json" };
+/**
+ * Appel générique à l'API ContextaLingua.
+ *
+ * @param {string} path - Chemin après /api, ex : "/auth/login"
+ * @param {string} method - Méthode HTTP (GET, POST, etc.)
+ * @param {object|null} body - Corps JSON éventuel
+ * @param {boolean} withAuth - true pour envoyer le token Bearer
+ */
+async function apiRequest(path, method = "GET", body = null, withAuth = false) {
+    const url = API_BASE_URL + path;
+    const headers = {
+        "Content-Type": "application/json"
+    };
 
-    if (requireAuth) {
+    if (withAuth) {
         const token = localStorage.getItem("token");
-        if (!token) {
-            const err = new Error("Authentification requise.");
-            err.status = 401;
-            throw err;
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
         }
-        headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const options = {
         method,
-        headers,
-        body: data ? JSON.stringify(data) : null
-    });
+        headers
+    };
 
-    let payload = null;
+    if (body !== null) {
+        options.body = JSON.stringify(body);
+    }
+
+    let response;
     try {
-        payload = await response.json();
-    } catch {
-        // pas de body JSON, on laisse payload à null
+        response = await fetch(url, options);
+    } catch (err) {
+        console.error("Erreur réseau vers", url, ":", err);
+        throw new Error("Failed to fetch");
+    }
+
+    let data = null;
+    const text = await response.text();
+    if (text) {
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            data = { raw: text };
+        }
     }
 
     if (!response.ok) {
-        const message = payload && payload.message ? payload.message : `Erreur HTTP ${response.status}`;
-        const err = new Error(message);
-        err.status = response.status;
-        throw err;
+        const error = new Error(data && data.message ? data.message : "Erreur API");
+        error.status = response.status;
+        error.data = data;
+        throw error;
     }
 
-    return payload;
+    return data;
 }
+
+// ---- Gestion auth / utilisateur ----
 
 function saveAuth(token, user) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-}
-
-function clearAuth() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    if (token) {
+        localStorage.setItem("token", token);
+    }
+    if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+    }
 }
 
 function getCurrentUser() {
@@ -58,7 +78,13 @@ function getCurrentUser() {
     if (!raw) return null;
     try {
         return JSON.parse(raw);
-    } catch {
+    } catch (e) {
+        console.warn("Impossible de parser l’utilisateur stocké.");
         return null;
     }
+}
+
+function clearAuth() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 }
