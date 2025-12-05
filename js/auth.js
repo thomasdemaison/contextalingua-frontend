@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function normalizeText(str) {
     return (str || "")
         .toLowerCase()
-        // on enlève les accents pour éviter les soucis de comparaison
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .trim();
@@ -105,47 +104,22 @@ function setupHeaderNavigation() {
         }
     });
 
-    // Email dans le header, si présent
+    // Email dans le header
     const headerEmail = document.getElementById("headerUserEmail");
     if (headerEmail && user && user.email) {
         headerEmail.textContent = user.email;
     }
 }
 
-// ---------- Détection robuste du formulaire de login ----------
+// ---------- Login (IDs fixes) ----------
 
 function setupLoginForm() {
-    // 1) On essaie d'abord par ID explicite
-    let form = document.getElementById("loginForm");
+    const form = document.getElementById("loginForm");
+    if (!form) return;
 
-    // 2) Sinon, on cherche le 1er form qui contient email + mot de passe
-    if (!form) {
-        const forms = document.querySelectorAll("form");
-        for (const f of forms) {
-            const emailField = f.querySelector(
-                'input[type="email"], input[name*="email" i]'
-            );
-            const pwdField = f.querySelector('input[type="password"]');
-            const innerText = normalizeText(f.innerText || "");
-            if (emailField && pwdField && innerText.includes("connexion")) {
-                form = f;
-                break;
-            }
-        }
-    }
-
-    if (!form) return; // pas de formulaire de connexion sur cette page
-
-    // On identifie les champs
-    const emailInput =
-        form.querySelector("#loginEmail") ||
-        form.querySelector('input[type="email"], input[name*="email" i]');
-    const passwordInput =
-        form.querySelector("#loginPassword") ||
-        form.querySelector('input[type="password"]');
-    const errorEl =
-        document.getElementById("loginError") ||
-        form.querySelector(".auth-error");
+    const emailInput = document.getElementById("loginEmail");
+    const passwordInput = document.getElementById("loginPassword");
+    const errorEl = document.getElementById("loginError");
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -180,7 +154,7 @@ function setupLoginForm() {
                     errorEl.textContent = "Identifiants invalides.";
                 } else if (err.message === "Failed to fetch") {
                     errorEl.textContent =
-                        "Impossible de contacter le serveur (backend éteint ?).";
+                        "Impossible de contacter le serveur.";
                 } else {
                     errorEl.textContent =
                         err.message || "Erreur lors de la connexion.";
@@ -190,45 +164,16 @@ function setupLoginForm() {
     });
 }
 
-// ---------- Détection robuste du formulaire de register ----------
+// ---------- Register (IDs fixes) ----------
 
 function setupRegisterForm() {
-    let form = document.getElementById("registerForm");
-
-    if (!form) {
-        const forms = document.querySelectorAll("form");
-        for (const f of forms) {
-            const emailField = f.querySelector(
-                'input[type="email"], input[name*="email" i]'
-            );
-            const pwdField = f.querySelector('input[type="password"]');
-            const innerText = normalizeText(f.innerText || "");
-            if (
-                emailField &&
-                pwdField &&
-                (innerText.includes("creer un compte") ||
-                    innerText.includes("inscription"))
-            ) {
-                form = f;
-                break;
-            }
-        }
-    }
-
+    const form = document.getElementById("registerForm");
     if (!form) return;
 
-    const emailInput =
-        form.querySelector("#registerEmail") ||
-        form.querySelector('input[type="email"], input[name*="email" i]');
-    const passwordInput =
-        form.querySelector("#registerPassword") ||
-        form.querySelector('input[type="password"]');
-    const languageSelect =
-        form.querySelector("#registerLanguage") ||
-        form.querySelector("select[name*='language' i]");
-    const errorEl =
-        document.getElementById("registerError") ||
-        form.querySelector(".auth-error");
+    const emailInput = document.getElementById("registerEmail");
+    const passwordInput = document.getElementById("registerPassword");
+    const languageSelect = document.getElementById("registerLanguage");
+    const errorEl = document.getElementById("registerError");
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
