@@ -65,7 +65,7 @@
 
               <p
                 id="loginError"
-                style="margin-top: 6px; font-size: 0.9rem; color: var(--danger);"
+                style="margin-top: 6px; font-size: 0.9rem; color: var(--danger); min-height: 1.2em;"
               ></p>
 
               <button
@@ -84,7 +84,7 @@
                 "
               >
                 Pas encore de compte ?
-                <a href="register.html" class="nav-link" style="display:inline;">
+                <a href="register.html" style="color: var(--accent-strong);">
                   Créer un compte
                 </a>
               </p>
@@ -103,8 +103,72 @@
       </div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- Scripts globaux -->
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+
+    <!-- Script de login dédié, super simple -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("loginForm");
+        const emailInput = document.getElementById("loginEmail");
+        const passwordInput = document.getElementById("loginPassword");
+        const errorEl = document.getElementById("loginError");
+
+        if (!form) return;
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (errorEl) errorEl.textContent = "";
+
+          const email = emailInput ? emailInput.value.trim() : "";
+          const password = passwordInput ? passwordInput.value : "";
+
+          if (!email || !password) {
+            if (errorEl) {
+              errorEl.textContent = "Email et mot de passe requis.";
+            }
+            return;
+          }
+
+          try {
+            // On utilise apiRequest défini dans api.js
+            const data = await apiRequest(
+              "/auth/login",
+              "POST",
+              { email, password },
+              false
+            );
+
+            const token = data.token;
+            const user = data.user;
+
+            // Sauvegarde dans le localStorage
+            if (token) {
+              localStorage.setItem("token", token);
+            }
+            if (user) {
+              localStorage.setItem("user", JSON.stringify(user));
+            }
+
+            // Redirection vers le dashboard
+            window.location.href = "dashboard.html";
+          } catch (err) {
+            console.error("Erreur login (inline) :", err);
+            if (errorEl) {
+              if (err.status === 401) {
+                errorEl.textContent = "Identifiants invalides.";
+              } else if (err.message === "Failed to fetch") {
+                errorEl.textContent =
+                  "Impossible de contacter le serveur. Vérifiez que le backend est démarré.";
+              } else {
+                errorEl.textContent =
+                  err.message || "Erreur lors de la connexion.";
+              }
+            }
+          }
+        });
+      });
+    </script>
   </body>
 </html>
