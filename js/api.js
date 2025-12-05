@@ -1,32 +1,59 @@
-// api.js — utilisé par toutes les pages sauf login et register
+// js/api.js
+// Helper global pour appeler le backend ContextaLingua
 
-const API_BASE_URL = "http://localhost:4000/api";
-
-async function apiRequest(endpoint, method = "GET", body = null) {
-  const token = localStorage.getItem("token");
-
-  const headers = {
-    "Content-Type": "application/json"
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+(function () {
+  // Si déjà défini quelque part, on le réutilise, sinon on met la valeur par défaut.
+  if (!window.API_BASE_URL) {
+    window.API_BASE_URL = "http://localhost:4000/api";
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : null
-  });
+  /**
+   * Appel générique à l'API backend.
+   * @param {string} endpoint - ex : "/auth/login"
+   * @param {string} [method="GET"]
+   * @param {object|null} [body=null]
+   * @param {boolean} [withAuth=true] - inclure ou non le token
+   */
+  async function apiRequest(endpoint, method = "GET", body = null, withAuth = true) {
+    const headers = {
+      "Content-Type": "application/json",
+    };
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Erreur API");
+    if (withAuth) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+
+    const response = await fetch(window.API_BASE_URL + endpoint, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : null,
+    });
+
+    const rawText = await response.text();
+    let data = null;
+    if (rawText) {
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        data = rawText;
+      }
+    }
+
+    if (!response.ok) {
+      const error = new Error(
+        (data && data.message) || response.statusText || "Erreur API"
+      );
+      error.status = response.status;
+      error.data = data;
+      throw error;
+    }
+
+    return data;
   }
 
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
+  // On expose la fonction au scope global
+  window.apiRequest = apiRequest;
+})();
