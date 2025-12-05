@@ -38,29 +38,23 @@ async function initDashboard() {
 
   // ----- Affichage / masquage des blocs admin -----
 
-  // Bloc "Gestion des crédits" : visible pour admin & superadmin
-  const adminCreditForm = document.getElementById("adminCreditForm");
-  if (adminCreditForm) {
-    const card = adminCreditForm.closest(".card");
-    if (card) {
-      if (role === "admin" || role === "superadmin") {
-        card.style.display = "";
-      } else {
-        card.style.display = "none";
-      }
+  // Bloc "Administration – Gestion des crédits"
+  const adminPanel = document.getElementById("adminPanel");
+  if (adminPanel) {
+    if (role === "admin" || role === "superadmin") {
+      adminPanel.style.display = "";
+    } else {
+      adminPanel.style.display = "none";
     }
   }
 
-  // Bloc "Rôles des utilisateurs" : visible uniquement pour superadmin
-  const adminRoleForm = document.getElementById("adminRoleForm");
-  if (adminRoleForm) {
-    const card = adminRoleForm.closest(".card");
-    if (card) {
-      if (role === "superadmin") {
-        card.style.display = "";
-      } else {
-        card.style.display = "none";
-      }
+  // Bloc "Administration – Rôles des utilisateurs"
+  const rolePanel = document.getElementById("rolePanel");
+  if (rolePanel) {
+    if (role === "superadmin") {
+      rolePanel.style.display = "";
+    } else {
+      rolePanel.style.display = "none";
     }
   }
 
@@ -75,7 +69,7 @@ async function initDashboard() {
 // ---------- Solde de crédits ----------
 
 async function loadCreditBalance() {
-  // TON HTML : <strong id="creditBalance">…</strong>
+  // HTML : <strong id="creditBalance">…</strong>
   const valueEl = document.getElementById("creditBalance");
 
   if (!valueEl) {
@@ -102,7 +96,7 @@ async function loadCreditBalance() {
 // ---------- Dernières opérations ----------
 
 async function loadCreditTransactions() {
-  // TON HTML : <ul id="transactionsList"><li>Chargement en cours…</li></ul>
+  // HTML : <ul id="transactionsList"><li>Chargement en cours…</li></ul>
   const listEl = document.getElementById("transactionsList");
   if (!listEl) {
     console.warn(
@@ -166,10 +160,10 @@ function setupAdminCreditForm() {
   const form = document.getElementById("adminCreditForm");
   if (!form) return;
 
-  const emailInput = document.getElementById("adminCreditEmail");
-  const amountInput = document.getElementById("adminCreditAmount");
-  const reasonInput = document.getElementById("adminCreditReason");
-  const messageEl = document.getElementById("adminCreditMessage");
+  const emailInput = document.getElementById("adminEmail");
+  const amountInput = document.getElementById("adminAmount");
+  const reasonInput = document.getElementById("adminDescription");
+  const messageEl = document.getElementById("adminMessage");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -222,12 +216,12 @@ function setupAdminCreditForm() {
 // ---------- Formulaire admin : gestion des rôles ----------
 
 function setupAdminRoleForm() {
-  const form = document.getElementById("adminRoleForm");
+  const form = document.getElementById("roleForm");
   if (!form) return;
 
-  const emailInput = document.getElementById("adminRoleEmail");
-  const roleSelect = document.getElementById("adminRoleSelect");
-  const messageEl = document.getElementById("adminRoleMessage");
+  const emailInput = document.getElementById("roleEmail");
+  const roleSelect = document.getElementById("roleSelect");
+  const messageEl = document.getElementById("roleMessage");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
