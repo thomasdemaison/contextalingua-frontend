@@ -1,63 +1,90 @@
 // js/interpret.js
-import { apiRequest, clearAuth, getCurrentUser } from "./api.js";
 
-function protectPage() {
-    const user = getCurrentUser();
-    if (!user) {
+document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
         window.location.href = "login.html";
-    }
-}
-
-async function submitInterpret() {
-    const inputText = document.getElementById("intInputText").value;
-    const explanationLanguage = document.getElementById("intExplanationLanguage").value;
-    const context = document.getElementById("intContext").value;
-    const recipientRole = document.getElementById("intRecipientRole").value;
-
-    const outputEl = document.getElementById("intOutput");
-    const errorEl = document.getElementById("intError");
-
-    if (errorEl) errorEl.textContent = "";
-    if (outputEl) outputEl.textContent = "";
-
-    if (!inputText || !explanationLanguage) {
-        if (errorEl) errorEl.textContent = "Texte et langue d'explication sont obligatoires.";
         return;
     }
 
-    try {
-        const result = await apiRequest(
-            "/ai/interpret",
-            "POST",
-            {
-                inputText,
-                explanationLanguage,
-                context,
-                recipientRole
-            },
-            true
-        );
+    setupInterpretForm();
+});
 
-        if (outputEl) outputEl.textContent = result.outputText || "";
+function setupInterpretForm() {
+    const form = document.getElementById("interpretForm");
+    if (!form) return;
 
-    } catch (err) {
-        console.error(err);
-        if (err.status === 401) {
-            clearAuth();
-            window.location.href = "login.html";
+    const inputEl = document.getElementById("interpretInput");
+    const contextEl = document.getElementById("interpretContext");
+    const languageSelect = document.getElementById("interpretLanguage");
+    const resultEl = document.getElementById("interpretResult");
+    const statusEl = document.getElementById("interpretStatus");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (statusEl) {
+            statusEl.textContent = "Camille analyse votre message...";
+        }
+        if (resultEl) {
+            resultEl.textContent = "";
+        }
+
+        const inputText = inputEl ? inputEl.value.trim() : "";
+        const context = contextEl ? contextEl.value.trim() : "";
+        const language = languageSelect
+            ? languageSelect.value
+            : "fr";
+
+        if (!inputText) {
+            if (statusEl) {
+                statusEl.textContent =
+                    "Merci de coller le message à interpréter.";
+            }
             return;
         }
-        if (errorEl) errorEl.textContent = err.message || "Erreur lors de l’interprétation.";
-    }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-    protectPage();
-    const btn = document.getElementById("intSubmit");
-    if (btn) {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            submitInterpret();
-        });
-    }
-});
+        try {
+            const data = await apiRequest(
+                "/ai/interpret",
+                "POST",
+                {
+                    language,
+                    inputText,
+                    context: context || null
+                },
+                true
+            );
+
+            const output =
+                data.outputText ||
+                data.output ||
+                data.text ||
+                (data.result &&
+                    (data.result.outputText ||
+                        data.result.text)) ||
+                JSON.stringify(data, null, 2);
+
+            if (resultEl) {
+                resultEl.textContent = output;
+            }
+
+            if (statusEl) {
+                if (typeof data.remainingCredits === "number") {
+                    statusEl.textContent =
+                        "Analyse terminée. Crédits restants : " +
+                        data.remainingCredits;
+                } else {
+                    statusEl.textContent = "Analyse terminée.";
+                }
+            }
+        } catch (err) {
+            console.error("Erreur /ai/interpret :", err);
+            if (statusEl) {
+                statusEl.textContent =
+                    err.message ||
+                    "Erreur lors de l’interprétation.";
+            }
+        }
+    });
+}
