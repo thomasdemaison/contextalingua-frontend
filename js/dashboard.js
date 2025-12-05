@@ -15,11 +15,14 @@ async function initDashboard() {
     return;
   }
 
-  // On tente de rafraîchir les infos user via /auth/me
+  // On récupère/rafraîchit les infos utilisateur
+  let user = getCurrentUser();
+
   try {
     const me = await apiRequest("/auth/me", "GET");
     if (me && me.user) {
       saveAuth(token, me.user);
+      user = me.user;
     }
   } catch (err) {
     console.error("Erreur /auth/me :", err);
@@ -30,6 +33,32 @@ async function initDashboard() {
     }
   }
 
+  // ----- Gestion des sections selon le rôle -----
+  const role = (user && user.role) || "user";
+  console.log("[Dashboard] rôle utilisateur :", role);
+
+  const adminCreditsSection = document.getElementById("adminCreditsSection");
+  const adminRolesSection = document.getElementById("adminRolesSection");
+
+  // Section "Administration – Gestion des crédits"
+  if (adminCreditsSection) {
+    if (role === "admin" || role === "superadmin") {
+      adminCreditsSection.style.display = "";
+    } else {
+      adminCreditsSection.style.display = "none";
+    }
+  }
+
+  // Section "Administration – Rôles des utilisateurs"
+  if (adminRolesSection) {
+    if (role === "superadmin") {
+      adminRolesSection.style.display = "";
+    } else {
+      adminRolesSection.style.display = "none";
+    }
+  }
+
+  // ----- Chargement des données -----
   await loadCreditBalance();
   await loadCreditTransactions();
 
@@ -40,11 +69,22 @@ async function initDashboard() {
 // ---------- Solde de crédits ----------
 
 async function loadCreditBalance() {
-  const valueEl = document.getElementById("creditBalanceValue");
-  if (!valueEl) return;
+  // On essaie plusieurs IDs pour plus de robustesse
+  const valueEl =
+    document.getElementById("creditBalanceValue") ||
+    document.getElementById("creditBalance");
+
+  if (!valueEl) {
+    console.warn(
+      "[Dashboard] Élément de solde de crédits introuvable (id=creditBalanceValue ou id=creditBalance)."
+    );
+    return;
+  }
 
   try {
     const data = await apiRequest("/credits/balance", "GET");
+    console.log("[Dashboard] /credits/balance →", data);
+
     const balance =
       (data && (data.balance ?? data.creditBalance)) ?? 0;
 
@@ -61,7 +101,12 @@ async function loadCreditTransactions() {
   const listEl = document.getElementById("creditTransactionsList");
   const statusEl = document.getElementById("creditTransactionsStatus");
 
-  if (!listEl) return;
+  if (!listEl) {
+    console.warn(
+      "[Dashboard] Élément creditTransactionsList introuvable."
+    );
+    return;
+  }
 
   if (statusEl) {
     statusEl.textContent = "Chargement en cours...";
@@ -72,6 +117,7 @@ async function loadCreditTransactions() {
       "/credits/transactions?limit=5",
       "GET"
     );
+    console.log("[Dashboard] /credits/transactions →", data);
 
     const transactions = Array.isArray(data) ? data : data?.transactions;
 
@@ -123,7 +169,10 @@ function setupAdminCreditForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (messageEl) messageEl.textContent = "";
+    if (messageEl) {
+      messageEl.textContent = "";
+      messageEl.style.color = "";
+    }
 
     const email = emailInput ? emailInput.value.trim() : "";
     const amount = amountInput ? Number(amountInput.value) : 0;
@@ -131,6 +180,7 @@ function setupAdminCreditForm() {
 
     if (!email || !amount) {
       if (messageEl) {
+        messageEl.style.color = "var(--danger)";
         messageEl.textContent =
           "Email et montant sont obligatoires.";
       }
@@ -143,6 +193,8 @@ function setupAdminCreditForm() {
         "POST",
         { email, amount, reason }
       );
+
+      console.log("[Dashboard] /admin/credits/adjust →", data);
 
       if (messageEl) {
         messageEl.style.color = "#22c55e";
@@ -176,13 +228,17 @@ function setupAdminRoleForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (messageEl) messageEl.textContent = "";
+    if (messageEl) {
+      messageEl.textContent = "";
+      messageEl.style.color = "";
+    }
 
     const email = emailInput ? emailInput.value.trim() : "";
     const role = roleSelect ? roleSelect.value : "";
 
     if (!email || !role) {
       if (messageEl) {
+        messageEl.style.color = "var(--danger)";
         messageEl.textContent =
           "Email et rôle sont obligatoires.";
       }
@@ -195,6 +251,8 @@ function setupAdminRoleForm() {
         "POST",
         { email, role }
       );
+
+      console.log("[Dashboard] /admin/users/role →", data);
 
       if (messageEl) {
         messageEl.style.color = "#22c55e";
