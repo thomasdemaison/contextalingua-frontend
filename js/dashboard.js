@@ -33,28 +33,34 @@ async function initDashboard() {
     }
   }
 
-  // ----- Gestion des sections selon le rôle -----
   const role = (user && user.role) || "user";
   console.log("[Dashboard] rôle utilisateur :", role);
 
-  const adminCreditsSection = document.getElementById("adminCreditsSection");
-  const adminRolesSection = document.getElementById("adminRolesSection");
+  // ----- Affichage / masquage des blocs admin -----
 
-  // Section "Administration – Gestion des crédits"
-  if (adminCreditsSection) {
-    if (role === "admin" || role === "superadmin") {
-      adminCreditsSection.style.display = "";
-    } else {
-      adminCreditsSection.style.display = "none";
+  // Bloc "Gestion des crédits" : visible pour admin & superadmin
+  const adminCreditForm = document.getElementById("adminCreditForm");
+  if (adminCreditForm) {
+    const card = adminCreditForm.closest(".card");
+    if (card) {
+      if (role === "admin" || role === "superadmin") {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
     }
   }
 
-  // Section "Administration – Rôles des utilisateurs"
-  if (adminRolesSection) {
-    if (role === "superadmin") {
-      adminRolesSection.style.display = "";
-    } else {
-      adminRolesSection.style.display = "none";
+  // Bloc "Rôles des utilisateurs" : visible uniquement pour superadmin
+  const adminRoleForm = document.getElementById("adminRoleForm");
+  if (adminRoleForm) {
+    const card = adminRoleForm.closest(".card");
+    if (card) {
+      if (role === "superadmin") {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
     }
   }
 
@@ -69,14 +75,12 @@ async function initDashboard() {
 // ---------- Solde de crédits ----------
 
 async function loadCreditBalance() {
-  // On essaie plusieurs IDs pour plus de robustesse
-  const valueEl =
-    document.getElementById("creditBalanceValue") ||
-    document.getElementById("creditBalance");
+  // TON HTML : <strong id="creditBalance">…</strong>
+  const valueEl = document.getElementById("creditBalance");
 
   if (!valueEl) {
     console.warn(
-      "[Dashboard] Élément de solde de crédits introuvable (id=creditBalanceValue ou id=creditBalance)."
+      "[Dashboard] Élément de solde de crédits introuvable (id=creditBalance)."
     );
     return;
   }
@@ -91,26 +95,27 @@ async function loadCreditBalance() {
     valueEl.textContent = balance;
   } catch (err) {
     console.error("Erreur /credits/balance :", err);
-    valueEl.textContent = "--";
+    valueEl.textContent = "—";
   }
 }
 
 // ---------- Dernières opérations ----------
 
 async function loadCreditTransactions() {
-  const listEl = document.getElementById("creditTransactionsList");
-  const statusEl = document.getElementById("creditTransactionsStatus");
-
+  // TON HTML : <ul id="transactionsList"><li>Chargement en cours…</li></ul>
+  const listEl = document.getElementById("transactionsList");
   if (!listEl) {
     console.warn(
-      "[Dashboard] Élément creditTransactionsList introuvable."
+      "[Dashboard] Élément transactionsList introuvable."
     );
     return;
   }
 
-  if (statusEl) {
-    statusEl.textContent = "Chargement en cours...";
-  }
+  // On vide la liste et on met un état "chargement"
+  listEl.innerHTML = "";
+  const loadingLi = document.createElement("li");
+  loadingLi.textContent = "Chargement en cours…";
+  listEl.appendChild(loadingLi);
 
   try {
     const data = await apiRequest(
@@ -124,15 +129,14 @@ async function loadCreditTransactions() {
     listEl.innerHTML = "";
 
     if (!transactions || transactions.length === 0) {
-      if (statusEl) statusEl.textContent = "Aucune opération récente.";
+      const li = document.createElement("li");
+      li.textContent = "Aucune opération récente.";
+      listEl.appendChild(li);
       return;
     }
 
-    if (statusEl) statusEl.textContent = "";
-
     transactions.forEach((tx) => {
-      const li = document.createElement("div");
-      li.style.fontSize = "0.9rem";
+      const li = document.createElement("li");
 
       const createdAt = tx.createdAt || tx.created_at;
       const date = createdAt ? new Date(createdAt) : null;
@@ -149,10 +153,10 @@ async function loadCreditTransactions() {
     });
   } catch (err) {
     console.error("Erreur /credits/transactions :", err);
-    if (statusEl) {
-      statusEl.textContent =
-        "Impossible de charger les opérations.";
-    }
+    listEl.innerHTML = "";
+    const li = document.createElement("li");
+    li.textContent = "Impossible de charger les opérations.";
+    listEl.appendChild(li);
   }
 }
 
@@ -202,7 +206,6 @@ function setupAdminCreditForm() {
           data.message || "Crédits mis à jour.";
       }
 
-      // On rafraîchit solde + opérations si l'admin s'ajuste lui-même
       await loadCreditBalance();
       await loadCreditTransactions();
     } catch (err) {
