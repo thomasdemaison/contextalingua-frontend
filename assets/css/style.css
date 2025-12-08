@@ -72,6 +72,18 @@ ul {
 
 /* --- Header & navigation --- */
 
+/* Ne pas couper les libellés de navigation sur plusieurs lignes */
+.main-nav .nav-link {
+    white-space: nowrap;
+}
+
+/* Pour que la zone actions puisse respirer même avec l'email */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .site-header {
     position: sticky;
     top: 0;
