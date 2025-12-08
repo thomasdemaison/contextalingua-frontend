@@ -1,342 +1,367 @@
 // js/accompanied.js
-// Mode accompagné avec Camille (front-only, pas de nouvel endpoint pour l'instant)
+// Mode accompagné : logique côté front (sans IA pour l’instant)
+
+// Questions fixes pour le mode rédaction
+const WRITE_QUESTIONS = [
+  "À qui est destiné ce message (profil du ou des destinataires) ?",
+  "Quel est l'objectif précis de ce message pour vous ?",
+  "Quel ton souhaitez-vous adopter (formel, chaleureux, ferme, diplomate…) ?",
+  "Y a-t-il des contraintes particulières (longueur, délais, éléments à absolument mentionner) ?"
+];
+
+// Questions fixes pour le mode interprétation
+const INTERPRET_QUESTIONS = [
+  "Dans quel contexte professionnel avez-vous reçu ce message ?",
+  "Qu'attendez-vous concrètement comme résultat de l'interprétation (comprendre le ton, préparer une réponse, vérifier un risque…) ?",
+  "Quels passages vous inquiètent ou vous semblent flous ?",
+  "Y a-t-il des informations de contexte (relation commerciale, historique, enjeux financiers) que Camille doit connaître ?"
+];
+
+let acState = {
+  mode: "write",           // "write" ou "interpret"
+  currentStep: 0,
+  answers: [],
+  started: false
+};
 
 document.addEventListener("DOMContentLoaded", () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    // accès réservé aux utilisateurs connectés
+  // Sécurité : accès réservé aux utilisateurs connectés
+  if (!localStorage.getItem("token")) {
     window.location.href = "login.html";
     return;
   }
 
-  initGuidedMode();
+  setupModeButtons();
+  setupStartButton();
+  setupAnswerForm();
+  setupGenerateButton();
+
+  // État initial de l’UI
+  updateModeUI();
+  updateBriefPreview();
 });
 
-function initGuidedMode() {
-  const stepsContainer = document.getElementById("wizardSteps");
-  const prevBtn = document.getElementById("prevStepBtn");
-  const nextBtn = document.getElementById("nextStepBtn");
-  const statusEl = document.getElementById("wizardStatus");
+// ----------------- Mode (rédaction / interprétation) -----------------
 
-  if (!stepsContainer || !prevBtn || !nextBtn) {
-    console.error("[Accompanied] éléments de wizard introuvables.");
+function setupModeButtons() {
+  const writeBtn = document.getElementById("modeWriteBtn");
+  const interpretBtn = document.getElementById("modeInterpretBtn");
+
+  if (writeBtn) {
+    writeBtn.addEventListener("click", () => {
+      acState.mode = "write";
+      resetConversation();
+      updateModeUI();
+    });
+  }
+
+  if (interpretBtn) {
+    interpretBtn.addEventListener("click", () => {
+      acState.mode = "interpret";
+      resetConversation();
+      updateModeUI();
+    });
+  }
+}
+
+function updateModeUI() {
+  const writeBtn = document.getElementById("modeWriteBtn");
+  const interpretBtn = document.getElementById("modeInterpretBtn");
+  const sourceBlock = document.getElementById("acSourceBlock");
+
+  const isWrite = acState.mode === "write";
+
+  if (writeBtn && interpretBtn) {
+    if (isWrite) {
+      writeBtn.classList.remove("btn-ghost");
+      writeBtn.classList.add("btn-secondary");
+
+      interpretBtn.classList.remove("btn-secondary");
+      interpretBtn.classList.add("btn-ghost");
+    } else {
+      interpretBtn.classList.remove("btn-ghost");
+      interpretBtn.classList.add("btn-secondary");
+
+      writeBtn.classList.remove("btn-secondary");
+      writeBtn.classList.add("btn-ghost");
+    }
+  }
+
+  // Pour l’interprétation, on affiche le bloc "Texte reçu"
+  if (sourceBlock) {
+    sourceBlock.style.display = isWrite ? "none" : "";
+  }
+
+  resetConversation();
+  updateBriefPreview();
+}
+
+// ----------------- Démarrage de l’accompagnement -----------------
+
+function setupStartButton() {
+  const btn = document.getElementById("acStartBtn");
+  const errorEl = document.getElementById("acError");
+  if (!btn) return;
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (errorEl) errorEl.textContent = "";
+
+    const langEl = document.getElementById("acLang");
+    const audienceEl = document.getElementById("acAudience");
+    const goalEl = document.getElementById("acGoal");
+    const sourceEl = document.getElementById("acSourceText");
+
+    const lang = langEl ? langEl.value : "fr";
+    const audience = audienceEl ? audienceEl.value : "";
+    const goal = goalEl ? goalEl.value.trim() : "";
+    const sourceText = sourceEl ? sourceEl.value.trim() : "";
+
+    if (!goal) {
+      if (errorEl) {
+        errorEl.textContent = "Merci de préciser l'objectif principal.";
+      }
+      return;
+    }
+
+    if (acState.mode === "interpret" && !sourceText) {
+      if (errorEl) {
+        errorEl.textContent =
+          "Pour l’interprétation accompagnée, le texte reçu est nécessaire.";
+      }
+      return;
+    }
+
+    // On stocke ces infos de base dans le state (utile pour le brief)
+    acState.lang = lang;
+    acState.audience = audience;
+    acState.goal = goal;
+    acState.sourceText = sourceText;
+
+    startConversation();
+  });
+}
+
+function startConversation() {
+  acState.started = true;
+  acState.currentStep = 0;
+  acState.answers = [];
+
+  const convEl = document.getElementById("acConversation");
+  const form = document.getElementById("acAnswerForm");
+  const answerInput = document.getElementById("acAnswerInput");
+
+  if (convEl) {
+    convEl.innerHTML = "";
+    appendCamilleMessage(
+      "Parfait, nous allons clarifier la situation ensemble. " +
+        "Je vais vous poser quelques questions ciblées, puis je préparerai un brief complet."
+    );
+  }
+
+  if (form) form.style.display = "";
+  if (answerInput) answerInput.value = "";
+
+  showNextQuestion();
+}
+
+// ----------------- Gestion des questions / réponses -----------------
+
+function setupAnswerForm() {
+  const form = document.getElementById("acAnswerForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const answerInput = document.getElementById("acAnswerInput");
+    if (!answerInput) return;
+
+    const answer = answerInput.value.trim();
+    if (!answer) return;
+
+    // On affiche la réponse dans la conversation
+    appendUserMessage(answer);
+    acState.answers.push(answer);
+    answerInput.value = "";
+
+    // Question suivante ou fin
+    const questions = getCurrentQuestions();
+    if (acState.currentStep >= questions.length) {
+      endConversation();
+    } else {
+      showNextQuestion();
+    }
+
+    updateBriefPreview();
+  });
+}
+
+function getCurrentQuestions() {
+  return acState.mode === "write" ? WRITE_QUESTIONS : INTERPRET_QUESTIONS;
+}
+
+function showNextQuestion() {
+  const questions = getCurrentQuestions();
+  const index = acState.currentStep;
+
+  if (index >= questions.length) {
+    endConversation();
     return;
   }
 
-  const state = {
-    currentStep: 0,
-    mode: "generate", // "generate" ou "interpret"
-    language: "fr",
-    domain: "",
-    recipient: "",
-    objective: "",
-    tone: "professionnel mais vivant",
-    extraContext: "",
-    sourceText: ""
-  };
+  const question = questions[index];
+  acState.currentStep++;
 
-  const totalSteps = 7; // 1: mode, 2: langue, 3: domaine, 4: destinataire, 5: objectif, 6: ton, 7: contexte + texte source si interprétation
+  appendCamilleMessage(question);
 
-  function renderStep() {
-    const step = state.currentStep;
-    let html = "";
-
-    if (step === 0) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Commençons simplement : avez-vous besoin que je <strong>rédige</strong> un texte
-            ou que j’<strong>interprète</strong> un message que vous avez reçu ? »
-          </p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
-            <button type="button" class="btn btn-secondary guided-mode-btn" data-mode="generate">
-              ✍ Rédaction
-            </button>
-            <button type="button" class="btn btn-secondary guided-mode-btn" data-mode="interpret">
-              🔎 Interprétation
-            </button>
-          </div>
-        </div>
-      `;
-    } else if (step === 1) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Dans quelle langue souhaitez-vous le résultat final ? »
-          </p>
-          <div class="form-field">
-            <span>Langue cible</span>
-            <select id="guidedLanguage">
-              <option value="fr" ${state.language === "fr" ? "selected" : ""}>Français</option>
-              <option value="en" ${state.language === "en" ? "selected" : ""}>Anglais</option>
-              <option value="es" ${state.language === "es" ? "selected" : ""}>Espagnol</option>
-              <option value="de" ${state.language === "de" ? "selected" : ""}>Allemand</option>
-              <option value="it" ${state.language === "it" ? "selected" : ""}>Italien</option>
-              <option value="pt" ${state.language === "pt" ? "selected" : ""}>Portugais</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else if (step === 2) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Dites-m’en un peu plus sur le contexte métier. Dans quel environnement évoluez-vous ? »
-          </p>
-          <div class="form-field">
-            <span>Contexte métier</span>
-            <textarea id="guidedDomain" rows="3" placeholder="Ex. : cabinet de conseil en finance, BTP, logiciel SaaS, école de langues...">${state.domain || ""}</textarea>
-          </div>
-        </div>
-      `;
-    } else if (step === 3) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Qui est votre destinataire principal ? »
-          </p>
-          <div class="form-field">
-            <span>Destinataire</span>
-            <textarea id="guidedRecipient" rows="3" placeholder="Ex. : dirigeant de PME déjà client, prospect froid, RH d’un grand groupe, équipe interne...">${state.recipient || ""}</textarea>
-          </div>
-        </div>
-      `;
-    } else if (step === 4) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Quel est l’objectif précis de votre message ? »
-          </p>
-          <div class="form-field">
-            <span>Objectif du message</span>
-            <textarea id="guidedObjective" rows="3" placeholder="Ex. : obtenir un rendez-vous, clarifier un malentendu, faire accepter une proposition, expliquer une situation délicate...">${state.objective || ""}</textarea>
-          </div>
-        </div>
-      `;
-    } else if (step === 5) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Quel ton souhaitez-vous que j’adopte ? »
-          </p>
-          <div class="form-field">
-            <span>Ton souhaité</span>
-            <select id="guidedTone">
-              <option value="professionnel mais vivant" ${state.tone === "professionnel mais vivant" ? "selected" : ""}>Professionnel mais vivant</option>
-              <option value="formel et très poli" ${state.tone === "formel et très poli" ? "selected" : ""}>Formel et très poli</option>
-              <option value="direct et efficace" ${state.tone === "direct et efficace" ? "selected" : ""}>Direct et efficace</option>
-              <option value="chaleureux et rassurant" ${state.tone === "chaleureux et rassurant" ? "selected" : ""}>Chaleureux et rassurant</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else if (step === 6) {
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Y a-t-il des contraintes ou précisions à respecter ? »
-          </p>
-          <div class="form-field">
-            <span>Précisions supplémentaires</span>
-            <textarea id="guidedExtra" rows="3" placeholder="Ex. : longueur maximale, éléments à éviter, vocabulaire à privilégier...">${state.extraContext || ""}</textarea>
-          </div>
-
-          ${
-            state.mode === "interpret"
-              ? `
-          <div class="form-field" style="margin-top:12px;">
-            <span>Texte à interpréter (copiez-collez votre message reçu)</span>
-            <textarea id="guidedSourceText" rows="5" placeholder="Collez ici l’email ou le message dont vous souhaitez une interprétation fine.">${state.sourceText || ""}</textarea>
-          </div>
-          `
-              : ""
-          }
-        </div>
-      `;
-    } else {
-      // Étape finale : affichage du brief
-      const brief = buildBrief(state);
-      html = `
-        <div>
-          <p class="camille-quote" style="margin-bottom:10px;">
-            « Voici le brief que j’ai préparé pour vous. Vous pouvez le copier et le coller dans le mode ${
-              state.mode === "generate" ? "rédaction" : "interprétation"
-            }. »
-          </p>
-          <div class="form-field">
-            <span>Brief généré</span>
-            <textarea id="guidedBriefOutput" rows="10" readonly>${brief}</textarea>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
-            <button type="button" class="btn btn-secondary" id="copyBriefBtn">
-              Copier le brief
-            </button>
-            ${
-              state.mode === "generate"
-                ? `<a href="generate.html" class="btn btn-primary">Ouvrir le mode rédaction</a>`
-                : `<a href="interpret.html" class="btn btn-primary">Ouvrir le mode interprétation</a>`
-            }
-          </div>
-        </div>
-      `;
-    }
-
-    stepsContainer.innerHTML = html;
-
-    // Gestion des boutons mode (étape 0)
-    if (state.currentStep === 0) {
-      const modeButtons = document.querySelectorAll(".guided-mode-btn");
-      modeButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const mode = btn.getAttribute("data-mode");
-          if (mode === "generate" || mode === "interpret") {
-            state.mode = mode;
-          }
-          // Feedback visuel
-          modeButtons.forEach((b) => {
-            b.classList.remove("btn-primary");
-            b.classList.add("btn-secondary");
-          });
-          btn.classList.remove("btn-secondary");
-          btn.classList.add("btn-primary");
-        });
-      });
-    }
-
-    // Bouton copier le brief (étape finale)
-    if (state.currentStep > totalSteps - 1) {
-      const copyBtn = document.getElementById("copyBriefBtn");
-      const briefOutput = document.getElementById("guidedBriefOutput");
-      if (copyBtn && briefOutput) {
-        copyBtn.addEventListener("click", async () => {
-          const text = briefOutput.value;
-          try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              await navigator.clipboard.writeText(text);
-            } else {
-              briefOutput.select();
-              document.execCommand("copy");
-            }
-            copyBtn.textContent = "Brief copié ✔";
-          } catch (err) {
-            console.error("[Accompanied] Erreur copie presse-papiers :", err);
-            copyBtn.textContent = "Impossible de copier";
-          }
-        });
-      }
-    }
-
-    // Mettre à jour boutons précédent / suivant
-    if (state.currentStep === 0) {
-      prevBtn.disabled = true;
-    } else {
-      prevBtn.disabled = false;
-    }
-
-    if (state.currentStep <= totalSteps - 1) {
-      nextBtn.style.display = "";
-      nextBtn.textContent =
-        state.currentStep === totalSteps - 1
-          ? "Générer le brief"
-          : "Étape suivante ➝";
-    } else {
-      nextBtn.style.display = "none";
-    }
-
-    const stepNumber =
-      state.currentStep <= totalSteps - 1
-        ? state.currentStep + 1
-        : totalSteps + 1;
-    if (statusEl) {
-      statusEl.textContent =
-        state.currentStep <= totalSteps - 1
-          ? `Étape ${stepNumber} / ${totalSteps + 1}`
-          : `Étape finale – brief généré`;
-    }
+  const label = document.getElementById("acCurrentQuestionLabel");
+  if (label) {
+    label.textContent = "Camille : " + question;
   }
-
-  function persistCurrentStepInputs() {
-    const step = state.currentStep;
-    if (step === 1) {
-      const langSelect = document.getElementById("guidedLanguage");
-      if (langSelect) state.language = langSelect.value;
-    } else if (step === 2) {
-      const domainEl = document.getElementById("guidedDomain");
-      if (domainEl) state.domain = domainEl.value.trim();
-    } else if (step === 3) {
-      const recEl = document.getElementById("guidedRecipient");
-      if (recEl) state.recipient = recEl.value.trim();
-    } else if (step === 4) {
-      const objEl = document.getElementById("guidedObjective");
-      if (objEl) state.objective = objEl.value.trim();
-    } else if (step === 5) {
-      const toneEl = document.getElementById("guidedTone");
-      if (toneEl) state.tone = toneEl.value;
-    } else if (step === 6) {
-      const extraEl = document.getElementById("guidedExtra");
-      if (extraEl) state.extraContext = extraEl.value.trim();
-      const srcEl = document.getElementById("guidedSourceText");
-      if (srcEl) state.sourceText = srcEl.value.trim();
-    }
-  }
-
-  prevBtn.addEventListener("click", () => {
-    if (state.currentStep > 0) {
-      state.currentStep -= 1;
-      renderStep();
-    }
-  });
-
-  nextBtn.addEventListener("click", () => {
-    if (state.currentStep <= totalSteps - 1) {
-      persistCurrentStepInputs();
-      state.currentStep += 1;
-      renderStep();
-    } else {
-      // déjà sur la dernière étape "brief généré"
-    }
-  });
-
-  // Render initial
-  renderStep();
 }
 
-function buildBrief(state) {
+function endConversation() {
+  appendCamilleMessage(
+    "Merci pour toutes ces précisions. Le brief est prêt, vous pouvez maintenant lancer la génération."
+  );
+
+  const form = document.getElementById("acAnswerForm");
+  if (form) {
+    form.style.display = "none";
+  }
+
+  const generateBtn = document.getElementById("acGenerateBtn");
+  if (generateBtn) {
+    generateBtn.disabled = false;
+  }
+
+  updateBriefPreview();
+}
+
+// ----------------- Construction du brief -----------------
+
+function updateBriefPreview() {
+  const briefEl = document.getElementById("acBriefPreview");
+  if (!briefEl) return;
+
   const modeLabel =
-    state.mode === "interpret"
-      ? "INTERPRÉTATION d'un message reçu"
-      : "RÉDACTION d'un message";
+    acState.mode === "write" ? "Rédaction accompagnée" : "Interprétation accompagnée";
 
-  let brief = "";
-  brief += `Type de demande : ${modeLabel}\n`;
-  brief += `Langue cible : ${state.language || "fr"}\n\n`;
+  const parts = [];
 
-  if (state.domain) {
-    brief += `Contexte métier : ${state.domain}\n\n`;
+  parts.push(`Mode : ${modeLabel}`);
+  parts.push("");
+
+  if (acState.lang) {
+    parts.push(`Langue du texte final : ${acState.lang}`);
   }
 
-  if (state.recipient) {
-    brief += `Destinataire : ${state.recipient}\n\n`;
+  if (acState.audience) {
+    parts.push(`Type de destinataire : ${acState.audience}`);
   }
 
-  if (state.objective) {
-    brief += `Objectif du message : ${state.objective}\n\n`;
+  if (acState.goal) {
+    parts.push(`Objectif principal : ${acState.goal}`);
   }
 
-  if (state.tone) {
-    brief += `Ton souhaité : ${state.tone}\n\n`;
+  if (acState.mode === "interpret" && acState.sourceText) {
+    parts.push("");
+    parts.push("Texte reçu à interpréter :");
+    parts.push(acState.sourceText);
   }
 
-  if (state.extraContext) {
-    brief += `Précisions supplémentaires : ${state.extraContext}\n\n`;
+  if (acState.answers && acState.answers.length > 0) {
+    parts.push("");
+    parts.push("Réponses détaillées de l'utilisateur :");
+    const questions = getCurrentQuestions();
+    acState.answers.forEach((answer, idx) => {
+      const q = questions[idx] || `Question ${idx + 1}`;
+      parts.push(`- ${q}`);
+      parts.push(`  → ${answer}`);
+    });
   }
 
-  if (state.mode === "interpret" && state.sourceText) {
-    brief += `Texte à interpréter :\n${state.sourceText}\n\n`;
-    brief += `Consigne : fournissez une interprétation claire et nuancée de ce message, en explicitant les sous-entendus éventuels, le niveau de formalité, les risques et les pistes de réponse possibles.`;
-  } else {
-    brief += `Consigne : rédigez le message complet à ma place, en respectant le ton et l'objectif décrits ci-dessus.`;
+  briefEl.value = parts.join("\n");
+}
+
+// ----------------- Bouton "Générer avec Camille" (placeholder IA) -----------------
+
+function setupGenerateButton() {
+  const btn = document.getElementById("acGenerateBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const briefEl = document.getElementById("acBriefPreview");
+    if (!briefEl || !briefEl.value.trim()) {
+      alert("Le brief est vide. Répondez d'abord aux questions de Camille.");
+      return;
+    }
+
+    // Pour l’instant : simple message de confirmation
+    // (on branchera ensuite sur vos endpoints IA existants).
+    alert(
+      "Le brief est prêt et structuré.\n\n" +
+        "Prochaine étape : nous brancherons ce mode accompagné sur l'API IA " +
+        "en utilisant la même structure de requête que les pages Rédaction et Interprétation."
+    );
+  });
+}
+
+// ----------------- Helpers affichage conversation -----------------
+
+function appendCamilleMessage(text) {
+  const convEl = document.getElementById("acConversation");
+  if (!convEl) return;
+
+  const p = document.createElement("p");
+  p.style.color = "var(--text-main)";
+  p.innerHTML = `<strong>Camille :</strong> ${escapeHtml(text)}`;
+  convEl.appendChild(p);
+  convEl.scrollTop = convEl.scrollHeight;
+}
+
+function appendUserMessage(text) {
+  const convEl = document.getElementById("acConversation");
+  if (!convEl) return;
+
+  const p = document.createElement("p");
+  p.style.color = "var(--text-muted)";
+  p.style.textAlign = "right";
+  p.innerHTML = `<strong>Vous :</strong> ${escapeHtml(text)}`;
+  convEl.appendChild(p);
+  convEl.scrollTop = convEl.scrollHeight;
+}
+
+function resetConversation() {
+  acState.started = false;
+  acState.currentStep = 0;
+  acState.answers = [];
+
+  const convEl = document.getElementById("acConversation");
+  const form = document.getElementById("acAnswerForm");
+  const answerInput = document.getElementById("acAnswerInput");
+  const generateBtn = document.getElementById("acGenerateBtn");
+
+  if (convEl) {
+    convEl.innerHTML = "";
+    const p = document.createElement("p");
+    p.style.color = "var(--text-muted)";
+    p.textContent = "Camille attend que vous lanciez le mode accompagné.";
+    convEl.appendChild(p);
   }
 
-  return brief;
+  if (form) form.style.display = "none";
+  if (answerInput) answerInput.value = "";
+  if (generateBtn) generateBtn.disabled = true;
+}
+
+// Sécurité simple pour éviter l'injection HTML dans la conversation
+function escapeHtml(str) {
+  return (str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
