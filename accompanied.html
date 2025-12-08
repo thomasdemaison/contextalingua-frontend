@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <!-- Header commun (le même que sur les autres pages) -->
+  <!-- Header commun -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="header-logo">
@@ -49,7 +49,7 @@
             </h1>
             <p style="color:var(--text-muted);font-size:0.95rem;">
               Camille vous pose quelques questions pour affiner le contexte, puis prépare
-              un brief ultra précis pour la rédaction ou l’interprétation.
+              un brief précis pour la rédaction ou l’interprétation.
             </p>
           </div>
 
@@ -77,8 +77,9 @@
             </div>
 
             <div class="form-field">
-              <span>Type de destinataire</span>
+              <span>Type de destinataire (si connu)</span>
               <select id="acAudience">
+                <option value="">Je ne sais pas / pas pertinent</option>
                 <option value="client">Client / prospect</option>
                 <option value="collegue">Collègue / équipe interne</option>
                 <option value="direction">Direction / investisseur</option>
@@ -88,11 +89,11 @@
             </div>
 
             <div class="form-field">
-              <span>Objectif principal</span>
+              <span>Objectif principal (en quelques mots)</span>
               <input
                 type="text"
                 id="acGoal"
-                placeholder="Ex. rassurer le client, négocier un délai, clarifier un malentendu…">
+                placeholder="Ex. comprendre le sous-texte, rassurer un client, négocier un délai…">
             </div>
 
             <!-- Pour l’interprétation : texte source obligatoire -->
@@ -102,6 +103,15 @@
                 id="acSourceText"
                 rows="5"
                 placeholder="Collez ici le mail ou le message que vous avez reçu."></textarea>
+            </div>
+
+            <!-- Pour l’interprétation : type d’accompagnement -->
+            <div class="form-field" id="acInterpretTypeBlock" style="display:none;">
+              <span>Type d’accompagnement</span>
+              <select id="acInterpretType">
+                <option value="analyse">Comprendre / analyser le texte</option>
+                <option value="analyse_reponse">Comprendre + préparer une réponse</option>
+              </select>
             </div>
 
             <!-- Bouton de démarrage -->
@@ -163,7 +173,7 @@
 
           <p id="acInfo"
              style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">
-            Pour cette première étape, le bouton prépare simplement le brief.  
+            Pour cette étape, le bouton prépare simplement le brief.  
             Nous le connecterons ensuite à votre moteur IA existant, en utilisant les mêmes
             endpoints que les modes Rédaction et Interprétation.
           </p>
