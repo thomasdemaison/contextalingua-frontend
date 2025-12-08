@@ -144,6 +144,23 @@ function setupHeaderNavigation() {
       return;
     }
 
+    // "Mode accompagné" (ou "Accompagné")
+    if (
+      txt.includes("mode accompagne") ||
+      txt === "accompagne" ||
+      txt.includes("accompagne")
+    ) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "accompanied.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+
     // Lien explicite "Déconnexion"
     if (txt.includes("deconnexion")) {
       el.addEventListener("click", (e) => {
