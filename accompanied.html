@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr" class="page">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mode accompagné – ContextaLingua</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <span class="contexta">Contexta</span>
+      <span class="lingua">Lingua</span>
+    </a>
+
+    <nav class="main-nav">
+      <a href="produit.html" class="nav-link">Produit</a>
+      <a href="tarifs.html" class="nav-link">Tarifs</a>
+      <a href="faq.html" class="nav-link">FAQ</a>
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="generate.html" class="nav-link">Rédaction</a>
+      <a href="interpret.html" class="nav-link">Interprétation</a>
+      <a href="accompanied.html" class="nav-link">Mode accompagné</a>
+    </nav>
+
+    <div class="header-actions">
+      <span id="headerUserEmail" class="nav-link"></span>
+      <button class="btn btn-ghost">Se connecter</button>
+      <button class="btn btn-primary">Commencer gratuitement</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container hero-grid hero-grid-simple">
+      <div class="card" style="max-width: 720px; margin: 0 auto;">
+        <h1 style="margin-bottom: 8px;">Camille – Mode accompagné</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Je vais vous poser quelques questions pour préparer un brief précis, puis vous pourrez lancer
+          la <strong>rédaction</strong> ou l’<strong>interprétation</strong> en un clic.
+        </p>
+
+        <div id="wizardSteps" style="margin-top: 20px;">
+          <!-- contenu injecté par accompanied.js -->
+        </div>
+
+        <div id="wizardFooter" style="margin-top: 20px; display:flex; justify-content:space-between; gap:10px;">
+          <button id="prevStepBtn" class="btn btn-secondary" type="button">
+            ⬅ Étape précédente
+          </button>
+          <button id="nextStepBtn" class="btn btn-primary" type="button">
+            Étape suivante ➝
+          </button>
+        </div>
+
+        <p id="wizardStatus" style="margin-top: 12px; font-size:0.85rem; color:var(--text-muted);">
+          Étape 1 / 7
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>© ContextaLingua</span>
+    <nav class="footer-nav">
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/accompanied.js"></script>
+</body>
+</html>
