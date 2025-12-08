@@ -59,35 +59,132 @@ function setupHeaderNavigation() {
   const user = getCurrentUser();
   const hasToken = isAuthenticated();
 
-  // Afficher l'email si un élément est prévu
+  // Affichage / masquage des blocs public / auth
+  const publicEls = document.querySelectorAll(".nav-public-only");
+  const authEls = document.querySelectorAll(".nav-auth-only");
+
+  publicEls.forEach((el) => {
+    el.style.display = hasToken ? "none" : "";
+  });
+  authEls.forEach((el) => {
+    el.style.display = hasToken ? "" : "none";
+  });
+
+  // Affichage de l'email dans le header
   const headerEmail = document.getElementById("headerUserEmail");
-  if (headerEmail && user && user.email) {
-    headerEmail.textContent = user.email;
+  if (headerEmail) {
+    headerEmail.textContent = hasToken && user && user.email ? user.email : "";
   }
 
   const clickable = Array.from(document.querySelectorAll("a, button"));
+  const normalizeText = (str) =>
+    (str || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
 
   clickable.forEach((el) => {
     const txt = normalizeText(el.textContent || "");
     if (!txt) return;
 
-    // Bouton connexion : si connecté, on le transforme en "Déconnexion"
-    if (txt.includes("se connecter")) {
-      if (hasToken) {
-        el.textContent = "Déconnexion";
-        el.addEventListener("click", (e) => {
-          e.preventDefault();
-          clearAuth();
-          window.location.href = "index.html";
-        });
-      } else {
-        el.addEventListener("click", (e) => {
-          e.preventDefault();
-          window.location.href = "login.html";
-        });
-      }
+    // Bouton explicite de déconnexion
+    if (el.id === "btnLogout" || txt.includes("deconnexion")) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearAuth();
+        window.location.href = "index.html";
+      });
       return;
     }
+
+    // Boutons Se connecter (visibles seulement si non connecté)
+    if (txt.includes("se connecter")) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          // Si on est déjà connecté et qu'on clique sur un "Se connecter" résiduel
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+
+    // "Commencer / Essayer gratuitement"
+    if (
+      txt.includes("commencer gratuitement") ||
+      txt.includes("essayer gratuitement")
+    ) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "register.html";
+        }
+      });
+      return;
+    }
+
+    // "Tableau de bord"
+    if (txt.includes("tableau de bord")) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+
+    // "Rédaction"
+    if (txt.includes("redaction")) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "generate.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+
+    // "Interprétation"
+    if (txt.includes("interpretation")) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "interpret.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+
+    // "Mode accompagné"
+    if (
+      txt.includes("mode accompagne") ||
+      txt === "accompagne" ||
+      txt.includes("accompagne")
+    ) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (hasToken) {
+          window.location.href = "accompanied.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+      return;
+    }
+  });
+}
 
     // "Commencer / Essayer gratuitement"
     if (
