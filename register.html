@@ -16,32 +16,37 @@
 
     <!-- Navigation principale -->
     <nav class="main-nav">
-      <!-- Menu PUBLIC : toujours visible pour les visiteurs -->
+      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
       <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-      <a href="tarifs.html" class="nav-link nav-public-only">Tarifs</a>
-      <a href="faq.html" class="nav-link nav-public-only">FAQ</a>
+      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-      <!-- Menu UTILISATEUR : visible uniquement si connecté -->
-      <a href="index.html" class="nav-link nav-auth-only">Accueil</a>
-      <a href="dashboard.html" class="nav-link nav-auth-only">Tableau de bord</a>
-      <a href="generate.html" class="nav-link nav-auth-only">Rédaction</a>
-      <a href="interpret.html" class="nav-link nav-auth-only">Interprétation</a>
+      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
+      <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
       <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
     </nav>
 
-    <!-- Zone de droite : actions -->
+    <!-- Zone de droite -->
     <div class="header-actions">
-      <!-- Email + déconnexion : visibles uniquement si connecté -->
+      <!-- Email + déconnexion : visibles quand connecté -->
       <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-      <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
+        Déconnexion
+      </button>
 
-      <!-- Boutons publics : visibles seulement si NON connecté -->
-      <button class="btn btn-ghost nav-public-only">Se connecter</button>
-      <button class="btn btn-primary nav-public-only">Commencer gratuitement</button>
+      <!-- Actions publiques : visibles quand NON connecté -->
+      <button class="btn btn-ghost nav-public-only">
+        Se connecter
+      </button>
+      <button class="btn btn-primary nav-public-only">
+        Commencer gratuitement
+      </button>
     </div>
   </div>
 </header>
-
 
 
 <main>
