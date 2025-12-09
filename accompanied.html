@@ -123,31 +123,44 @@
                style="font-size:0.9rem;color:var(--danger);min-height:1.1em;"></p>
           </div>
 
-          <!-- Zone de conversation -->
-          <div class="card"
-               style="margin-top:12px;background:var(--bg-elevated-soft);max-height:380px;overflow:auto;">
-            <h3 style="margin-bottom:8px;color:var(--text-strong);font-size:1rem;">
-              Échanges avec Camille
-            </h3>
-            <div id="acConversation"
-                 style="display:flex;flex-direction:column;gap:8px;font-size:0.9rem;">
-              <p style="color:var(--text-muted);">
-                Camille attend que vous lanciez le mode accompagné.
-              </p>
-            </div>
+          <!-- Carte échanges avec Camille -->
+<div class="card" style="margin-top:24px;">
+  <h3 style="margin-bottom: 10px; color: var(--text-strong);">
+    Échanges avec Camille
+  </h3>
+  <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+    Camille vous pose quelques questions pour affiner le contexte, puis prépare un brief
+    détaillé que vous retrouverez dans la colonne de droite.
+  </p>
 
-            <form id="acAnswerForm" style="margin-top:10px;display:none;">
-              <div class="form-field">
-                <span id="acCurrentQuestionLabel">Question en cours</span>
-                <textarea id="acAnswerInput" rows="3"
-                          placeholder="Votre réponse…"></textarea>
-              </div>
-              <button type="submit" class="btn btn-secondary btn-full">
-                Envoyer la réponse
-              </button>
-            </form>
-          </div>
-        </div>
+  <!-- Zone de conversation -->
+  <div id="acConversation"
+       style="background:#020617; border-radius:12px; padding:12px; min-height:120px; max-height:260px; overflow-y:auto; font-size:0.9rem;">
+    <!-- Message d'intro (sera remplacé par le script) -->
+    <p style="margin-bottom:8px;">
+      <strong>Camille :</strong> Pour commencer, choisissez un mode et cliquez sur
+      «&nbsp;Démarrer l’accompagnement avec Camille&nbsp;».
+    </p>
+  </div>
+
+  <!-- Champ de réponse -->
+  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+    <label for="acAnswerInput" style="font-size:0.9rem; color:var(--text-muted);">
+      Votre réponse pour Camille :
+    </label>
+    <textarea id="acAnswerInput"
+              rows="3"
+              placeholder="Votre réponse… (Ctrl+Entrée pour envoyer)"
+              style="background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
+
+    <div style="display:flex; justify-content:flex-end;">
+      <button id="acAnswerSendBtn" class="btn btn-secondary">
+        Envoyer à Camille
+      </button>
+    </div>
+  </div>
+</div>
+
 
         <!-- Colonne droite : récap & résultat -->
         <div class="card"
