@@ -1,249 +1,571 @@
 // js/accompanied.js
-// Logique du "mode accompagné" (rédaction / interprétation) sans appel IA
+// Assistant pas à pas pour le mode accompagné
 
 document.addEventListener("DOMContentLoaded", () => {
-  setupHeaderNavigation(); // vient de auth.js
+  setupHeaderNavigation?.(); // si défini dans auth.js
+  protectPageIfNeeded?.();   // idem, selon ton implementation
+
   initAccompaniedMode();
 });
 
+let acMode = "write"; // "write" (rédaction) ou "interpret"
+let acStepIndex = 0;
+
+// Réponses stockées par mode
+const acAnswers = {
+  write: {
+    language: "fr",
+    messageType: "",
+    recipientProfile: "",
+    relation: "",
+    goal: "",
+    tone: "",
+    context: "",
+    rawText: "",
+    constraints: ""
+  },
+  interpret: {
+    sourceLanguage: "fr",
+    summaryLanguage: "fr",
+    text: "",
+    relation: "",
+    importance: "",
+    focus: "",
+    wantsAnswer: "je ne sais pas"
+  }
+};
+
 function initAccompaniedMode() {
-  const modeWriteBtn = document.getElementById("modeWriteBtn");
-  const modeInterpretBtn = document.getElementById("modeInterpretBtn");
-  const startBtn = document.getElementById("acStartBtn");
-  const convoEl = document.getElementById("acConversation");
-  const answerInput = document.getElementById("acAnswerInput");
-  const answerBtn = document.getElementById("acAnswerSendBtn");
-  const briefText = document.getElementById("acBriefText");
-  const generateBtn = document.getElementById("acGenerateBtn");
+  const modeWriteBtn = document.getElementById("acModeWriteBtn");
+  const modeInterpretBtn = document.getElementById("acModeInterpretBtn");
+  const prevBtn = document.getElementById("acPrevBtn");
+  const nextBtn = document.getElementById("acNextBtn");
+  const launchBtn = document.getElementById("acLaunchBtn");
+  const copyBtn = document.getElementById("acCopyBtn");
 
   if (
     !modeWriteBtn ||
     !modeInterpretBtn ||
-    !startBtn ||
-    !convoEl ||
-    !answerInput ||
-    !answerBtn ||
-    !briefText ||
-    !generateBtn
+    !prevBtn ||
+    !nextBtn ||
+    !launchBtn ||
+    !copyBtn
   ) {
     console.warn(
-      "[Mode accompagné] Certains éléments HTML sont manquants. Vérifiez les id : " +
-        "modeWriteBtn, modeInterpretBtn, acStartBtn, acConversation, acAnswerInput, " +
-        "acAnswerSendBtn, acBriefText, acGenerateBtn."
+      "[Mode accompagné] Certains éléments HTML sont manquants. Vérifiez accompanied.html."
     );
     return;
   }
 
-  // --- État interne ---
-  let currentMode = "write"; // "write" ou "interpret"
-  let stepIndex = 0;
-  let answers = [];
-
-  // Flots de questions différents selon le mode
-  const flows = {
-    write: [
-      {
-        id: "destinataire",
-        label:
-          "À qui est destiné ce message ? Décrivez le profil du ou des destinataires et votre lien avec eux.",
-      },
-      {
-        id: "contexte",
-        label:
-          "Quel est le contexte de ce message ? Y a-t-il un historique important à connaître (échanges précédents, tension, enjeu business) ?",
-      },
-      {
-        id: "objectif",
-        label:
-          "Quel résultat concret souhaitez-vous obtenir après l’envoi de ce message ?",
-      },
-      {
-        id: "ton",
-        label:
-          "Quel ton souhaitez-vous ? (ex. très diplomate, ferme mais courtois, chaleureux, neutre, etc.)",
-      },
-      {
-        id: "contraintes",
-        label:
-          "Y a-t-il des éléments à éviter absolument (mots, formulations, sujets sensibles) ou au contraire à mentionner obligatoirement ?",
-      },
-    ],
-    interpret: [
-      {
-        id: "source",
-        label:
-          "Qui est à l’origine du message ou du texte à analyser ? Quel est votre lien avec cette personne / organisation ?",
-      },
-      {
-        id: "texteOrigine",
-        label:
-          "Pouvez-vous résumer brièvement le contenu ou le sujet du texte reçu ?",
-      },
-      {
-        id: "ressenti",
-        label:
-          "Quel est votre ressenti spontané en lisant ce texte ? Y voyez-vous des zones d’inconfort, de doute ou de tension ?",
-      },
-      {
-        id: "enjeux",
-        label:
-          "Quels sont, selon vous, les enjeux derrière ce texte (relationnels, financiers, juridiques, réputation, etc.) ?",
-      },
-      {
-        id: "besoin",
-        label:
-          "Qu’attendez-vous de Camille pour cette interprétation ? (ex. décryptage du sous-texte, suggestion de réponse, analyse des risques…) ",
-      },
-    ],
-  };
-
-  function setMode(newMode) {
-    currentMode = newMode;
-    console.log("[Mode accompagné] mode =", currentMode);
-
-    // gestion des styles boutons
-    if (currentMode === "write") {
-      modeWriteBtn.classList.add("btn-secondary");
-      modeWriteBtn.classList.remove("btn-ghost");
-      modeInterpretBtn.classList.add("btn-ghost");
-      modeInterpretBtn.classList.remove("btn-secondary");
-    } else {
-      modeInterpretBtn.classList.add("btn-secondary");
-      modeInterpretBtn.classList.remove("btn-ghost");
-      modeWriteBtn.classList.add("btn-ghost");
-      modeWriteBtn.classList.remove("btn-secondary");
-    }
-  }
-
-  function resetConversation() {
-    stepIndex = 0;
-    answers = [];
-    convoEl.innerHTML = "";
-
-    const intro = document.createElement("p");
-    intro.innerHTML =
-      "<strong>Camille :</strong> Parfait, nous allons clarifier la situation ensemble. " +
-      "Je vais vous poser quelques questions ciblées, puis je préparerai un brief très précis.";
-    convoEl.appendChild(intro);
-
-    askNextQuestion();
-    updateBrief();
-  }
-
-  function askNextQuestion() {
-    const flow = flows[currentMode];
-    if (!flow || stepIndex >= flow.length) {
-      const done = document.createElement("p");
-      done.innerHTML =
-        "<strong>Camille :</strong> Merci, j’ai toutes les informations nécessaires. " +
-        "Vous pouvez maintenant relire le brief à droite avant de lancer la génération.";
-      convoEl.appendChild(done);
-      convoEl.scrollTop = convoEl.scrollHeight;
-      return;
-    }
-
-    const q = flow[stepIndex];
-    const p = document.createElement("p");
-    p.style.marginTop = "8px";
-    p.innerHTML = `<strong>Camille :</strong> ${q.label}`;
-    convoEl.appendChild(p);
-    convoEl.scrollTop = convoEl.scrollHeight;
-  }
-
-  function handleAnswer() {
-    const text = answerInput.value.trim();
-    if (!text) return;
-
-    // Affichage côté utilisateur
-    const p = document.createElement("p");
-    p.style.marginTop = "4px";
-    p.innerHTML = `<strong>Vous :</strong> ${escapeHtml(text)}`;
-    convoEl.appendChild(p);
-    convoEl.scrollTop = convoEl.scrollHeight;
-
-    // Enregistrement
-    const flow = flows[currentMode];
-    if (flow && flow[stepIndex]) {
-      answers.push({
-        mode: currentMode,
-        id: flow[stepIndex].id,
-        question: flow[stepIndex].label,
-        answer: text,
-      });
-    }
-
-    answerInput.value = "";
-    stepIndex += 1;
-    updateBrief();
-    askNextQuestion();
-  }
-
-  function updateBrief() {
-    const lang = document.getElementById("acMainLanguage")?.value || "fr";
-    const audience = document.getElementById("acAudienceType")?.value || "unknown";
-    const goal = document.getElementById("acMainGoal")?.value || "";
-
-    let brief = "";
-    brief += `Mode : ${currentMode === "write" ? "Rédaction accompagnée" : "Interprétation accompagnée"}\n`;
-    brief += `Langue principale du texte final : ${lang}\n`;
-    brief += `Type de destinataire : ${audience}\n`;
-    if (goal) {
-      brief += `Objectif principal : ${goal}\n`;
-    }
-    brief += "\n--- Détails issus de l’accompagnement ---\n";
-
-    answers.forEach((a, idx) => {
-      brief += `\n${idx + 1}. ${a.question}\n`;
-      brief += `   → Réponse : ${a.answer}\n`;
-    });
-
-    briefText.value = brief;
-  }
-
-  // ——— LISTENERS ———
-    // ——— LISTENERS ———
+  // Choix de mode
   modeWriteBtn.addEventListener("click", (e) => {
-    // Empêche absolument toute navigation si c'est un <a>
     e.preventDefault();
-    e.stopPropagation();
-    setMode("write");
+    setAcMode("write");
   });
 
   modeInterpretBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    setMode("interpret");
+    setAcMode("interpret");
   });
 
-
-  answerBtn.addEventListener("click", () => {
-    handleAnswer();
-  });
-
-  answerInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      handleAnswer();
+  // Navigation étapes
+  prevBtn.addEventListener("click", () => {
+    saveCurrentStep();
+    if (acStepIndex > 0) {
+      acStepIndex--;
+      renderCurrentStep();
+      updateSummary();
     }
   });
 
-  generateBtn.addEventListener("click", () => {
-    // Pour l’instant : simple log + mise à jour du brief
-    updateBrief();
-    alert(
-      "Le brief est prêt dans la colonne de droite.\n" +
-        "Dans la V1, ce bouton appelera l’API d’IA en utilisant ce brief."
-    );
+  nextBtn.addEventListener("click", () => {
+    if (!saveCurrentStep()) return; // validation minimale
+    const maxSteps = getStepsCount();
+    if (acStepIndex < maxSteps - 1) {
+      acStepIndex++;
+      renderCurrentStep();
+      updateSummary();
+    }
   });
 
-  // Mode par défaut
-  setMode("write");
+  launchBtn.addEventListener("click", async () => {
+    if (!saveCurrentStep()) return;
+    updateSummary();
+    await copyBriefToClipboard("Le brief a été copié. Redirection...");
+    redirectToTargetPage();
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    saveCurrentStep();
+    updateSummary();
+    await copyBriefToClipboard("Brief copié dans le presse-papiers.");
+  });
+
+  // Initialisation
+  setAcMode("write"); // mode par défaut
 }
 
-// utilitaire très simple pour éviter d’injecter du HTML brut
+/* -------------------- Mode & étapes -------------------- */
+
+function setAcMode(mode) {
+  acMode = mode === "interpret" ? "interpret" : "write";
+  acStepIndex = 0;
+
+  const modeWriteBtn = document.getElementById("acModeWriteBtn");
+  const modeInterpretBtn = document.getElementById("acModeInterpretBtn");
+
+  if (modeWriteBtn && modeInterpretBtn) {
+    if (acMode === "write") {
+      modeWriteBtn.classList.remove("btn-secondary");
+      modeWriteBtn.classList.add("btn-primary");
+      modeInterpretBtn.classList.remove("btn-primary");
+      modeInterpretBtn.classList.add("btn-secondary");
+    } else {
+      modeInterpretBtn.classList.remove("btn-secondary");
+      modeInterpretBtn.classList.add("btn-primary");
+      modeWriteBtn.classList.remove("btn-primary");
+      modeWriteBtn.classList.add("btn-secondary");
+    }
+  }
+
+  renderCurrentStep();
+  updateSummary();
+}
+
+function getStepsCount() {
+  return acMode === "write" ? 4 : 4;
+}
+
+/* -------------------- Rendu d’étape -------------------- */
+
+function renderCurrentStep() {
+  const stepLabel = document.getElementById("acStepLabel");
+  const stepTitle = document.getElementById("acStepTitle");
+  const stepSubtitle = document.getElementById("acStepSubtitle");
+  const stepBody = document.getElementById("acStepBody");
+  const stepProgress = document.getElementById("acStepProgress");
+  const prevBtn = document.getElementById("acPrevBtn");
+  const nextBtn = document.getElementById("acNextBtn");
+  const launchBtn = document.getElementById("acLaunchBtn");
+
+  if (!stepBody) return;
+
+  const total = getStepsCount();
+  const stepNumber = acStepIndex + 1;
+
+  if (stepLabel) {
+    stepLabel.textContent = `Étape ${stepNumber}`;
+  }
+  if (stepProgress) {
+    stepProgress.textContent = `Étape ${stepNumber} / ${total}`;
+  }
+
+  // Gestion visibilité des boutons
+  if (prevBtn) prevBtn.style.visibility = acStepIndex === 0 ? "hidden" : "visible";
+  if (nextBtn) nextBtn.style.display =
+    acStepIndex === total - 1 ? "none" : "inline-flex";
+  if (launchBtn) launchBtn.style.display =
+    acStepIndex === total - 1 ? "inline-flex" : "none";
+
+  const a = acAnswers[acMode];
+
+  // On construit le contenu de l’étape selon le mode
+  let html = "";
+
+  if (acMode === "write") {
+    // --------- Parcours RÉDACTION ---------
+    switch (acStepIndex) {
+      case 0:
+        if (stepTitle) stepTitle.textContent = "Contexte général du message";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Quelques éléments sur votre situation et le message à préparer.";
+
+        html = `
+          <div class="form-field">
+            <span>Langue principale du message final</span>
+            <input id="acWriteLanguage" type="text" placeholder="fr, en, es..." value="${escapeHtml(
+              a.language || "fr"
+            )}">
+          </div>
+
+          <div class="form-field">
+            <span>Type de message</span>
+            <input id="acWriteMessageType" type="text"
+              placeholder="email de relance, LinkedIn, WhatsApp, note interne..."
+              value="${escapeHtml(a.messageType || "")}">
+          </div>
+
+          <div class="form-field">
+            <span>Contexte métier / situation</span>
+            <textarea id="acWriteContext" rows="3"
+              placeholder="Que se passe-t-il ? Dans quel contexte professionnel ou personnel s’inscrit ce message ?">${escapeHtml(
+                a.context || ""
+              )}</textarea>
+          </div>
+        `;
+        break;
+
+      case 1:
+        if (stepTitle) stepTitle.textContent = "Destinataire et relation";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Camille a besoin de savoir à qui vous écrivez et votre lien avec cette personne.";
+
+        html = `
+          <div class="form-field">
+            <span>Profil du destinataire</span>
+            <textarea id="acWriteRecipientProfile" rows="3"
+              placeholder="Dirigeant de PME, client fidèle, prospect froid, collègue RH...">${escapeHtml(
+                a.recipientProfile || ""
+              )}</textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Votre relation / historique</span>
+            <textarea id="acWriteRelation" rows="3"
+              placeholder="1er contact, relation tendue, client en retard de paiement, collaboration de longue date...">${escapeHtml(
+                a.relation || ""
+              )}</textarea>
+          </div>
+        `;
+        break;
+
+      case 2:
+        if (stepTitle) stepTitle.textContent = "Objectif et ton du message";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Clarifions ce que vous voulez obtenir et comment vous voulez sonner.";
+
+        html = `
+          <div class="form-field">
+            <span>Objectif principal</span>
+            <textarea id="acWriteGoal" rows="2"
+              placeholder="obtenir un rendez-vous, relancer un paiement, rassurer un client, dire non sans braquer...">${escapeHtml(
+                a.goal || ""
+              )}</textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Ton souhaité</span>
+            <input id="acWriteTone" type="text"
+              placeholder="professionnel et chaleureux, direct mais diplomate..."
+              value="${escapeHtml(a.tone || "")}">
+          </div>
+
+          <div class="form-field">
+            <span>Contraintes particulières</span>
+            <textarea id="acWriteConstraints" rows="2"
+              placeholder="éléments à absolument mentionner ou à éviter, longueur max, niveau de détail...">${escapeHtml(
+                a.constraints || ""
+              )}</textarea>
+          </div>
+        `;
+        break;
+
+      case 3:
+        if (stepTitle) stepTitle.textContent =
+          "Texte brut / éléments à intégrer (facultatif)";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Collez ici un texte existant ou des puces que Camille devra reprendre ou améliorer.";
+
+        html = `
+          <div class="form-field">
+            <span>Texte ou notes à intégrer (facultatif)</span>
+            <textarea id="acWriteRawText" rows="6"
+              placeholder="Collez votre message actuel, vos bullet points ou toute matière première utile...">${escapeHtml(
+                a.rawText || ""
+              )}</textarea>
+          </div>
+        `;
+        break;
+    }
+  } else {
+    // --------- Parcours INTERPRÉTATION ---------
+    switch (acStepIndex) {
+      case 0:
+        if (stepTitle) stepTitle.textContent = "Texte à analyser";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Collez ici le message, l’email ou l’extrait que vous voulez que Camille analyse.";
+
+        html = `
+          <div class="form-field">
+            <span>Texte / message reçu</span>
+            <textarea id="acIntText" rows="8"
+              placeholder="Collez le message tel que vous l’avez reçu (sans le modifier).">${escapeHtml(
+                a.text || ""
+              )}</textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Langue du message</span>
+            <input id="acIntSourceLanguage" type="text"
+              placeholder="fr, en, es..."
+              value="${escapeHtml(a.sourceLanguage || "fr")}">
+          </div>
+        `;
+        break;
+
+      case 1:
+        if (stepTitle) stepTitle.textContent = "Contexte et relation";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Pour bien interpréter le sens, le ton et les non-dits, Camille a besoin du contexte.";
+
+        html = `
+          <div class="form-field">
+            <span>Qui vous a écrit ?</span>
+            <textarea id="acIntRelation" rows="3"
+              placeholder="client, fournisseur, manager, partenaire, administration...">${escapeHtml(
+                a.relation || ""
+              )}</textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Niveau d’enjeu pour vous</span>
+            <input id="acIntImportance" type="text"
+              placeholder="faible, moyen, très important, risque juridique, enjeu commercial majeur..."
+              value="${escapeHtml(a.importance || "")}">
+          </div>
+        `;
+        break;
+
+      case 2:
+        if (stepTitle) stepTitle.textContent = "Ce que vous voulez comprendre";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Précisez ce que vous attendez de l’interprétation de Camille.";
+
+        html = `
+          <div class="form-field">
+            <span>Points sur lesquels vous voulez de la clarté</span>
+            <textarea id="acIntFocus" rows="3"
+              placeholder="ton réel, intention, risques, points flous, éléments cachés...">${escapeHtml(
+                a.focus || ""
+              )}</textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Souhaitez-vous que Camille prépare aussi une réponse ?</span>
+            <input id="acIntWantsAnswer" type="text"
+              placeholder="oui, non, je ne sais pas, seulement si nécessaire..."
+              value="${escapeHtml(a.wantsAnswer || "je ne sais pas")}">
+          </div>
+        `;
+        break;
+
+      case 3:
+        if (stepTitle) stepTitle.textContent =
+          "Langue et forme du retour de Camille";
+        if (stepSubtitle)
+          stepSubtitle.textContent =
+            "Dans quelle langue souhaitez-vous le résumé et sous quel format ?";
+
+        html = `
+          <div class="form-field">
+            <span>Langue de la synthèse</span>
+            <input id="acIntSummaryLanguage" type="text"
+              placeholder="fr, en, es..."
+              value="${escapeHtml(a.summaryLanguage || "fr")}">
+          </div>
+
+          <div class="form-field">
+            <span>Format souhaité</span>
+            <textarea id="acIntFormat" rows="3"
+              placeholder="résumé simple, analyse détaillée avec points forts / points faibles, recommandation d’action...">${escapeHtml(
+                a.format || ""
+              )}</textarea>
+          </div>
+        `;
+        break;
+    }
+  }
+
+  stepBody.innerHTML = html;
+}
+
+/* -------------------- Sauvegarde / validation -------------------- */
+
+function saveCurrentStep() {
+  const a = acAnswers[acMode];
+  const step = acStepIndex;
+
+  if (acMode === "write") {
+    switch (step) {
+      case 0: {
+        const lang = document.getElementById("acWriteLanguage")?.value.trim();
+        const type = document.getElementById("acWriteMessageType")?.value.trim();
+        const ctx = document.getElementById("acWriteContext")?.value.trim();
+
+        a.language = lang || "fr";
+        a.messageType = type || "";
+        a.context = ctx || "";
+        return true;
+      }
+      case 1: {
+        const prof =
+          document.getElementById("acWriteRecipientProfile")?.value.trim();
+        const rel = document.getElementById("acWriteRelation")?.value.trim();
+        a.recipientProfile = prof || "";
+        a.relation = rel || "";
+        return true;
+      }
+      case 2: {
+        const goal = document.getElementById("acWriteGoal")?.value.trim();
+        const tone = document.getElementById("acWriteTone")?.value.trim();
+        const cons = document.getElementById("acWriteConstraints")?.value.trim();
+        a.goal = goal || "";
+        a.tone = tone || "";
+        a.constraints = cons || "";
+        return true;
+      }
+      case 3: {
+        const raw = document.getElementById("acWriteRawText")?.value.trim();
+        a.rawText = raw || "";
+        return true;
+      }
+    }
+  } else {
+    switch (step) {
+      case 0: {
+        const text = document.getElementById("acIntText")?.value.trim();
+        const lang =
+          document.getElementById("acIntSourceLanguage")?.value.trim();
+        a.text = text || "";
+        a.sourceLanguage = lang || "fr";
+
+        if (!a.text) {
+          showStatus("Merci de coller le message à analyser.", true);
+          return false;
+        }
+        return true;
+      }
+      case 1: {
+        const rel = document.getElementById("acIntRelation")?.value.trim();
+        const imp = document.getElementById("acIntImportance")?.value.trim();
+        a.relation = rel || "";
+        a.importance = imp || "";
+        return true;
+      }
+      case 2: {
+        const foc = document.getElementById("acIntFocus")?.value.trim();
+        const wa = document.getElementById("acIntWantsAnswer")?.value.trim();
+        a.focus = foc || "";
+        a.wantsAnswer = wa || "je ne sais pas";
+        return true;
+      }
+      case 3: {
+        const lang =
+          document.getElementById("acIntSummaryLanguage")?.value.trim();
+        const fmt = document.getElementById("acIntFormat")?.value.trim();
+        a.summaryLanguage = lang || "fr";
+        a.format = fmt || "";
+        return true;
+      }
+    }
+  }
+
+  return true;
+}
+
+/* -------------------- Récapitulatif -------------------- */
+
+function updateSummary() {
+  const summaryEl = document.getElementById("acSummary");
+  if (!summaryEl) return;
+
+  const a = acAnswers[acMode];
+
+  let summary = "";
+
+  if (acMode === "write") {
+    summary += "🎯 Mode : rédaction accompagnée\n\n";
+    summary += `• Langue finale : ${a.language || "non précisé"}\n`;
+    summary += `• Type de message : ${a.messageType || "non précisé"}\n\n`;
+
+    summary += "Contexte :\n";
+    summary += (a.context || "—") + "\n\n";
+
+    summary += "Destinataire / relation :\n";
+    summary += `• Profil : ${a.recipientProfile || "—"}\n`;
+    summary += `• Historique / relation : ${a.relation || "—"}\n\n`;
+
+    summary += "Objectif et ton :\n";
+    summary += `• Objectif principal : ${a.goal || "—"}\n`;
+    summary += `• Ton souhaité : ${a.tone || "—"}\n`;
+    summary += `• Contraintes : ${a.constraints || "—"}\n\n`;
+
+    summary += "Texte brut / matière première :\n";
+    summary += (a.rawText || "aucun texte fourni pour l’instant") + "\n";
+  } else {
+    summary += "🔎 Mode : interprétation accompagnée\n\n";
+    summary += `• Langue du message : ${a.sourceLanguage || "non précisé"}\n`;
+    summary += `• Langue de la synthèse : ${
+      a.summaryLanguage || "non précisé"
+    }\n\n`;
+
+    summary += "Texte à analyser :\n";
+    summary += (a.text || "—") + "\n\n";
+
+    summary += "Contexte :\n";
+    summary += `• Relation avec l’auteur : ${a.relation || "—"}\n`;
+    summary += `• Niveau d’enjeu : ${a.importance || "—"}\n\n`;
+
+    summary += "Ce que vous attendez de Camille :\n";
+    summary += `• Points à éclairer : ${a.focus || "—"}\n`;
+    summary += `• Préparation d’une réponse ? ${a.wantsAnswer || "—"}\n`;
+    summary += `• Format : ${a.format || "—"}\n`;
+  }
+
+  summaryEl.value = summary;
+}
+
+/* -------------------- Copie + redirection -------------------- */
+
+async function copyBriefToClipboard(messageOnSuccess) {
+  const summaryEl = document.getElementById("acSummary");
+  if (!summaryEl) return;
+
+  const text = summaryEl.value || "";
+  if (!text) return;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus(messageOnSuccess || "Brief copié.", false);
+  } catch (err) {
+    console.error("Erreur lors de la copie dans le presse-papiers :", err);
+    showStatus(
+      "Impossible de copier automatiquement. Vous pouvez copier le brief manuellement.",
+      true
+    );
+  }
+}
+
+function redirectToTargetPage() {
+  if (acMode === "write") {
+    window.location.href = "generate.html";
+  } else {
+    window.location.href = "interpret.html";
+  }
+}
+
+/* -------------------- Utilitaires -------------------- */
+
+function showStatus(msg, isError) {
+  const el = document.getElementById("acStatusMessage");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = isError ? "var(--danger)" : "var(--accent-strong)";
+}
+
 function escapeHtml(str) {
+  if (!str) return "";
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
