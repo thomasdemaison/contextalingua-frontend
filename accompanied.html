@@ -166,35 +166,36 @@
   </div>
 </div>
 
-        <!-- Colonne droite : récap & résultat -->
-        <div class="card"
-             style="display:flex;flex-direction:column;gap:16px;background:var(--bg-elevated-soft);">
-          <div>
-            <h2 style="margin-bottom:8px;color:var(--text-strong);font-size:1.2rem;">
-              Brief prêt pour Camille
-            </h2>
-            <p style="color:var(--text-muted);font-size:0.9rem;">
-              Ce résumé regroupe vos réponses. Il servira de base à la génération IA.
-            </p>
-          </div>
+        <!-- Colonne de droite : brief -->
+<aside class="card" style="margin-top:0; max-width:420px;">
+  <h3 style="margin-bottom:10px; color:var(--text-strong);">
+    Brief prêt pour Camille
+  </h3>
+  <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+    Ce résumé regroupe vos réponses. Il servira de base à la génération IA.
+  </p>
 
-          <div class="form-field">
-            <span>Résumé du contexte</span>
-            <textarea id="acBriefPreview" rows="10" readonly
-                      style="background:#020617;resize:vertical;"></textarea>
-          </div>
+  <label for="acBriefText" style="font-size:0.9rem; color:var(--text-muted);">
+    Résumé du contexte
+  </label>
+  <textarea id="acBriefText"
+            rows="10"
+            readonly
+            style="margin-top:6px; width:100%; background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
 
-          <button id="acGenerateBtn" class="btn btn-primary btn-large" disabled>
-            Générer avec Camille (bientôt branché à l’IA)
-          </button>
+  <button id="acGenerateBtn"
+          type="button"
+          class="btn btn-primary btn-large"
+          style="margin-top:14px;">
+    Générer avec Camille (bientôt branché à l’IA)
+  </button>
 
-          <p id="acInfo"
-             style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">
-            Pour cette étape, le bouton prépare simplement le brief.  
-            Nous le connecterons ensuite à votre moteur IA existant, en utilisant les mêmes
-            endpoints que les modes Rédaction et Interprétation.
-          </p>
-        </div>
+  <p style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);">
+    Pour cette première étape, le bouton prépare simplement le brief. Nous le connecterons ensuite
+    à votre moteur IA existant, en utilisant les mêmes endpoints que les modes Rédaction et
+    Interprétation.
+  </p>
+</aside>
       </div>
     </section>
   </main>
