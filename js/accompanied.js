@@ -201,12 +201,20 @@ function initAccompaniedMode() {
   }
 
   // ——— LISTENERS ———
-  modeWriteBtn.addEventListener("click", () => setMode("write"));
-  modeInterpretBtn.addEventListener("click", () => setMode("interpret"));
-
-  startBtn.addEventListener("click", () => {
-    resetConversation();
+    // ——— LISTENERS ———
+  modeWriteBtn.addEventListener("click", (e) => {
+    // Empêche absolument toute navigation si c'est un <a>
+    e.preventDefault();
+    e.stopPropagation();
+    setMode("write");
   });
+
+  modeInterpretBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMode("interpret");
+  });
+
 
   answerBtn.addEventListener("click", () => {
     handleAnswer();
