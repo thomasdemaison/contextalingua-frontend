@@ -141,7 +141,6 @@
   <!-- Zone de conversation -->
   <div id="acConversation"
        style="background:#020617; border-radius:12px; padding:12px; min-height:120px; max-height:260px; overflow-y:auto; font-size:0.9rem;">
-    <!-- Message d'intro (sera remplacé par le script) -->
     <p style="margin-bottom:8px;">
       <strong>Camille :</strong> Pour commencer, choisissez un mode et cliquez sur
       «&nbsp;Démarrer l’accompagnement avec Camille&nbsp;».
@@ -153,19 +152,19 @@
     <label for="acAnswerInput" style="font-size:0.9rem; color:var(--text-muted);">
       Votre réponse pour Camille :
     </label>
+
     <textarea id="acAnswerInput"
               rows="3"
               placeholder="Votre réponse… (Ctrl+Entrée pour envoyer)"
               style="background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
 
     <div style="display:flex; justify-content:flex-end;">
-      <button id="acAnswerSendBtn" class="btn btn-secondary">
+      <button id="acAnswerSendBtn" type="button" class="btn btn-secondary">
         Envoyer à Camille
       </button>
     </div>
   </div>
 </div>
-
 
         <!-- Colonne droite : récap & résultat -->
         <div class="card"
