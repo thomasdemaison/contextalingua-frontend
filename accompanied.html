@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr" class="page">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mode accompagné – ContextaLingua</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <!-- Header commun -->
+  <!-- HEADER PUBLIC / CONNECTÉ -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="header-logo">
@@ -15,25 +15,20 @@
       </a>
 
       <nav class="main-nav">
-        <!-- Public -->
-        <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-        <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
-        <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
-
-        <!-- Espace utilisateur -->
-        <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
-        <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
-        <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
-        <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
-        <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+        <a href="produit.html" class="nav-link">Produit</a>
+        <a href="tarifs.html" class="nav-link">Tarifs</a>
+        <a href="faq.html" class="nav-link">FAQ</a>
+        <a href="dashboard.html" class="nav-link" data-private="true">Tableau de bord</a>
+        <a href="generate.html" class="nav-link" data-private="true">Rédaction</a>
+        <a href="interpret.html" class="nav-link" data-private="true">Interprétation</a>
+        <a href="accompanied.html" class="nav-link active" data-private="true">Mode accompagné</a>
       </nav>
 
       <div class="header-actions">
-        <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-        <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
-
-        <button class="btn btn-ghost nav-public-only">Se connecter</button>
-        <button class="btn btn-primary nav-public-only">Commencer gratuitement</button>
+        <span id="headerUserEmail" class="nav-link"></span>
+        <button id="headerLoginBtn" class="btn btn-ghost">Se connecter</button>
+        <button id="headerLogoutBtn" class="btn btn-ghost" style="display:none;">Déconnexion</button>
+        <button id="headerCtaBtn" class="btn btn-primary">Commencer gratuitement</button>
       </div>
     </div>
   </header>
@@ -41,161 +36,138 @@
   <main>
     <section class="hero">
       <div class="container hero-grid">
-        <!-- Colonne gauche : configuration & conversation -->
-        <div class="card" style="display:flex;flex-direction:column;gap:16px;">
-          <div>
-            <h1 style="margin-bottom:8px;color:var(--text-strong);font-size:1.6rem;">
-              Mode accompagné
-            </h1>
-            <p style="color:var(--text-muted);font-size:0.95rem;">
-              Camille vous pose quelques questions pour affiner le contexte, puis prépare
-              un brief précis pour la rédaction ou l’interprétation.
-            </p>
-          </div>
+        <!-- COLONNE GAUCHE : MODE ACCOMPAGNÉ -->
+        <div class="card" style="margin-bottom:24px;">
+          <h1 style="margin-bottom:8px; color:var(--text-strong);">
+            Mode accompagné
+          </h1>
+          <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:16px;">
+            Camille vous pose quelques questions pour affiner le contexte, puis prépare un brief précis
+            pour la rédaction ou l’interprétation.
+          </p>
 
           <!-- Choix du mode -->
-<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
-  <button id="modeWriteBtn"
-          type="button"
-          class="btn btn-secondary">
-    ✍ Rédaction accompagnée
-  </button>
-
-  <button id="modeInterpretBtn"
-          type="button"
-          class="btn btn-ghost">
-    🔎 Interprétation accompagnée
-  </button>
-</div>
-
-          <!-- Inputs de base -->
-          <div style="margin-top:12px;display:grid;gap:10px;">
-            <div class="form-field">
-              <span>Langue principale du texte final</span>
-              <select id="acLang">
-                <option value="fr">Français</option>
-                <option value="en">Anglais</option>
-                <option value="es">Espagnol</option>
-                <option value="de">Allemand</option>
-                <option value="it">Italien</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <span>Type de destinataire (si connu)</span>
-              <select id="acAudience">
-                <option value="">Je ne sais pas / pas pertinent</option>
-                <option value="client">Client / prospect</option>
-                <option value="collegue">Collègue / équipe interne</option>
-                <option value="direction">Direction / investisseur</option>
-                <option value="institutionnel">Institution / administration</option>
-                <option value="autre">Autre</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <span>Objectif principal (en quelques mots)</span>
-              <input
-                type="text"
-                id="acGoal"
-                placeholder="Ex. comprendre le sous-texte, rassurer un client, négocier un délai…">
-            </div>
-
-            <!-- Pour l’interprétation : texte source obligatoire -->
-            <div class="form-field" id="acSourceBlock" style="display:none;">
-              <span>Texte reçu à interpréter</span>
-              <textarea
-                id="acSourceText"
-                rows="5"
-                placeholder="Collez ici le mail ou le message que vous avez reçu."></textarea>
-            </div>
-
-            <!-- Pour l’interprétation : type d’accompagnement -->
-            <div class="form-field" id="acInterpretTypeBlock" style="display:none;">
-              <span>Type d’accompagnement</span>
-              <select id="acInterpretType">
-                <option value="analyse">Comprendre / analyser le texte</option>
-                <option value="analyse_reponse">Comprendre + préparer une réponse</option>
-              </select>
-            </div>
-
-            <!-- Bouton de démarrage -->
-            <button id="acStartBtn" class="btn btn-primary btn-large">
-              Démarrer l’accompagnement avec Camille
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;margin-bottom:18px;">
+            <button id="modeWriteBtn"
+                    type="button"
+                    class="btn btn-secondary">
+              ✍ Rédaction accompagnée
             </button>
 
-            <p id="acError"
-               style="font-size:0.9rem;color:var(--danger);min-height:1.1em;"></p>
+            <button id="modeInterpretBtn"
+                    type="button"
+                    class="btn btn-ghost">
+              🔎 Interprétation accompagnée
+            </button>
           </div>
 
+          <!-- Paramètres de départ -->
+          <div class="form-field">
+            <span>Langue principale du texte final</span>
+            <select id="acMainLanguage">
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+              <option value="es">Espagnol</option>
+              <option value="de">Allemand</option>
+              <option value="it">Italien</option>
+              <option value="pt">Portugais</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <span>Type de destinataire (si connu)</span>
+            <select id="acAudienceType">
+              <option value="unknown">Je ne sais pas / pas pertinent</option>
+              <option value="client">Client / prospect</option>
+              <option value="fournisseur">Fournisseur / partenaire</option>
+              <option value="collaborateur">Collaborateur / équipe interne</option>
+              <option value="direction">Direction / dirigeant</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <span>Objectif principal (en quelques mots)</span>
+            <input
+              id="acMainGoal"
+              type="text"
+              placeholder="Ex. comprendre le sous-texte, rassurer un client, négocier un délai…"
+            />
+          </div>
+
+          <!-- Bouton de démarrage -->
+          <button id="acStartBtn" type="button" class="btn btn-primary btn-large" style="margin-top:10px;">
+            Démarrer l’accompagnement avec Camille
+          </button>
+
           <!-- Carte échanges avec Camille -->
-<div class="card" style="margin-top:24px;">
-  <h3 style="margin-bottom: 10px; color: var(--text-strong);">
-    Échanges avec Camille
-  </h3>
-  <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
-    Camille vous pose quelques questions pour affiner le contexte, puis prépare un brief
-    détaillé que vous retrouverez dans la colonne de droite.
-  </p>
+          <div class="card" style="margin-top:24px;">
+            <h3 style="margin-bottom: 10px; color: var(--text-strong);">
+              Échanges avec Camille
+            </h3>
+            <p style="color: var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+              Camille vous pose quelques questions pour affiner le contexte, puis prépare un brief
+              détaillé que vous retrouverez dans la colonne de droite.
+            </p>
 
-  <!-- Zone de conversation -->
-  <div id="acConversation"
-       style="background:#020617; border-radius:12px; padding:12px; min-height:120px; max-height:260px; overflow-y:auto; font-size:0.9rem;">
-    <p style="margin-bottom:8px;">
-      <strong>Camille :</strong> Pour commencer, choisissez un mode et cliquez sur
-      «&nbsp;Démarrer l’accompagnement avec Camille&nbsp;».
-    </p>
-  </div>
+            <!-- Zone de conversation -->
+            <div id="acConversation"
+                style="background:#020617; border-radius:12px; padding:12px; min-height:120px; max-height:260px; overflow-y:auto; font-size:0.9rem;">
+              <p style="margin-bottom:8px;">
+                <strong>Camille :</strong> Pour commencer, choisissez un mode puis cliquez sur
+                «&nbsp;Démarrer l’accompagnement avec Camille&nbsp;».
+              </p>
+            </div>
 
-  <!-- Champ de réponse -->
-  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
-    <label for="acAnswerInput" style="font-size:0.9rem; color:var(--text-muted);">
-      Votre réponse pour Camille :
-    </label>
+            <!-- Champ de réponse -->
+            <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+              <label for="acAnswerInput" style="font-size:0.9rem; color:var(--text-muted);">
+                Votre réponse pour Camille :
+              </label>
 
-    <textarea id="acAnswerInput"
-              rows="3"
-              placeholder="Votre réponse… (Ctrl+Entrée pour envoyer)"
-              style="background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
+              <textarea id="acAnswerInput"
+                        rows="3"
+                        placeholder="Votre réponse… (Ctrl+Entrée pour envoyer)"
+                        style="background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
 
-    <div style="display:flex; justify-content:flex-end;">
-      <button id="acAnswerSendBtn" type="button" class="btn btn-secondary">
-        Envoyer à Camille
-      </button>
-    </div>
-  </div>
-</div>
+              <div style="display:flex; justify-content:flex-end;">
+                <button id="acAnswerSendBtn" type="button" class="btn btn-secondary">
+                  Envoyer à Camille
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <!-- Colonne de droite : brief -->
-<aside class="card" style="margin-top:0; max-width:420px;">
-  <h3 style="margin-bottom:10px; color:var(--text-strong);">
-    Brief prêt pour Camille
-  </h3>
-  <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
-    Ce résumé regroupe vos réponses. Il servira de base à la génération IA.
-  </p>
+        <!-- COLONNE DROITE : BRIEF -->
+        <aside class="card" style="margin-top:0; max-width:420px;">
+          <h3 style="margin-bottom:10px; color:var(--text-strong);">
+            Brief prêt pour Camille
+          </h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+            Ce résumé regroupe vos réponses. Il servira de base à la génération IA.
+          </p>
 
-  <label for="acBriefText" style="font-size:0.9rem; color:var(--text-muted);">
-    Résumé du contexte
-  </label>
-  <textarea id="acBriefText"
-            rows="10"
-            readonly
-            style="margin-top:6px; width:100%; background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
+          <label for="acBriefText" style="font-size:0.9rem; color:var(--text-muted);">
+            Résumé du contexte
+          </label>
+          <textarea id="acBriefText"
+                    rows="12"
+                    readonly
+                    style="margin-top:6px; width:100%; background:#020617; border-radius:12px; border:1px solid rgba(148,163,184,0.4); padding:8px 10px; color:var(--text-main); font:inherit; resize:vertical;"></textarea>
 
-  <button id="acGenerateBtn"
-          type="button"
-          class="btn btn-primary btn-large"
-          style="margin-top:14px;">
-    Générer avec Camille (bientôt branché à l’IA)
-  </button>
+          <button id="acGenerateBtn"
+                  type="button"
+                  class="btn btn-primary btn-large"
+                  style="margin-top:14px;">
+            Générer avec Camille (bientôt branché à l’IA)
+          </button>
 
-  <p style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);">
-    Pour cette première étape, le bouton prépare simplement le brief. Nous le connecterons ensuite
-    à votre moteur IA existant, en utilisant les mêmes endpoints que les modes Rédaction et
-    Interprétation.
-  </p>
-</aside>
+          <p style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);">
+            Pour cette première étape, le bouton prépare simplement le brief. Nous le connecterons ensuite
+            à votre moteur IA existant, en utilisant les mêmes endpoints que les modes Rédaction et
+            Interprétation.
+          </p>
+        </aside>
       </div>
     </section>
   </main>
@@ -209,10 +181,9 @@
     </div>
   </footer>
 
-  <!-- Scripts communs -->
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
-  <!-- Script spécifique mode accompagné -->
   <script src="js/accompanied.js"></script>
 </body>
 </html>
