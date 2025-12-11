@@ -29,6 +29,79 @@
       <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
     </nav>
 
+<!-- Nouvel ajout -->
+      <form id="interpretForm" class="card">
+  <h2>Mode interprétation</h2>
+
+  <div class="form-field">
+    <span>Langue de la réponse</span>
+    <select id="intLanguage">
+      <option value="fr">Français</option>
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+      <!-- etc. -->
+    </select>
+  </div>
+
+  <div class="form-field">
+    <span>Type d'analyse</span>
+    <select id="intQuestionType">
+      <option value="analyse_globale">
+        Analyse globale (ton, intention, risques)
+      </option>
+      <option value="reformulation_simple">
+        Reformulation simple et neutre
+      </option>
+      <option value="risques_juridiques">
+        Points de vigilance (juridique / contractuel)
+      </option>
+      <option value="suggestions_reponse">
+        Suggestions de posture / réponse
+      </option>
+    </select>
+  </div>
+
+  <div class="form-field">
+    <span>Texte à interpréter</span>
+    <textarea
+      id="intText"
+      rows="8"
+      placeholder="Collez le mail, le message ou l’extrait de document à analyser."
+    ></textarea>
+  </div>
+
+  <div class="form-field">
+    <span>Contexte (optionnel)</span>
+    <textarea
+      id="intContext"
+      rows="3"
+      placeholder="Relation avec la personne, situation, historique, enjeux…"
+    ></textarea>
+  </div>
+
+  <p
+    id="intError"
+    style="color:var(--danger);font-size:0.9rem;min-height:1.2em;"
+  ></p>
+
+  <button
+    type="submit"
+    id="intSubmitBtn"
+    class="btn btn-primary btn-large"
+  >
+    Lancer l’interprétation avec Camille
+  </button>
+</form>
+
+<div class="card" style="margin-top:20px;">
+  <h3>Analyse de Camille</h3>
+  <pre
+    id="intResult"
+    style="white-space:pre-wrap;font-family:inherit;font-size:0.95rem;margin-top:10px;"
+  ></pre>
+</div>
+
+      
     <!-- Zone de droite -->
     <div class="header-actions">
       <!-- Email + déconnexion : visibles quand connecté -->
