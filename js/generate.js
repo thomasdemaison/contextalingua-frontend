@@ -1,15 +1,17 @@
 // js/generate.js
 // Page "Rédaction" (generate.html)
-// Utilise l'endpoint backend : POST /api/ai/generate
+// Appel direct au backend : POST /api/ai/generate (sans apiRequest)
 
 document.addEventListener("DOMContentLoaded", () => {
   // Vérifie la connexion : sinon, retour à login
   const token = localStorage.getItem("token");
   if (!token) {
+    console.log("[generate.js] Pas de token, redirection login.");
     window.location.href = "login.html";
     return;
   }
 
+  console.log("[generate.js] DOM chargé, initialisation…");
   setupGeneratePage();
 });
 
@@ -30,8 +32,16 @@ function setupGeneratePage() {
     return;
   }
 
+  // On récupère la base de l'API ; si non définie, fallback localhost
+  const API_BASE_URL =
+    window.API_BASE_URL || "http://localhost:4000/api";
+
   submitBtn.addEventListener("click", async (e) => {
-    e.preventDefault(); // par sécurité : au cas où
+    // Ceinture + bretelles : on bloque tout comportement par défaut
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log("[generate.js] Clic sur Lancer la rédaction");
 
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
@@ -51,33 +61,82 @@ function setupGeneratePage() {
         errorEl.textContent =
           "Merci de préciser au minimum un objectif ou un texte de départ.";
       }
-      return;
+      console.log(
+        "[generate.js] Validation échouée : ni objectif ni texte de départ."
+      );
+      return false;
     }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Camille rédige…";
 
+    const payload = {
+      language,
+      tone,
+      objective,
+      recipientDescription,
+      draftText,
+      context,
+    };
+
+    console.log(
+      "[generate.js] Envoi à /ai/generate avec payload :",
+      payload
+    );
+
     try {
-      const payload = {
-        language,
-        tone,
-        objective,
-        recipientDescription,
-        draftText,
-        context,
-      };
+      const token = localStorage.getItem("token");
 
-      const data = await apiRequest("/ai/generate", "POST", payload);
+      const response = await fetch(`${API_BASE_URL}/ai/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      if (!data || !data.ok || !data.result) {
-        throw new Error("Réponse inattendue du moteur de rédaction.");
+      console.log(
+        "[generate.js] Réponse brute /ai/generate :",
+        response.status,
+        response.statusText
+      );
+
+      if (response.status === 401) {
+        console.warn(
+          "[generate.js] 401 non autorisé, redirection login."
+        );
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+        return false;
       }
 
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        console.error(
+          "[generate.js] Réponse non OK :",
+          response.status,
+          text
+        );
+        if (errorEl) {
+          errorEl.textContent =
+            "Erreur lors de la génération (" +
+            response.status +
+            ").";
+        }
+        return false;
+      }
+
+      const data = await response.json();
+      console.log("[generate.js] JSON /ai/generate :", data);
+
+      const finalText = data?.result?.text || data?.text || "";
       if (resultEl) {
-        resultEl.textContent = data.result.text || "";
+        resultEl.textContent = finalText;
       }
     } catch (err) {
-      console.error("[generate.js] Erreur /ai/generate :", err);
+      console.error("[generate.js] Exception fetch /ai/generate :", err);
       if (errorEl) {
         errorEl.textContent =
           err.message ||
@@ -87,5 +146,8 @@ function setupGeneratePage() {
       submitBtn.disabled = false;
       submitBtn.textContent = "Lancer la rédaction";
     }
+
+    // On retourne false pour être sûr que le navigateur ne tente rien
+    return false;
   });
 }
