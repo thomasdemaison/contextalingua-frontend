@@ -1,5 +1,5 @@
 // js/interpret.js
-// Logique de la page "Interprétation" (interpret.html)
+// Page "Interprétation" (interpret.html)
 // Utilise l'endpoint backend : POST /api/ai/interpret
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,40 +9,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  setupInterpretForm();
+  setupInterpretPage();
 });
 
-/**
- * Initialise le formulaire d’interprétation.
- * Nécessite les éléments suivants dans interpret.html :
- * - <form id="interpretForm">
- * - <select id="intLanguage">
- * - <select id="intQuestionType">
- * - <textarea id="intText">
- * - <textarea id="intContext">
- * - <button id="intSubmitBtn">
- * - <div id="intError"></div>
- * - <pre id="intResult"></pre>
- */
-function setupInterpretForm() {
-  const form = document.getElementById("interpretForm");
-  if (!form) {
-    console.warn(
-      "[interpret.js] Formulaire introuvable (id=interpretForm)."
-    );
-    return;
-  }
-
+function setupInterpretPage() {
   const languageEl = document.getElementById("intLanguage");
   const questionTypeEl = document.getElementById("intQuestionType");
   const textEl = document.getElementById("intText");
   const contextEl = document.getElementById("intContext");
 
-  const submitBtn = document.getElementById("intSubmitBtn");
+  const submitBtn = document.getElementById("intSubmit");
   const errorEl = document.getElementById("intError");
-  const resultEl = document.getElementById("intResult");
+  const resultEl = document.getElementById("intOutput");
 
-  form.addEventListener("submit", async (e) => {
+  if (!submitBtn) {
+    console.warn("[interpret.js] Bouton intSubmit introuvable.");
+    return;
+  }
+
+  submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
     if (errorEl) errorEl.textContent = "";
@@ -63,10 +48,8 @@ function setupInterpretForm() {
       return;
     }
 
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Camille analyse…";
-    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Camille analyse…";
 
     try {
       const payload = {
@@ -99,11 +82,8 @@ function setupInterpretForm() {
           "Une erreur est survenue lors de l’analyse.";
       }
     } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent =
-          "Lancer l’interprétation avec Camille";
-      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Interpréter le message";
     }
   });
 }
