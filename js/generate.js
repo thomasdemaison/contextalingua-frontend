@@ -3,17 +3,23 @@
 // Utilise l'endpoint backend : POST /api/ai/generate
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Sécurité simple : si pas connecté → login
+  // Sécurité simple : si pas connecté → redirection login
   const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
   }
 
-  setupGeneratePage();
+  setupGenerateForm();
 });
 
-function setupGeneratePage() {
+function setupGenerateForm() {
+  const form = document.getElementById("generateForm");
+  if (!form) {
+    console.warn("[generate.js] generateForm introuvable.");
+    return;
+  }
+
   const languageEl = document.getElementById("genLanguage");
   const toneEl = document.getElementById("genTone");
   const objectiveEl = document.getElementById("genObjective");
@@ -25,13 +31,8 @@ function setupGeneratePage() {
   const errorEl = document.getElementById("genError");
   const resultEl = document.getElementById("genOutput");
 
-  if (!submitBtn) {
-    console.warn("[generate.js] Bouton genSubmit introuvable.");
-    return;
-  }
-
-  submitBtn.addEventListener("click", async (e) => {
-    e.preventDefault(); // par sécurité, empêche tout submit implicite
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // ⬅ bloque le rechargement de page
 
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
@@ -45,7 +46,7 @@ function setupGeneratePage() {
     const draftText = draftEl ? draftEl.value.trim() : "";
     const context = contextEl ? contextEl.value.trim() : "";
 
-    // Règle UX basique : au moins objectif ou texte de départ
+    // Règle UX simple : on exige au moins un objectif ou un texte de base
     if (!objective && !draftText) {
       if (errorEl) {
         errorEl.textContent =
@@ -54,8 +55,10 @@ function setupGeneratePage() {
       return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Camille rédige…";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Camille rédige…";
+    }
 
     try {
       const payload = {
@@ -84,8 +87,10 @@ function setupGeneratePage() {
           "Une erreur est survenue lors de la génération.";
       }
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Lancer la rédaction";
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Lancer la rédaction";
+      }
     }
   });
 }
