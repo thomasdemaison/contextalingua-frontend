@@ -1,41 +1,19 @@
 // js/generate.js
-// Logique de la page "Rédaction" (generate.html)
+// Page "Rédaction" (generate.html)
 // Utilise l'endpoint backend : POST /api/ai/generate
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Protection simple : si pas de token → login
+  // Sécurité simple : si pas connecté → login
   const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
   }
 
-  setupGenerateForm();
+  setupGeneratePage();
 });
 
-/**
- * Initialise le formulaire de rédaction.
- * Nécessite les éléments suivants dans generate.html :
- * - <form id="generateForm">
- * - <select id="genLanguage">
- * - <input id="genTone">
- * - <textarea id="genObjective">
- * - <textarea id="genRecipient">
- * - <textarea id="genDraft">
- * - <textarea id="genContext">
- * - <button id="genSubmitBtn">
- * - <div id="genError"></div>
- * - <pre id="genResult"></pre>
- */
-function setupGenerateForm() {
-  const form = document.getElementById("generateForm");
-  if (!form) {
-    console.warn(
-      "[generate.js] Formulaire introuvable (id=generateForm)."
-    );
-    return;
-  }
-
+function setupGeneratePage() {
   const languageEl = document.getElementById("genLanguage");
   const toneEl = document.getElementById("genTone");
   const objectiveEl = document.getElementById("genObjective");
@@ -43,19 +21,20 @@ function setupGenerateForm() {
   const draftEl = document.getElementById("genDraft");
   const contextEl = document.getElementById("genContext");
 
-  const submitBtn = document.getElementById("genSubmitBtn");
+  const submitBtn = document.getElementById("genSubmit");
   const errorEl = document.getElementById("genError");
-  const resultEl = document.getElementById("genResult");
+  const resultEl = document.getElementById("genOutput");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  if (!submitBtn) {
+    console.warn("[generate.js] Bouton genSubmit introuvable.");
+    return;
+  }
 
-    if (errorEl) {
-      errorEl.textContent = "";
-    }
-    if (resultEl) {
-      resultEl.textContent = "";
-    }
+  submitBtn.addEventListener("click", async (e) => {
+    e.preventDefault(); // par sécurité, empêche tout submit implicite
+
+    if (errorEl) errorEl.textContent = "";
+    if (resultEl) resultEl.textContent = "";
 
     const language = languageEl ? languageEl.value || "fr" : "fr";
     const tone = toneEl ? toneEl.value.trim() : "";
@@ -66,6 +45,7 @@ function setupGenerateForm() {
     const draftText = draftEl ? draftEl.value.trim() : "";
     const context = contextEl ? contextEl.value.trim() : "";
 
+    // Règle UX basique : au moins objectif ou texte de départ
     if (!objective && !draftText) {
       if (errorEl) {
         errorEl.textContent =
@@ -74,10 +54,8 @@ function setupGenerateForm() {
       return;
     }
 
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Camille rédige…";
-    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Camille rédige…";
 
     try {
       const payload = {
@@ -89,16 +67,10 @@ function setupGenerateForm() {
         context,
       };
 
-      const data = await apiRequest(
-        "/ai/generate",
-        "POST",
-        payload
-      );
+      const data = await apiRequest("/ai/generate", "POST", payload);
 
       if (!data || !data.ok || !data.result) {
-        throw new Error(
-          "Réponse inattendue du moteur de rédaction."
-        );
+        throw new Error("Réponse inattendue du moteur de rédaction.");
       }
 
       if (resultEl) {
@@ -112,10 +84,8 @@ function setupGenerateForm() {
           "Une erreur est survenue lors de la génération.";
       }
     } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Lancer la rédaction avec Camille";
-      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Lancer la rédaction";
     }
   });
 }
