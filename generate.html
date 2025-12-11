@@ -1,4 +1,35 @@
-<form id="generateForm" class="card">
+<!DOCTYPE html>
+<html lang="fr" class="page">
+<head>
+    <meta charset="UTF-8">
+    <title>Rédaction – ContextaLingua</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <!-- Logo -->
+    <a href="index.html" class="header-logo">
+      <span class="contexta">Contexta</span>
+      <span class="lingua">Lingua</span>
+    </a>
+
+    <!-- Navigation principale -->
+    <nav class="main-nav">
+      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
+      <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
+
+      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
+      <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
+      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+    </nav>
+<!-- Nouvel ajout
+    <form id="generateForm" class="card">
   <h2>Mode rédaction</h2>
 
   <div class="form-field">
@@ -78,3 +109,87 @@
     style="white-space:pre-wrap;font-family:inherit;font-size:0.95rem;margin-top:10px;"
   ></pre>
 </div>
+
+    <!-- Zone de droite -->
+    <div class="header-actions">
+      <!-- Email + déconnexion : visibles quand connecté -->
+      <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
+        Déconnexion
+      </button>
+
+      <!-- Actions publiques : visibles quand NON connecté -->
+      <button class="btn btn-ghost nav-public-only">
+        Se connecter
+      </button>
+      <button class="btn btn-primary nav-public-only">
+        Commencer gratuitement
+      </button>
+    </div>
+  </div>
+</header>
+
+
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid hero-grid-simple">
+            <div class="card">
+                <h2 style="margin-bottom: 8px; color: var(--text-strong);">Camille — Mode rédaction</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
+                    Donnez le contexte, l’objectif et le texte brut. Camille le réécrit comme si vous l’aviez formulé vous-même.
+                </p>
+
+                <div class="form-field">
+                    <span>Texte à retravailler</span>
+                    <textarea id="genInputText" rows="6" placeholder="Collez ici votre message…"></textarea>
+                </div>
+
+                <div class="form-field">
+                    <span>Langue cible</span>
+                    <input id="genTargetLanguage" placeholder="fr, en, es…" value="fr">
+                </div>
+
+                <div class="form-field">
+                    <span>Ton souhaité</span>
+                    <input id="genTone" placeholder="professionnel et chaleureux, direct, diplomate…">
+                </div>
+
+                <div class="form-field">
+                    <span>Objectif du message</span>
+                    <input id="genGoal" placeholder="obtenir un rendez-vous, relancer un paiement, rassurer un client…">
+                </div>
+
+                <div class="form-field">
+                    <span>Description du destinataire</span>
+                    <input id="genRecipient" placeholder="Dirigeant de PME, client fidèle, fournisseur clé…">
+                </div>
+
+                <p id="genError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
+
+                <button id="genSubmit" class="btn btn-primary">Générer le message</button>
+
+                <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">Proposition de Camille</h3>
+                <pre id="genOutput" style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617; border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"></pre>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav">
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</footer>
+
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/generate.js"></script>
+    <!-- Scripts communs -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/generate.js"></script>
+  </body>
+</html>
