@@ -59,8 +59,8 @@
             Donnez le contexte, l’objectif et éventuellement un texte brut. Camille le réécrit comme si vous l’aviez formulé vous-même.
           </p>
 
-          <!-- FORMULAIRE DE RÉDACTION -->
-          <form id="generateForm">
+          <!-- On ne met PAS de <form> pour éviter tout submit natif -->
+          <div id="generatePanel">
             <div class="form-field">
               <span>Langue cible</span>
               <select id="genLanguage">
@@ -121,14 +121,15 @@
               style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"
             ></p>
 
+            <!-- Bouton simple, PAS submit -->
             <button
-              type="submit"
+              type="button"
               id="genSubmit"
               class="btn btn-primary"
             >
               Lancer la rédaction
             </button>
-          </form>
+          </div>
 
           <!-- RÉSULTAT -->
           <h3
