@@ -1,189 +1,148 @@
 <!DOCTYPE html>
 <html lang="fr" class="page">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Rédaction – ContextaLingua</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <!-- Logo -->
-        <a href="index.html" class="header-logo">
-          <span class="contexta">Contexta</span>
-          <span class="lingua">Lingua</span>
-        </a>
+<head>
+  <meta charset="UTF-8">
+  <title>Rédaction – ContextaLingua</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <!-- Logo -->
+    <a href="index.html" class="header-logo">
+      <span class="contexta">Contexta</span>
+      <span class="lingua">Lingua</span>
+    </a>
 
-        <!-- Navigation principale -->
-        <nav class="main-nav">
-          <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
-          <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-          <a href="tarifs.html" class="nav-link nav-public-only">Tarifs</a>
-          <a href="faq.html" class="nav-link nav-public-only">FAQ</a>
+    <!-- Navigation principale -->
+    <nav class="main-nav">
+      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
+      <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-          <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
-          <a href="index.html" class="nav-link nav-auth-only">Accueil</a>
-          <a href="dashboard.html" class="nav-link nav-auth-only"
-            >Tableau de bord</a
-          >
-          <a href="generate.html" class="nav-link nav-auth-only">Rédaction</a>
-          <a href="interpret.html" class="nav-link nav-auth-only"
-            >Interprétation</a
-          >
-          <a href="accompanied.html" class="nav-link nav-auth-only"
-            >Mode accompagné</a
-          >
-        </nav>
+      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
+      <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
+      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+    </nav>
 
-        <!-- Zone de droite -->
-        <div class="header-actions">
-          <!-- Email + déconnexion : visibles quand connecté -->
-          <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-          <button id="btnLogout" class="btn btn-ghost nav-auth-only">
-            Déconnexion
-          </button>
+    <!-- Zone de droite -->
+    <div class="header-actions">
+      <!-- Email + déconnexion : visibles quand connecté -->
+      <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
+        Déconnexion
+      </button>
 
-          <!-- Actions publiques : visibles quand NON connecté -->
-          <button class="btn btn-ghost nav-public-only">Se connecter</button>
-          <button class="btn btn-primary nav-public-only">
-            Commencer gratuitement
-          </button>
+      <!-- Actions publiques : visibles quand NON connecté -->
+      <button class="btn btn-ghost nav-public-only">
+        Se connecter
+      </button>
+      <button class="btn btn-primary nav-public-only">
+        Commencer gratuitement
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container hero-grid hero-grid-simple">
+      <div class="card" id="generateCard">
+        <h2 style="margin-bottom: 8px; color: var(--text-strong);">
+          Camille — Mode rédaction
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
+          Donnez le contexte, l’objectif et éventuellement un texte brut. Camille le réécrit comme si vous l’aviez formulé vous-même.
+        </p>
+
+        <div class="form-field">
+          <span>Langue cible</span>
+          <select id="genLanguage">
+            <option value="fr">Français</option>
+            <option value="en">Anglais</option>
+            <option value="es">Espagnol</option>
+          </select>
         </div>
-      </div>
-    </header>
 
-    <main>
-      <section class="hero">
-        <div class="container hero-grid hero-grid-simple">
-          <div class="card">
-            <h2 style="margin-bottom: 8px; color: var(--text-strong)">
-              Camille — Mode rédaction
-            </h2>
-            <p
-              style="
-                color: var(--text-muted);
-                font-size: 0.95rem;
-                margin-bottom: 18px;
-              "
-            >
-              Donnez le contexte, l’objectif et éventuellement un texte brut.
-              Camille le réécrit comme si vous l’aviez formulé vous-même.
-            </p>
-
-            <!-- FORMULAIRE UNIQUE -->
-            <form id="generateForm" novalidate>
-              <div class="form-field">
-                <span>Langue cible</span>
-                <select id="genLanguage">
-                  <option value="fr">Français</option>
-                  <option value="en">Anglais</option>
-                  <option value="es">Espagnol</option>
-                </select>
-              </div>
-
-              <div class="form-field">
-                <span>Ton souhaité</span>
-                <input
-                  type="text"
-                  id="genTone"
-                  placeholder="Ex : professionnel, chaleureux, ferme mais poli…"
-                />
-              </div>
-
-              <div class="form-field">
-                <span>Objectif du message</span>
-                <textarea
-                  id="genObjective"
-                  rows="3"
-                  placeholder="Ex : relancer un client en retard de paiement, répondre à une réclamation…"
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>À qui écrivez-vous ?</span>
-                <textarea
-                  id="genRecipient"
-                  rows="2"
-                  placeholder="Ex : dirigeant de PME, client fidèle mais en retard, partenaire, fournisseur…"
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>Texte de départ (optionnel)</span>
-                <textarea
-                  id="genDraft"
-                  rows="6"
-                  placeholder="Collez ici un texte à améliorer ou laissez vide pour une création complète."
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>Contexte supplémentaire (optionnel)</span>
-                <textarea
-                  id="genContext"
-                  rows="3"
-                  placeholder="Précisez le contexte, l'historique, les contraintes éventuelles…"
-                ></textarea>
-              </div>
-
-              <p
-                id="genError"
-                style="
-                  color: var(--danger);
-                  font-size: 0.9rem;
-                  min-height: 1.2em;
-                  margin-bottom: 8px;
-                "
-              ></p>
-
-              <button
-                type="submit"
-                id="genSubmit"
-                class="btn btn-primary btn-large"
-              >
-                Lancer la rédaction
-              </button>
-            </form>
-
-            <h3
-              style="
-                margin-top: 22px;
-                margin-bottom: 6px;
-                color: var(--text-strong);
-              "
-            >
-              Proposition de Camille
-            </h3>
-            <pre
-              id="genOutput"
-              style="
-                white-space: pre-wrap;
-                font-size: 0.95rem;
-                color: var(--text-main);
-                background: #020617;
-                border-radius: 12px;
-                padding: 12px;
-                border: 1px solid var(--border-subtle);
-                min-height: 80px;
-              "
-            ></pre>
-          </div>
+        <div class="form-field">
+          <span>Ton souhaité</span>
+          <input
+            type="text"
+            id="genTone"
+            placeholder="Ex : professionnel, chaleureux, ferme mais poli…"
+          />
         </div>
-      </section>
-    </main>
 
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <span>© ContextaLingua</span>
-        <nav class="footer-nav">
-          <a href="contact.html">Contact</a>
-        </nav>
+        <div class="form-field">
+          <span>Objectif du message</span>
+          <textarea
+            id="genObjective"
+            rows="3"
+            placeholder="Ex : relancer un client en retard de paiement, répondre à une réclamation…"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <span>À qui écrivez-vous ?</span>
+          <textarea
+            id="genRecipient"
+            rows="2"
+            placeholder="Ex : dirigeant de PME, client fidèle mais en retard, partenaire, fournisseur…"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <span>Texte de départ (optionnel)</span>
+          <textarea
+            id="genDraft"
+            rows="6"
+            placeholder="Collez ici un texte à améliorer ou laissez vide pour une création complète."
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <span>Contexte supplémentaire (optionnel)</span>
+          <textarea
+            id="genContext"
+            rows="3"
+            placeholder="Précisez le contexte, l'historique, les contraintes éventuelles…"
+          ></textarea>
+        </div>
+
+        <p id="genError"
+           style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
+
+        <!-- IMPORTANT : type="button" pour éviter toute soumission native -->
+        <button id="genSubmit" type="button" class="btn btn-primary">
+          Lancer la rédaction
+        </button>
+
+        <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">
+          Proposition de Camille
+        </h3>
+        <pre id="genOutput"
+             style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617; border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"></pre>
       </div>
-    </footer>
+    </div>
+  </section>
+</main>
 
-    <!-- Scripts communs -->
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/generate.js"></script>
-  </body>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>© ContextaLingua</span>
+    <nav class="footer-nav">
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- Scripts communs -->
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/generate.js"></script>
+</body>
 </html>
