@@ -1,5 +1,5 @@
 // js/generate.js
-// Page "Rédaction" (generate.html) – version simplifiée et très verbeuse
+// Page "Rédaction" (generate.html) – sans balise <form>
 
 console.log("[generate.js] Fichier chargé.");
 
@@ -13,70 +13,54 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const form = document.getElementById("generateForm");
   const submitBtn = document.getElementById("genSubmit");
-
-  if (!form) {
-    console.warn("[generate.js] Formulaire introuvable (id=generateForm).");
-  } else {
-    form.addEventListener("submit", (event) => {
-      console.log("[generate.js] ÉVÉNEMENT submit détecté.");
-      handleGenerateSubmit(event);
-    });
-    console.log("[generate.js] Listener 'submit' attaché sur generateForm.");
-  }
-
-  if (submitBtn) {
-    submitBtn.addEventListener("click", (event) => {
-      console.log("[generate.js] ÉVÉNEMENT click sur genSubmit.");
-      // On intercepte aussi le click, au cas où le submit ne remonte pas
-      handleGenerateSubmit(event);
-    });
-    console.log("[generate.js] Listener 'click' attaché sur genSubmit.");
-  } else {
+  if (!submitBtn) {
     console.warn("[generate.js] Bouton genSubmit introuvable.");
+    return;
   }
+
+  submitBtn.addEventListener("click", async (event) => {
+    console.log("[generate.js] Clic sur genSubmit.");
+    await handleGenerateClick(event);
+  });
+  console.log("[generate.js] Listener 'click' attaché sur genSubmit.");
 });
 
-async function handleGenerateSubmit(event) {
-  // On blinde : on empêche TOUT comportement par défaut
+async function handleGenerateClick(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
   }
-  console.log("[generate.js] handleGenerateSubmit démarré.");
+  console.log("[generate.js] handleGenerateClick démarré.");
 
-  const languageEl = document.getElementById("genLanguage");
-  const toneEl = document.getElementById("genTone");
+  const languageEl  = document.getElementById("genLanguage");
+  const toneEl      = document.getElementById("genTone");
   const objectiveEl = document.getElementById("genObjective");
   const recipientEl = document.getElementById("genRecipient");
-  const draftEl = document.getElementById("genDraft");
-  const contextEl = document.getElementById("genContext");
+  const draftEl     = document.getElementById("genDraft");
+  const contextEl   = document.getElementById("genContext");
 
   const submitBtn = document.getElementById("genSubmit");
-  const errorEl = document.getElementById("genError");
-  const resultEl = document.getElementById("genOutput");
+  const errorEl   = document.getElementById("genError");
+  const resultEl  = document.getElementById("genOutput");
 
-  if (errorEl) errorEl.textContent = "";
+  if (errorEl)  errorEl.textContent = "";
   if (resultEl) resultEl.textContent = "";
 
-  const language = languageEl ? languageEl.value || "fr" : "fr";
-  const tone = toneEl ? toneEl.value.trim() : "";
-  const objective = objectiveEl ? objectiveEl.value.trim() : "";
-  const recipientDescription = recipientEl ? recipientEl.value.trim() : "";
-  const draftText = draftEl ? draftEl.value.trim() : "";
-  const context = contextEl ? contextEl.value.trim() : "";
+  const language            = languageEl ? languageEl.value || "fr" : "fr";
+  const tone                = toneEl ? toneEl.value.trim() : "";
+  const objective           = objectiveEl ? objectiveEl.value.trim() : "";
+  const recipientDescription= recipientEl ? recipientEl.value.trim() : "";
+  const draftText           = draftEl ? draftEl.value.trim() : "";
+  const context             = contextEl ? contextEl.value.trim() : "";
 
-  // Vérification minimale
   if (!objective && !draftText) {
-    console.log(
-      "[generate.js] Validation échouée : ni objectif ni texte de départ."
-    );
+    console.log("[generate.js] Validation : objectif ET texte de départ vides.");
     if (errorEl) {
       errorEl.textContent =
         "Merci de préciser au minimum un objectif ou un texte de départ.";
     }
-    return false;
+    return;
   }
 
   if (submitBtn) {
@@ -93,7 +77,7 @@ async function handleGenerateSubmit(event) {
     context,
   };
 
-  console.log("[generate.js] Payload envoyé à /ai/generate :", payload);
+  console.log("[generate.js] Payload → /ai/generate :", payload);
 
   try {
     const API_BASE_URL = window.API_BASE_URL || "http://localhost:4000/api";
@@ -115,11 +99,11 @@ async function handleGenerateSubmit(event) {
     );
 
     if (response.status === 401) {
-      console.warn("[generate.js] 401 non autorisé, redirection login.");
+      console.warn("[generate.js] 401 → déconnexion et retour login.");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "login.html";
-      return false;
+      return;
     }
 
     if (!response.ok) {
@@ -133,7 +117,7 @@ async function handleGenerateSubmit(event) {
         errorEl.textContent =
           "Erreur lors de la génération (" + response.status + ").";
       }
-      return false;
+      return;
     }
 
     const data = await response.json();
@@ -155,7 +139,4 @@ async function handleGenerateSubmit(event) {
       submitBtn.textContent = "Lancer la rédaction";
     }
   }
-
-  // On retourne false pour couper court à toute propagation
-  return false;
 }
