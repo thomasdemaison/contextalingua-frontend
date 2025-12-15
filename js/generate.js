@@ -106,4 +106,144 @@ function ensurePromptDebugUI() {
   const outEl = document.getElementById("genOutput");
   if (!outEl || !outEl.parentElement) return null;
 
-  wrap = document.createElemen
+  wrap = document.createElement("div");
+  wrap.id = "genPromptDebugWrap";
+  wrap.style.marginTop = "14px";
+
+  const title = document.createElement("h4");
+  title.textContent = "Debug – Prompt envoyé (copiable)";
+  title.style.margin = "10px 0 6px";
+  title.style.color = "var(--text-strong)";
+
+  const pre = document.createElement("pre");
+  pre.id = "genPromptDebug";
+  pre.style.whiteSpace = "pre-wrap";
+  pre.style.fontSize = "0.85rem";
+  pre.style.color = "var(--text-muted)";
+  pre.style.background = "#020617";
+  pre.style.borderRadius = "12px";
+  pre.style.padding = "12px";
+  pre.style.border = "1px solid var(--border-subtle)";
+  pre.style.minHeight = "60px";
+  pre.textContent = "(le prompt apparaîtra ici après clic sur “Lancer la rédaction”)";
+
+  const btnCopy = document.createElement("button");
+  btnCopy.type = "button";
+  btnCopy.className = "btn btn-secondary";
+  btnCopy.style.marginTop = "8px";
+  btnCopy.textContent = "Copier le prompt";
+  btnCopy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pre.textContent || "");
+      btnCopy.textContent = "Copié ✓";
+      setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
+    } catch {
+      btnCopy.textContent = "Copie impossible";
+      setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
+    }
+  });
+
+  wrap.appendChild(title);
+  wrap.appendChild(pre);
+  wrap.appendChild(btnCopy);
+
+  outEl.parentElement.appendChild(wrap);
+  return wrap;
+}
+
+function readValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return { found: false, value: "" };
+  return { found: true, value: (el.value ?? "").toString() };
+}
+
+async function runGenerate() {
+  const btn = document.getElementById("genSubmit");
+  const errorEl = document.getElementById("genError");
+  const outEl = document.getElementById("genOutput");
+
+  if (errorEl) errorEl.textContent = "";
+  if (outEl) outEl.textContent = "";
+
+  const formatR = readValue("genFormat");
+  const langR = readValue("genLanguage");
+  const toneR = readValue("genTone");
+  const objR = readValue("genObjective");
+  const recR = readValue("genRecipient");
+  const draftR = readValue("genDraft");
+  const ctxR = readValue("genContext");
+
+  const missing = [
+    ["genFormat", formatR.found],
+    ["genLanguage", langR.found],
+    ["genTone", toneR.found],
+    ["genObjective", objR.found],
+    ["genRecipient", recR.found],
+    ["genDraft", draftR.found],
+    ["genContext", ctxR.found],
+  ]
+    .filter((x) => !x[1])
+    .map((x) => x[0]);
+
+  if (missing.length) {
+    if (errorEl) {
+      errorEl.textContent = `Champs introuvables : ${missing.join(", ")} (IDs HTML à corriger).`;
+    }
+    return;
+  }
+
+  const format = (formatR.value || "email").trim() || "email";
+  const targetLang = (langR.value || "fr").trim() || "fr";
+  const userLang = getUserLanguageFallback();
+
+  const tone = toneR.value;
+  const objective = objR.value;
+  const recipient = recR.value;
+  const draft = draftR.value;
+  const context = ctxR.value;
+
+  if (!objective.trim() && !draft.trim()) {
+    if (errorEl) errorEl.textContent = "Renseignez au moins un objectif ou un texte de départ.";
+    return;
+  }
+
+  const prompt = buildPrompt({ format, targetLang, userLang, tone, objective, recipient, draft, context });
+
+  ensurePromptDebugUI();
+  const dbg = document.getElementById("genPromptDebug");
+  if (dbg) dbg.textContent = prompt;
+
+  const payload = { prompt, meta: { format, targetLang, userLang } };
+
+  const originalLabel = btn ? btn.textContent : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Camille rédige…";
+  }
+
+  try {
+    const data = await apiRequest("/ai/generate", "POST", payload);
+
+    const text =
+      data?.result?.text ??
+      data?.result ??
+      data?.text ??
+      "";
+
+    if (!text) throw new Error("Réponse inattendue du moteur de génération (texte vide).");
+    if (outEl) outEl.textContent = text;
+  } catch (err) {
+    if (errorEl) {
+      if (err.message === "Failed to fetch") {
+        errorEl.textContent = "Impossible de contacter le serveur (API hors ligne ?).";
+      } else {
+        errorEl.textContent = err.message || "Erreur lors de la génération.";
+      }
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalLabel || "Lancer la rédaction";
+    }
+  }
+}
