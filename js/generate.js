@@ -116,7 +116,7 @@ async function runGenerate() {
   const recEl = document.getElementById("genRecipient");
   const draftEl = document.getElementById("genDraft");
   const ctxEl = document.getElementById("genContext");
-
+const format = document.getElementById("genFormat")?.value || "email";
   const format = formatEl ? formatEl.value : "email";
   const targetLang = langEl ? (langEl.value || "fr") : "fr";
   const userLang = getUserLanguageFallback();
