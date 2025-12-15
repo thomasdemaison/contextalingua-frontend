@@ -109,17 +109,18 @@ async function runGenerate() {
   if (errorEl) errorEl.textContent = "";
   if (outEl) outEl.textContent = "";
 
-  const formatEl = document.getElementById("genFormat");
+    const formatEl = document.getElementById("genFormat");
   const langEl = document.getElementById("genLanguage");
   const toneEl = document.getElementById("genTone");
   const objEl = document.getElementById("genObjective");
   const recEl = document.getElementById("genRecipient");
   const draftEl = document.getElementById("genDraft");
   const ctxEl = document.getElementById("genContext");
-const format = document.getElementById("genFormat")?.value || "email";
-  const format = formatEl ? formatEl.value : "email";
-  const targetLang = langEl ? (langEl.value || "fr") : "fr";
+
+  const format = formatEl?.value || "email";
+  const targetLang = langEl?.value || "fr";
   const userLang = getUserLanguageFallback();
+
 
   const tone = toneEl ? toneEl.value : "";
   const objective = objEl ? objEl.value : "";
