@@ -32,7 +32,7 @@ function attachGenerateHandlers() {
     console.warn("[generate.js] Formulaire introuvable (#generateForm). Fallback via click.");
   }
 
-  // Fallback click (bouton hors form / DOM remplacé / duplications)
+  // Fallback click (si bouton hors form / DOM remplacé / duplications)
   document.addEventListener(
     "click",
     (e) => {
@@ -47,7 +47,7 @@ function attachGenerateHandlers() {
     true
   );
 
-  // Forcer un type safe
+  // Sécurisation : si pas de type, on force un type safe
   if (btn && !btn.getAttribute("type")) btn.setAttribute("type", "button");
 }
 
@@ -84,7 +84,8 @@ LANGUE_UTILISATEUR = ${userLang}
 
   const add = (label, value) => {
     const v = (value || "").trim();
-    if (v) parts.push(`\n---\n${label}:\n${v}\n`);
+    if (!v) return;
+    parts.push(`\n---\n${label}:\n${v}\n`);
   };
 
   add("TON_SOUHAITÉ", tone);
@@ -93,27 +94,26 @@ LANGUE_UTILISATEUR = ${userLang}
   add("CONTEXTE_ET_CONTRAINTES", context);
   add("TEXTE_DEPART (optionnel)", draft);
 
-  parts.push(`
----
-RENDU ATTENDU (strict)
-
+  parts.push(
+    `
+--- RENDU ATTENDU (strict)
 MESSAGE_FINAL:
 (texte complet)
 
 EXPLICATION_UTILISATEUR:
 - ...
-`.trim());
+`.trim()
+  );
 
   return parts.join("\n");
 }
 
 function ensurePromptDebugUI() {
-  // Crée un bloc debug si absent (sans toucher au HTML existant)
   let wrap = document.getElementById("genPromptDebugWrap");
   if (wrap) return wrap;
 
   const outEl = document.getElementById("genOutput");
-  if (!outEl) return null;
+  if (!outEl || !outEl.parentElement) return null;
 
   wrap = document.createElement("div");
   wrap.id = "genPromptDebugWrap";
@@ -141,12 +141,13 @@ function ensurePromptDebugUI() {
   btnCopy.className = "btn btn-secondary";
   btnCopy.style.marginTop = "8px";
   btnCopy.textContent = "Copier le prompt";
+
   btnCopy.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(pre.textContent || "");
       btnCopy.textContent = "Copié ✓";
       setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
-    } catch (e) {
+    } catch {
       btnCopy.textContent = "Copie impossible";
       setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
     }
@@ -156,19 +157,14 @@ function ensurePromptDebugUI() {
   wrap.appendChild(pre);
   wrap.appendChild(btnCopy);
 
-  // On place le debug juste après la zone de résultat
   outEl.parentElement.appendChild(wrap);
-
   return wrap;
 }
 
-function readValue(id, kind = "value") {
+function readValue(id) {
   const el = document.getElementById(id);
   if (!el) return { found: false, value: "" };
-
-  // textarea/input/select -> value
-  const v = (el.value ?? "").toString();
-  return { found: true, value: v };
+  return { found: true, value: (el.value ?? "").toString() };
 }
 
 async function runGenerate() {
@@ -179,14 +175,7 @@ async function runGenerate() {
   if (errorEl) errorEl.textContent = "";
   if (outEl) outEl.textContent = "";
 
-  // IMPORTANT : ids attendus (doivent matcher ton HTML)
-  // - genLanguage (select)
-  // - genTone (input)
-  // - genObjective (textarea)
-  // - genRecipient (textarea)
-  // - genDraft (textarea)
-  // - genContext (textarea)
-  // - genFormat (select)  <-- à ajouter dans le HTML si tu veux mail/courrier/téléphone
+  // IDs attendus (doivent matcher generate.html)
   const formatR = readValue("genFormat");
   const langR = readValue("genLanguage");
   const toneR = readValue("genTone");
@@ -195,25 +184,29 @@ async function runGenerate() {
   const draftR = readValue("genDraft");
   const ctxR = readValue("genContext");
 
-  // Diagnostic : si certains éléments ne sont pas trouvés -> tes ids ne matchent pas
   const missing = [
+    ["genFormat", formatR.found],
     ["genLanguage", langR.found],
     ["genTone", toneR.found],
     ["genObjective", objR.found],
     ["genRecipient", recR.found],
     ["genDraft", draftR.found],
     ["genContext", ctxR.found],
-  ].filter((x) => !x[1]).map((x) => x[0]);
+  ]
+    .filter((x) => !x[1])
+    .map((x) => x[0]);
 
   if (missing.length) {
     console.warn("[generate.js] Champs introuvables :", missing);
     if (errorEl) {
-      errorEl.textContent = `Champs introuvables dans le HTML : ${missing.join(", ")}. Vérifiez les id.`;
+      errorEl.textContent = `Champs introuvables dans le HTML : ${missing.join(
+        ", "
+      )}. Vérifiez les id.`;
     }
     return;
   }
 
-  const format = (formatR.found ? formatR.value : "email") || "email";
+  const format = (formatR.value || "email").trim() || "email";
   const targetLang = (langR.value || "fr").trim() || "fr";
   const userLang = getUserLanguageFallback();
 
@@ -223,16 +216,14 @@ async function runGenerate() {
   const draft = draftR.value;
   const context = ctxR.value;
 
-  console.log("[generate.js] Champs collectés :", {
-    format,
-    targetLang,
-    userLang,
-    tone: tone?.slice(0, 80),
-    objective: objective?.slice(0, 80),
-    recipient: recipient?.slice(0, 80),
-    draft: draft?.slice(0, 80),
-    context: context?.slice(0, 80),
-  });
+  // Validation minimale : l’objectif ou le texte de départ doit exister
+  if (!objective.trim() && !draft.trim()) {
+    if (errorEl) {
+      errorEl.textContent =
+        "Merci de préciser au moins un objectif OU de coller un texte de départ.";
+    }
+    return;
+  }
 
   const prompt = buildPrompt({
     format,
@@ -245,7 +236,6 @@ async function runGenerate() {
     context,
   });
 
-  // Affiche le prompt envoyé (debug)
   ensurePromptDebugUI();
   const dbg = document.getElementById("genPromptDebug");
   if (dbg) dbg.textContent = prompt;
@@ -255,34 +245,7 @@ async function runGenerate() {
     meta: { format, targetLang, userLang },
   };
 
-  console.log("[generate.js] Envoi /ai/generate …", payload);
-
   const originalLabel = btn ? btn.textContent : "";
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Camille rédige…";
-  }
-
-  try {
-    const data = await apiRequest("/ai/generate", "POST", payload);
-    console.log("[generate.js] Réponse /ai/generate :", data);
-
-    const text =
-      data?.result?.text ??
-      data?.result ??
-      data?.text ??
-      "";
-
-    if (!text) throw new Error("Réponse inattendue du moteur de génération.");
-
-    if (outEl) outEl.textContent = text;
-  } catch (err) {
-    console.error("[generate.js] Erreur génération :", err);
-    if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = originalLabel || "Lancer la rédaction";
-    }
-  }
-}
+    btn.textContent = "C
