@@ -138,6 +138,10 @@ async function runGenerate() {
   const draft = draftEl ? draftEl.value : "";
   const context = ctxEl ? ctxEl.value : "";
 
+console.log("[generate.js] Champs:", {
+  format, targetLang, userLang, tone, objective, recipient, draft, context
+});
+  
   // Prompt enrichi (texte + séparateurs + labels)
   const prompt = buildPrompt({
     format,
