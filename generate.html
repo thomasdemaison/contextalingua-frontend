@@ -41,11 +41,19 @@
       <div class="card">
         <h2 style="margin-bottom: 8px; color: var(--text-strong);">Camille — Mode rédaction</h2>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
-          Donnez le contexte, l’objectif et éventuellement un texte brut. Camille le réécrit comme si vous l’aviez formulé vous-même.
+          Donnez le contexte, l’objectif et éventuellement un texte brut. Camille rédige selon le format choisi.
         </p>
 
-        <!-- ✅ FORM explicit pour éviter tout refresh parasite -->
         <form id="generateForm" autocomplete="off">
+          <div class="form-field">
+            <span>Format</span>
+            <select id="genFormat" required>
+              <option value="email">Email</option>
+              <option value="letter">Courrier</option>
+              <option value="phone_script">Script téléphonique</option>
+            </select>
+          </div>
+
           <div class="form-field">
             <span>Langue cible</span>
             <select id="genLanguage">
@@ -63,13 +71,13 @@
           <div class="form-field">
             <span>Objectif du message</span>
             <textarea id="genObjective" rows="3"
-              placeholder="Ex : relancer un client en retard de paiement, répondre à une réclamation…"></textarea>
+              placeholder="Ex : relancer un client en retard, confirmer un RDV, recadrer sans conflit…"></textarea>
           </div>
 
           <div class="form-field">
             <span>À qui écrivez-vous ?</span>
             <textarea id="genRecipient" rows="2"
-              placeholder="Ex : dirigeant de PME, client fidèle mais en retard, partenaire, fournisseur…"></textarea>
+              placeholder="Ex : dirigeant de PME, client fidèle mais en retard, fournisseur…"></textarea>
           </div>
 
           <div class="form-field">
@@ -81,12 +89,13 @@
           <div class="form-field">
             <span>Contexte supplémentaire (optionnel)</span>
             <textarea id="genContext" rows="3"
-              placeholder="Précisez le contexte, l'historique, les contraintes éventuelles…"></textarea>
+              placeholder="Historique, contraintes, éléments à éviter, détails de la situation…"></textarea>
           </div>
 
           <p id="genError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
 
-          <button id="genSubmit" type="button" class="btn btn-primary">Lancer la rédaction</button>
+          <!-- IMPORTANT : type submit, et c'est JS qui bloque le reload -->
+          <button id="genSubmit" type="submit" class="btn btn-primary">Lancer la rédaction</button>
         </form>
 
         <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">Proposition de Camille</h3>
