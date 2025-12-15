@@ -1,8 +1,10 @@
 // js/generate.js
 // Page "Rédaction" (generate.html)
-// Utilise l'endpoint backend : POST /api/ai/generate
+// Endpoint : POST /api/ai/generate
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[generate.js] DOM chargé, initialisation…");
+
   const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
@@ -13,8 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setupGeneratePage() {
-  const formEl = document.getElementById("generateForm");
-
   const languageEl  = document.getElementById("genLanguage");
   const toneEl      = document.getElementById("genTone");
   const objectiveEl = document.getElementById("genObjective");
@@ -26,17 +26,16 @@ function setupGeneratePage() {
   const errorEl   = document.getElementById("genError");
   const resultEl  = document.getElementById("genOutput");
 
-  if (!formEl) {
-    console.warn("[generate.js] Formulaire generateForm introuvable.");
-    return;
-  }
   if (!submitBtn) {
     console.warn("[generate.js] Bouton genSubmit introuvable.");
     return;
   }
 
-  formEl.addEventListener("submit", async (e) => {
+  submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    console.log("[generate.js] Click détecté → lancement génération");
 
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
@@ -48,16 +47,10 @@ function setupGeneratePage() {
     const draftText = draftEl ? draftEl.value.trim() : "";
     const context = contextEl ? contextEl.value.trim() : "";
 
-    // Garde-fou : on veut au moins un objectif OU un brouillon
-    if (!objective && !draftText) {
-      if (errorEl) {
-        errorEl.textContent =
-          "Merci de préciser au minimum un objectif ou un texte de départ.";
-      }
-      return;
-    }
-
+    // ✅ pas de garde-fou bloquant : on envoie même si draft vide
+    // (vous pourrez remettre une validation ensuite)
     submitBtn.disabled = true;
+    const originalLabel = submitBtn.textContent;
     submitBtn.textContent = "Camille rédige…";
 
     try {
@@ -70,9 +63,11 @@ function setupGeneratePage() {
         context,
       };
 
-      const data = await apiRequest("/ai/generate", "POST", payload);
+      console.log("[generate.js] Payload envoyé :", payload);
 
-      // On accepte plusieurs formats pour être tolérant côté backend
+      const data = await apiRequest("/ai/generate", "POST", payload);
+      console.log("[generate.js] Réponse brute :", data);
+
       const text =
         data?.result?.text ??
         data?.result ??
@@ -92,7 +87,7 @@ function setupGeneratePage() {
       }
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Lancer la rédaction";
+      submitBtn.textContent = originalLabel || "Lancer la rédaction";
     }
   });
 }
