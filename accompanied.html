@@ -1,174 +1,166 @@
 <!DOCTYPE html>
 <html lang="fr" class="page">
-<head>
-  <meta charset="UTF-8">
-  <title>Mode accompagné – ContextaLingua</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="index.html" class="header-logo">
-      <span class="contexta">Contexta</span>
-      <span class="lingua">Lingua</span>
-    </a>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mode accompagné – ContextaLingua</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
 
-    <!-- Navigation "publique" -->
-    <nav class="main-nav" id="publicNav">
-      <a href="produit.html" class="nav-link">Produit</a>
-      <a href="tarifs.html" class="nav-link">Tarifs</a>
-      <a href="faq.html" class="nav-link">FAQ</a>
-      <a href="index.html" class="nav-link">Accueil</a>
-    </nav>
+  <body>
+    <!-- Header harmonisé avec toutes les autres pages -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="header-logo">
+          <span class="contexta">Contexta</span>
+          <span class="lingua">Lingua</span>
+        </a>
 
-    <!-- Navigation "outil" (affichée si connecté) -->
-    <nav class="main-nav" id="appNav">
-      <a href="dashboard.html" class="nav-link" data-nav="dashboard">Tableau de bord</a>
-      <a href="generate.html" class="nav-link" data-nav="generate">Rédaction</a>
-      <a href="interpret.html" class="nav-link" data-nav="interpret">Interprétation</a>
-      <a href="accompanied.html" class="nav-link active" data-nav="accompanied">Mode accompagné</a>
-    </nav>
+        <nav class="main-nav">
+          <!-- PUBLIC -->
+          <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+          <a href="tarifs.html" class="nav-link nav-public-only">Tarifs</a>
+          <a href="faq.html" class="nav-link nav-public-only">FAQ</a>
 
-    <div class="header-actions">
-      <span id="headerUserEmail" class="nav-link"></span>
-      <button id="headerLoginBtn" class="btn btn-ghost">Se connecter</button>
-      <button id="headerLogoutBtn" class="btn btn-secondary" style="display:none;">Déconnexion</button>
-      <button id="headerCtaBtn" class="btn btn-primary">Commencer gratuitement</button>
-    </div>
-  </div>
-</header>
+          <!-- AUTH -->
+          <a href="index.html" class="nav-link nav-auth-only">Accueil</a>
+          <a href="dashboard.html" class="nav-link nav-auth-only">Tableau de bord</a>
+          <a href="generate.html" class="nav-link nav-auth-only">Rédaction</a>
+          <a href="interpret.html" class="nav-link nav-auth-only">Interprétation</a>
+          <a href="accompanied.html" class="nav-link nav-auth-only active">Mode accompagné</a>
+        </nav>
 
-<main class="page">
-  <section class="hero">
-    <div class="container hero-grid">
-      <!-- Colonne gauche : assistant pas à pas -->
-      <div class="card" style="display:flex;flex-direction:column;gap:18px;min-height:420px;">
-        <div>
-          <h1 style="font-size:1.6rem;margin-bottom:4px;color:var(--text-strong);">
-            Mode accompagné
-          </h1>
-          <p style="color:var(--text-muted);font-size:0.95rem;">
-            Camille vous guide étape par étape. Choisissez d’abord si vous souhaitez
-            <strong>rédiger</strong> un message ou <strong>comprendre</strong> un message reçu,
-            puis répondez aux questions. Le brief est construit en temps réel.
-          </p>
+        <div class="header-actions">
+          <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+          <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
+
+          <button class="btn btn-ghost nav-public-only">Se connecter</button>
+          <button class="btn btn-primary nav-public-only">Commencer gratuitement</button>
         </div>
-
-        <!-- Choix du but -->
-        <div>
-          <span class="eyebrow light">Étape 0 · Objectif</span>
-          <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">
-            Que voulez-vous faire ?
-          </p>
-
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-  <button id="acModeWriteBtn" type="button" class="btn btn-secondary">
-    ✍ Écrire / reformuler un message
-  </button>
-  <button id="acModeInterpretBtn" type="button" class="btn btn-secondary">
-    🔎 Comprendre / interpréter un message
-  </button>
-</div>
-
-        </div>
-
-        <!-- Zone du parcours -->
-        <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <span class="eyebrow light" id="acStepLabel">Étape 1</span>
-              <h2 id="acStepTitle" style="font-size:1.15rem;color:var(--text-strong);margin-top:4px;">
-                Contexte général
-              </h2>
-            </div>
-            <div style="font-size:0.85rem;color:var(--text-muted);" id="acStepProgress">
-              Étape 1 / 4
-            </div>
-          </div>
-
-          <p id="acStepSubtitle" style="color:var(--text-muted);font-size:0.9rem;"></p>
-
-          <div id="acStepBody" style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
-            <!-- Les questions de l’étape courante sont injectées ici par JS -->
-          </div>
-        </div>
-
-        <!-- Navigation d’étapes -->
-        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;">
-          <button id="acPrevBtn" type="button" class="btn btn-secondary" style="min-width:120px;">
-            ← Étape précédente
-          </button>
-
-          <div style="display:flex;gap:10px;">
-            <button id="acNextBtn" type="button" class="btn btn-primary" style="min-width:130px;">
-              Étape suivante →
-            </button>
-            <button id="acLaunchBtn" type="button" class="btn btn-primary" style="display:none;min-width:190px;">
-              Lancer avec Camille
-            </button>
-          </div>
-        </div>
-
-        <p id="acHelperMessage" style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">
-          Vous pouvez revenir en arrière à tout moment : le récapitulatif à droite se met à jour automatiquement.
-        </p>
       </div>
+    </header>
 
-      <!-- Colonne droite : résumé pour Camille -->
-      <aside class="card" style="display:flex;flex-direction:column;gap:14px;max-height:600px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:40px;height:40px;border-radius:999px;overflow:hidden;background:#020617;">
-            <!-- Suggestion : utilisez une image portrait de Camille ici -->
-            <img src="assets/img/camille1.png"
-                 alt="Camille, votre assistante linguistique"
-                 style="width:100%;height:100%;object-fit:cover;">
-          </div>
-          <div>
-            <h2 style="font-size:1rem;color:var(--text-strong);margin-bottom:2px;">
-              Brief prêt pour Camille
-            </h2>
-            <p style="font-size:0.85rem;color:var(--text-muted);">
-              Ce résumé se construit à partir de vos réponses. Il servira de base à la rédaction
-              ou à l’interprétation.
+    <main class="page">
+      <section class="hero">
+        <div class="container hero-grid">
+          <!-- Colonne gauche : parcours -->
+          <div class="card" style="display:flex;flex-direction:column;gap:18px;min-height:420px;">
+            <div>
+              <h1 style="font-size:1.6rem;margin-bottom:4px;color:var(--text-strong);">
+                Mode accompagné
+              </h1>
+              <p style="color:var(--text-muted);font-size:0.95rem;">
+                Camille vous guide étape par étape. Choisissez d’abord si vous souhaitez
+                <strong>rédiger</strong> un message ou <strong>comprendre</strong> un message reçu.
+                Le brief est construit en temps réel.
+              </p>
+            </div>
+
+            <!-- Choix du mode -->
+            <div>
+              <span class="eyebrow light">Étape 0 · Objectif</span>
+              <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">
+                Que voulez-vous faire ?
+              </p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                <button id="acModeWriteBtn" type="button" class="btn btn-secondary">
+                  ✍ Écrire / reformuler un message
+                </button>
+                <button id="acModeInterpretBtn" type="button" class="btn btn-secondary">
+                  🔎 Comprendre / interpréter un message
+                </button>
+              </div>
+            </div>
+
+            <!-- Étapes -->
+            <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <span class="eyebrow light" id="acStepLabel">Étape 0</span>
+                  <h2 id="acStepTitle" style="font-size:1.15rem;color:var(--text-strong);margin-top:4px;">
+                    Choisissez votre objectif
+                  </h2>
+                </div>
+                <div style="font-size:0.85rem;color:var(--text-muted);" id="acStepProgress">
+                  Étape 0 / 4
+                </div>
+              </div>
+
+              <p id="acStepSubtitle" style="color:var(--text-muted);font-size:0.9rem;"></p>
+
+              <div id="acStepBody" style="margin-top:10px;display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+
+            <!-- Navigation -->
+            <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;">
+              <button id="acPrevBtn" type="button" class="btn btn-secondary" style="min-width:120px;">
+                ← Étape précédente
+              </button>
+
+              <div style="display:flex;gap:10px;">
+                <button id="acNextBtn" type="button" class="btn btn-primary" style="min-width:130px;">
+                  Étape suivante →
+                </button>
+                <button id="acLaunchBtn" type="button" class="btn btn-primary" style="display:none;min-width:190px;">
+                  Lancer avec Camille
+                </button>
+              </div>
+            </div>
+
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">
+              Vous pouvez revenir en arrière à tout moment : le récapitulatif à droite se met à jour automatiquement.
             </p>
           </div>
+
+          <!-- Colonne droite : résumé -->
+          <aside class="card" style="display:flex;flex-direction:column;gap:14px;max-height:600px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:40px;height:40px;border-radius:999px;overflow:hidden;background:#020617;">
+                <img
+                  src="assets/img/camille1.png"
+                  alt="Camille, votre assistante linguistique"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div>
+                <h2 style="font-size:1rem;color:var(--text-strong);margin-bottom:2px;">Brief prêt pour Camille</h2>
+                <p style="font-size:0.85rem;color:var(--text-muted);">
+                  Ce résumé se construit à partir de vos réponses. Il servira de base à la rédaction ou à l’interprétation.
+                </p>
+              </div>
+            </div>
+
+            <textarea
+              id="acSummary"
+              readonly
+              style="flex:1;min-height:260px;background:#020617;border-radius:12px;border:1px solid var(--border-subtle);padding:10px;color:var(--text-main);font-size:0.9rem;resize:vertical;"
+            ></textarea>
+
+            <button id="acCopyBtn" type="button" class="btn btn-secondary btn-full">
+              Copier le brief dans le presse-papiers
+            </button>
+
+            <p style="font-size:0.85rem;color:var(--text-muted);">
+              En cliquant sur <strong>Lancer avec Camille</strong>, le brief sera copié et <strong>importé automatiquement</strong>
+              dans la page Rédaction ou Interprétation.
+            </p>
+
+            <p id="acStatusMessage" style="font-size:0.85rem;min-height:1.2em;"></p>
+          </aside>
         </div>
+      </section>
+    </main>
 
-        <textarea id="acSummary"
-                  readonly
-                  style="flex:1;min-height:260px;background:#020617;border-radius:12px;border:1px solid var(--border-subtle);padding:10px;color:var(--text-main);font-size:0.9rem;resize:vertical;"></textarea>
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>© ContextaLingua</span>
+        <nav class="footer-nav"><a href="contact.html">Contact</a></nav>
+      </div>
+    </footer>
 
-        <button id="acCopyBtn" type="button" class="btn btn-secondary btn-full">
-          Copier le brief dans le presse-papiers
-        </button>
-
-        <p style="font-size:0.85rem;color:var(--text-muted);">
-          Lorsque vous cliquerez sur <strong>Lancer avec Camille</strong>, le brief sera également copié
-          dans votre presse-papiers, puis vous serez redirigé vers la page
-          <strong>Rédaction</strong> ou <strong>Interprétation</strong>.  
-          Vous pourrez encore l’ajuster avant d’envoyer la requête d’IA.
-        </p>
-
-        <p id="acStatusMessage" style="font-size:0.85rem;min-height:1.2em;"></p>
-      </aside>
-    </div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="container footer-inner">
-    <span>© ContextaLingua</span>
-    <nav class="footer-nav">
-      <a href="contact.html">Contact</a>
-    </nav>
-  </div>
-</footer>
-
-<!-- Scripts communs -->
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<!-- Script spécifique mode accompagné -->
-<script src="js/accompanied.js"></script>
-</body>
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/accompanied.js"></script>
+  </body>
 </html>
