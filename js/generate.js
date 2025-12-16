@@ -1,9 +1,8 @@
 // js/generate.js
-// Mode Rédaction : POST /api/ai/generate
-// - Langues UX : recherche + drapeaux + noms complets
-// - Envoi interne : code + nom (le user ne voit pas les codes)
-// - Prompt durci pour forcer la langue
-// - Debug visible uniquement superadmin
+// Rédaction - POST /api/ai/generate
+// - Langues : picker (nom complet visible, code interne invisible)
+// - Debug prompt : uniquement superadmin
+// - Sécurise submit (pas de reload)
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -12,171 +11,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  initLanguagePicker();
+  try {
+    setupHeaderNavigation();
+  } catch {}
+
+  initLanguagePickerGenerate();
   attachGenerateHandlers();
 });
 
-/* -------------------- Rôles -------------------- */
-
-function getUserSafe() {
-  try {
-    return typeof getCurrentUser === "function" ? getCurrentUser() : null;
-  } catch {
-    return null;
-  }
-}
-
 function isSuperAdmin() {
-  const u = getUserSafe();
-  return !!(u && u.role === "superadmin");
-}
-
-/* -------------------- Langues (liste extensible) -------------------- */
-/**
- * NOTE :
- * - code = interne (utile backend, logs, etc.)
- * - name = affichage user (langue complète)
- * - flag = emoji (rapide et léger)
- *
- * Vous pouvez ajouter autant de langues que souhaité.
- */
-const LANGUAGES = [
-  { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "en", name: "Anglais", flag: "🇬🇧" },
-  { code: "en-US", name: "Anglais (US)", flag: "🇺🇸" },
-  { code: "es", name: "Espagnol", flag: "🇪🇸" },
-  { code: "de", name: "Allemand", flag: "🇩🇪" },
-  { code: "it", name: "Italien", flag: "🇮🇹" },
-  { code: "pt", name: "Portugais", flag: "🇵🇹" },
-  { code: "pt-BR", name: "Portugais (Brésil)", flag: "🇧🇷" },
-  { code: "nl", name: "Néerlandais", flag: "🇳🇱" },
-  { code: "sv", name: "Suédois", flag: "🇸🇪" },
-  { code: "no", name: "Norvégien", flag: "🇳🇴" },
-  { code: "da", name: "Danois", flag: "🇩🇰" },
-  { code: "fi", name: "Finnois", flag: "🇫🇮" },
-  { code: "pl", name: "Polonais", flag: "🇵🇱" },
-  { code: "cs", name: "Tchèque", flag: "🇨🇿" },
-  { code: "sk", name: "Slovaque", flag: "🇸🇰" },
-  { code: "hu", name: "Hongrois", flag: "🇭🇺" },
-  { code: "ro", name: "Roumain", flag: "🇷🇴" },
-  { code: "bg", name: "Bulgare", flag: "🇧🇬" },
-  { code: "el", name: "Grec", flag: "🇬🇷" },
-  { code: "tr", name: "Turc", flag: "🇹🇷" },
-  { code: "ru", name: "Russe", flag: "🇷🇺" },
-  { code: "uk", name: "Ukrainien", flag: "🇺🇦" },
-  { code: "ar", name: "Arabe", flag: "🇸🇦" },
-  { code: "he", name: "Hébreu", flag: "🇮🇱" },
-  { code: "zh", name: "Chinois", flag: "🇨🇳" },
-  { code: "zh-TW", name: "Chinois (Traditionnel)", flag: "🇹🇼" },
-  { code: "ja", name: "Japonais", flag: "🇯🇵" },
-  { code: "ko", name: "Coréen", flag: "🇰🇷" },
-  { code: "hi", name: "Hindi", flag: "🇮🇳" },
-  { code: "th", name: "Thaï", flag: "🇹🇭" },
-  { code: "vi", name: "Vietnamien", flag: "🇻🇳" },
-  { code: "id", name: "Indonésien", flag: "🇮🇩" },
-];
-
-function normalize(str) {
-  return (str || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-
-function findLanguageByName(input) {
-  const q = normalize(input);
-  if (!q) return null;
-  return (
-    LANGUAGES.find((l) => normalize(l.name) === q) ||
-    LANGUAGES.find((l) => normalize(l.name).includes(q)) ||
-    null
-  );
-}
-
-/* -------------------- Language Picker UI -------------------- */
-
-function setSelectedLanguage(lang) {
-  const codeEl = document.getElementById("genLanguageCode");
-  const nameEl = document.getElementById("genLanguageName");
-  const labelEl = document.getElementById("genLanguageSelectedLabel");
-
-  if (codeEl) codeEl.value = lang.code;
-  if (nameEl) nameEl.value = lang.name;
-  if (labelEl) labelEl.textContent = `${lang.flag} ${lang.name}`;
-
-  // Visuel "actif"
-  document.querySelectorAll(".lang-pill").forEach((btn) => {
-    btn.classList.remove("btn-primary");
-    btn.classList.add("btn-secondary");
-    btn.style.borderColor = "rgba(148, 163, 184, 0.35)";
-  });
-
-  const activeBtn = document.querySelector(`.lang-pill[data-code="${lang.code}"]`);
-  if (activeBtn) {
-    activeBtn.classList.remove("btn-secondary");
-    activeBtn.classList.add("btn-primary");
-    activeBtn.style.borderColor = "rgba(37, 99, 235, 0.8)";
+  try {
+    const u = getCurrentUser();
+    return u && u.role === "superadmin";
+  } catch {
+    return false;
   }
 }
-
-function renderLanguageGrid(filterText = "") {
-  const grid = document.getElementById("genLanguageGrid");
-  if (!grid) return;
-
-  const q = normalize(filterText);
-  const items = q
-    ? LANGUAGES.filter((l) => normalize(l.name).includes(q))
-    : LANGUAGES;
-
-  grid.innerHTML = "";
-
-  items.slice(0, 40).forEach((lang) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-secondary lang-pill";
-    btn.dataset.code = lang.code;
-    btn.style.justifyContent = "flex-start";
-    btn.style.gap = "10px";
-    btn.style.padding = "10px 12px";
-    btn.style.borderRadius = "14px";
-
-    const left = document.createElement("span");
-    left.textContent = lang.flag;
-    left.style.fontSize = "1.05rem";
-
-    const right = document.createElement("span");
-    right.textContent = lang.name;
-    right.style.fontSize = "0.92rem";
-
-    btn.appendChild(left);
-    btn.appendChild(right);
-
-    btn.addEventListener("click", () => setSelectedLanguage(lang));
-    grid.appendChild(btn);
-  });
-}
-
-function initLanguagePicker() {
-  const search = document.getElementById("genLanguageSearch");
-  renderLanguageGrid("");
-
-  // Valeur par défaut : Français
-  const defaultLang = LANGUAGES.find((l) => l.code === "fr") || LANGUAGES[0];
-  setSelectedLanguage(defaultLang);
-
-  if (search) {
-    search.addEventListener("input", () => {
-      renderLanguageGrid(search.value);
-
-      // Si le user tape un nom exact, on auto-sélectionne
-      const found = findLanguageByName(search.value);
-      if (found) setSelectedLanguage(found);
-    });
-  }
-}
-
-/* -------------------- Handlers formulaire -------------------- */
 
 function attachGenerateHandlers() {
   const form = document.getElementById("generateForm");
@@ -190,7 +40,7 @@ function attachGenerateHandlers() {
     });
   }
 
-  // fallback click
+  // Fallback click
   document.addEventListener(
     "click",
     (e) => {
@@ -209,66 +59,63 @@ function attachGenerateHandlers() {
 
 function getUserLanguageFallback() {
   const nav = (navigator.language || "fr").toLowerCase();
-  if (nav.startsWith("fr")) return "Français";
-  if (nav.startsWith("en")) return "Anglais";
-  if (nav.startsWith("es")) return "Espagnol";
-  return "Français";
+  if (nav.startsWith("fr")) return "fr";
+  if (nav.startsWith("en")) return "en";
+  if (nav.startsWith("es")) return "es";
+  return "fr";
 }
 
-/* -------------------- Prompt -------------------- */
-
-function buildPrompt({ format, targetLangName, targetLangCode, userLangName, tone, objective, recipient, draft, context }) {
-  return `
+function buildPrompt({ format, targetLangName, targetLangCode, userLang, tone, objective, recipient, draft, context }) {
+  const base = `
 Tu es Camille, spécialiste en communication professionnelle et en rédaction orientée résultat.
+Tu écris comme un HUMAIN NATIF dans la langue cible (expressions idiomatiques, fluidité, naturel), sans formulations robotiques.
 
-RÈGLE CRITIQUE (obligatoire) :
-- Écris EXCLUSIVEMENT en ${targetLangName}. Ne mélange aucune autre langue.
-- Si des éléments sont fournis dans une autre langue, tu produis quand même le message final intégralement en ${targetLangName}.
-- Si une info manque : utilise [à compléter] plutôt que d’inventer.
+RÈGLES ABSOLUES :
+- Tu dois produire un contenu COMPLET et exploitable, jamais un message vide.
+- Si une information manque, tu proposes une formulation neutre + une variante.
+- Tu n’inventes PAS de faits sensibles (montants, dates, identités) si non fournis ; utilise [à compléter] si nécessaire.
+- Pas de blabla : va droit au but.
 
-STYLE :
-- Professionnel, concis, actionnable.
-- Pas de blabla.
+CONTRAINTE DE LANGUE (prioritaire) :
+- Tu rédiges intégralement en : "${targetLangName}".
+- Si tu détectes une autre langue dans le brief, tu l’ignores pour le MESSAGE_FINAL.
 
-FORMAT DU LIVRABLE (obligatoire) :
-1) MESSAGE_FINAL (en ${targetLangName})
-2) NOTES (en ${userLangName}) : 3 à 6 puces max
+SORTIE OBLIGATOIRE EN 2 BLOCS :
+1) MESSAGE_FINAL (langue cible)
+2) EXPLICATION_UTILISATEUR (langue utilisateur) : 4 à 8 puces max (intention, structure, points d’attention).
 
 PARAMÈTRES :
-- FORMAT = ${format}
-- LANGUE_CIBLE (nom) = ${targetLangName}
-- LANGUE_CIBLE (code interne) = ${targetLangCode}
-
----
-TON_SOUHAITÉ:
-${(tone || "").trim() || "—"}
-
----
-OBJECTIF_PRINCIPAL:
-${(objective || "").trim() || "—"}
-
----
-PROFIL_DESTINATAIRE:
-${(recipient || "").trim() || "—"}
-
----
-CONTEXTE_ET_CONTRAINTES:
-${(context || "").trim() || "—"}
-
----
-TEXTE_DEPART (optionnel):
-${(draft || "").trim() || "—"}
-
---- RENDU ATTENDU (strict) ---
-MESSAGE_FINAL:
-(texte complet prêt à envoyer)
-
-NOTES:
-- ...
+FORMAT = ${format}
+LANGUE_CIBLE_NOM = ${targetLangName}
+LANGUE_CIBLE_CODE_INTERNE = ${targetLangCode}
+LANGUE_UTILISATEUR = ${userLang}
 `.trim();
-}
 
-/* -------------------- Debug (superadmin only) -------------------- */
+  const parts = [base];
+  const add = (label, value) => {
+    const v = (value || "").trim();
+    if (v) parts.push(`\n---\n${label}:\n${v}\n`);
+  };
+
+  add("TON_SOUHAITÉ", tone);
+  add("OBJECTIF_PRINCIPAL", objective);
+  add("PROFIL_DESTINATAIRE", recipient);
+  add("CONTEXTE_ET_CONTRAINTES", context);
+  add("TEXTE_DEPART (optionnel)", draft);
+
+  parts.push(
+    `
+--- RENDU ATTENDU (strict)
+MESSAGE_FINAL:
+(texte complet)
+
+EXPLICATION_UTILISATEUR:
+- ...
+`.trim()
+  );
+
+  return parts.join("\n");
+}
 
 function ensurePromptDebugUI() {
   if (!isSuperAdmin()) return null;
@@ -284,7 +131,7 @@ function ensurePromptDebugUI() {
   wrap.style.marginTop = "14px";
 
   const title = document.createElement("h4");
-  title.textContent = "Debug – Prompt envoyé (copiable)";
+  title.textContent = "Debug – Prompt envoyé (superadmin)";
   title.style.margin = "10px 0 6px";
   title.style.color = "var(--text-strong)";
 
@@ -298,6 +145,7 @@ function ensurePromptDebugUI() {
   pre.style.padding = "12px";
   pre.style.border = "1px solid var(--border-subtle)";
   pre.style.minHeight = "60px";
+  pre.textContent = "(le prompt apparaîtra ici après génération)";
 
   const btnCopy = document.createElement("button");
   btnCopy.type = "button";
@@ -323,12 +171,11 @@ function ensurePromptDebugUI() {
   return wrap;
 }
 
-/* -------------------- Run -------------------- */
-
 function readValue(id) {
   const el = document.getElementById(id);
   if (!el) return { found: false, value: "" };
-  return { found: true, value: (el.value ?? "").toString() };
+  const v = (el.value ?? "").toString();
+  return { found: true, value: v };
 }
 
 async function runGenerate() {
@@ -346,37 +193,18 @@ async function runGenerate() {
   const draftR = readValue("genDraft");
   const ctxR = readValue("genContext");
 
-  const langCodeR = readValue("genLanguageCode");
-  const langNameR = readValue("genLanguageName");
+  // picker
+  const langCode = (document.getElementById("genLanguageCode")?.value || "fr").trim() || "fr";
+  const langLabel = (document.getElementById("genLanguageLabel")?.value || "Français").trim() || "Français";
 
-  const missing = [
-    ["genFormat", formatR.found],
-    ["genLanguageCode", langCodeR.found],
-    ["genLanguageName", langNameR.found],
-    ["genTone", toneR.found],
-    ["genObjective", objR.found],
-    ["genRecipient", recR.found],
-    ["genDraft", draftR.found],
-    ["genContext", ctxR.found],
-  ]
-    .filter((x) => !x[1])
-    .map((x) => x[0]);
-
-  if (missing.length) {
-    if (errorEl) errorEl.textContent = `Champs introuvables : ${missing.join(", ")}`;
-    return;
-  }
-
-  const format = (formatR.value || "email").trim() || "email";
-  const targetLangCode = (langCodeR.value || "fr").trim() || "fr";
-  const targetLangName = (langNameR.value || "Français").trim() || "Français";
-  const userLangName = getUserLanguageFallback();
+  const format = (formatR.found ? formatR.value : "email") || "email";
+  const userLang = getUserLanguageFallback();
 
   const prompt = buildPrompt({
     format,
-    targetLangName,
-    targetLangCode,
-    userLangName,
+    targetLangName: langLabel,
+    targetLangCode: langCode,
+    userLang,
     tone: toneR.value,
     objective: objR.value,
     recipient: recR.value,
@@ -385,19 +213,17 @@ async function runGenerate() {
   });
 
   // Debug superadmin only
-  const wrap = ensurePromptDebugUI();
-  if (wrap) {
-    const dbg = document.getElementById("genPromptDebug");
-    if (dbg) dbg.textContent = prompt;
-  }
+  ensurePromptDebugUI();
+  const dbg = document.getElementById("genPromptDebug");
+  if (dbg && isSuperAdmin()) dbg.textContent = prompt;
 
   const payload = {
     prompt,
     meta: {
       format,
-      targetLang: targetLangCode,
-      targetLangName,
-      userLangName,
+      targetLangName: langLabel,
+      targetLangCode: langCode,
+      userLang,
     },
   };
 
@@ -413,16 +239,118 @@ async function runGenerate() {
     if (!text) throw new Error("Réponse inattendue du moteur de génération.");
     if (outEl) outEl.textContent = text;
   } catch (err) {
-    if (errorEl) {
-      errorEl.textContent =
-        err?.message === "Failed to fetch"
-          ? "Impossible de contacter le serveur (API hors ligne ?)."
-          : err.message || "Erreur lors de la génération.";
-    }
+    if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
   } finally {
     if (btn) {
       btn.disabled = false;
       btn.textContent = originalLabel || "Lancer la rédaction";
     }
   }
+}
+
+/* ---------------- Language Picker (Generate) ---------------- */
+
+function initLanguagePickerGenerate() {
+  const picker = document.getElementById("genLangPicker");
+  if (!picker || !window.CL_LANG) return;
+
+  const labelInput = document.getElementById("genLanguageLabel");
+  const codeInput = document.getElementById("genLanguageCode");
+  const openBtn = document.getElementById("genLangOpenBtn");
+  const panel = document.getElementById("genLangPanel");
+  const search = document.getElementById("genLangSearch");
+  const favList = document.getElementById("genLangFavList");
+  const allList = document.getElementById("genLangAllList");
+
+  // default
+  const def = window.CL_LANG.getLanguageByCode(codeInput.value) || window.CL_LANG.getLanguages()[0];
+  labelInput.value = def ? def.name : "Français";
+  codeInput.value = def ? def.code : "fr";
+
+  function closePanel() {
+    panel.classList.remove("open");
+  }
+  function openPanel() {
+    panel.classList.add("open");
+    search.value = "";
+    render();
+    search.focus();
+  }
+
+  openBtn.addEventListener("click", () => {
+    if (panel.classList.contains("open")) closePanel();
+    else openPanel();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!panel.classList.contains("open")) return;
+    if (picker.contains(e.target)) return;
+    closePanel();
+  });
+
+  function setLanguage(lang) {
+    labelInput.value = lang.name;
+    codeInput.value = lang.code;
+    closePanel();
+  }
+
+  function row(lang, isFav) {
+    const el = document.createElement("div");
+    el.className = "lang-picker-row";
+
+    const left = document.createElement("div");
+    left.className = "lang-picker-left";
+
+    const flag = document.createElement("div");
+    flag.className = "lang-picker-flag";
+    flag.textContent = lang.flag || "🏳️";
+
+    const name = document.createElement("div");
+    name.className = "lang-picker-name";
+    name.textContent = lang.name;
+
+    left.appendChild(flag);
+    left.appendChild(name);
+
+    const favBtn = document.createElement("button");
+    favBtn.type = "button";
+    favBtn.className = "lang-picker-fav" + (isFav ? " active" : "");
+    favBtn.textContent = isFav ? "★" : "☆";
+    favBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      window.CL_LANG.toggleFavorite(lang.code);
+      render();
+    });
+
+    el.appendChild(left);
+    el.appendChild(favBtn);
+
+    el.addEventListener("click", () => setLanguage(lang));
+    return el;
+  }
+
+  function render() {
+    const favCodes = window.CL_LANG.getFavorites();
+    const all = window.CL_LANG.searchLanguages(search.value);
+    const fav = favCodes
+      .map((c) => window.CL_LANG.getLanguageByCode(c))
+      .filter(Boolean);
+
+    favList.innerHTML = "";
+    allList.innerHTML = "";
+
+    if (!fav.length) {
+      const empty = document.createElement("div");
+      empty.style.color = "var(--text-muted)";
+      empty.style.fontSize = "0.9rem";
+      empty.textContent = "Aucun favori pour l’instant.";
+      favList.appendChild(empty);
+    } else {
+      fav.forEach((l) => favList.appendChild(row(l, true)));
+    }
+
+    all.forEach((l) => allList.appendChild(row(l, favCodes.includes(l.code))));
+  }
+
+  search.addEventListener("input", render);
 }
