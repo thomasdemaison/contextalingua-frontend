@@ -15,6 +15,67 @@ document.addEventListener("DOMContentLoaded", () => {
   setupInterpretPage();
 });
 
+function isSuperAdmin() {
+  try {
+    const u = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+    return (u && u.role === "superadmin") || false;
+  } catch {
+    return false;
+  }
+}
+
+function ensureInterpretDebugUI() {
+  let wrap = document.getElementById("intDebugWrap");
+  if (wrap) return wrap;
+
+  const outEl = document.getElementById("intOutput");
+  if (!outEl || !outEl.parentElement) return null;
+
+  wrap = document.createElement("div");
+  wrap.id = "intDebugWrap";
+  wrap.style.marginTop = "14px";
+
+  const title = document.createElement("h4");
+  title.textContent = "Debug – Requête envoyée (copiable)";
+  title.style.margin = "10px 0 6px";
+  title.style.color = "var(--text-strong)";
+
+  const pre = document.createElement("pre");
+  pre.id = "intDebugPayload";
+  pre.style.whiteSpace = "pre-wrap";
+  pre.style.fontSize = "0.85rem";
+  pre.style.color = "var(--text-muted)";
+  pre.style.background = "#020617";
+  pre.style.borderRadius = "12px";
+  pre.style.padding = "12px";
+  pre.style.border = "1px solid var(--border-subtle)";
+  pre.style.minHeight = "60px";
+  pre.textContent = "(la requête apparaîtra ici après clic sur “Interpréter le message”)";
+
+  const btnCopy = document.createElement("button");
+  btnCopy.type = "button";
+  btnCopy.className = "btn btn-secondary";
+  btnCopy.style.marginTop = "8px";
+  btnCopy.textContent = "Copier la requête";
+  btnCopy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pre.textContent || "");
+      btnCopy.textContent = "Copié ✓";
+      setTimeout(() => (btnCopy.textContent = "Copier la requête"), 1200);
+    } catch {
+      btnCopy.textContent = "Copie impossible";
+      setTimeout(() => (btnCopy.textContent = "Copier la requête"), 1200);
+    }
+  });
+
+  wrap.appendChild(title);
+  wrap.appendChild(pre);
+  wrap.appendChild(btnCopy);
+
+  outEl.parentElement.appendChild(wrap);
+  return wrap;
+}
+
 function importCamilleBriefIntoInterpret() {
   let payload = null;
   try {
@@ -79,6 +140,16 @@ function setupInterpretPage() {
     return;
   }
 
+const payload = { language, questionType, textToInterpret, context };
+
+// Debug (superadmin uniquement)
+if (isSuperAdmin()) {
+  ensureInterpretDebugUI();
+  const pre = document.getElementById("intDebugPayload");
+  if (pre) pre.textContent = JSON.stringify(payload, null, 2);
+}
+
+ 
   submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
