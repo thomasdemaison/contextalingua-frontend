@@ -1,8 +1,10 @@
 // js/generate.js
 // Rédaction - POST /api/ai/generate
-// + Import automatique du brief du Mode accompagné (camilleBriefV1)
-
-const CAMILLE_BRIEF_KEY = "camilleBriefV1";
+// Objectifs :
+// 1) Empêcher tout reload (submit + click)
+// 2) Collecter correctement les champs par ID
+// 3) Forcer strictement la langue cible (le bug actuel)
+// 4) Debug (prompt) uniquement SUPERADMIN
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -10,99 +12,21 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "login.html";
     return;
   }
-
-  importCamilleBriefIntoGenerate();
-  setupLanguageFlags();
   attachGenerateHandlers();
 });
 
-function setupLanguageFlags() {
-  const select = document.getElementById("genLanguage");
-  const free = document.getElementById("genLanguageFree");
-  const wrap = document.getElementById("langFlags");
-  if (!select || !wrap) return;
-
-  wrap.addEventListener("click", (e) => {
-    const btn = e.target?.closest?.("[data-lang]");
-    if (!btn) return;
-    const lang = btn.getAttribute("data-lang");
-    if (lang) {
-      select.value = lang;
-      if (free) free.value = "";
-    }
-  });
-
-  if (free) {
-    free.addEventListener("input", () => {
-      const v = (free.value || "").trim().toLowerCase();
-      if (v) select.value = v;
-    });
-  }
-}
-
-
-function importCamilleBriefIntoGenerate() {
-  let payload = null;
-  try {
-    const raw = localStorage.getItem(CAMILLE_BRIEF_KEY);
-    if (!raw) return;
-    payload = JSON.parse(raw);
-  } catch (e) {
-    console.warn("[generate] brief JSON parse error:", e);
-    return;
-  }
-
-  const briefData = payload?.briefData;
-  if (!briefData || briefData.mode !== "write" || !briefData.form) return;
-
-  const map = briefData.form;
-
-  const setVal = (id, value) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.value = value ?? "";
-  };
-
-  setVal("genFormat", map.genFormat);
-  setVal("genLanguage", map.genLanguage);
-  setVal("genTone", map.genTone);
-  setVal("genObjective", map.genObjective);
-  setVal("genRecipient", map.genRecipient);
-  setVal("genDraft", map.genDraft);
-  setVal("genContext", map.genContext);
-
-  showImportBanner("Brief importé depuis le Mode accompagné ✓");
-}
-
-function showImportBanner(text) {
-  const form = document.getElementById("generateForm");
-  if (!form) return;
-
-  // Evite doublons
-  if (document.getElementById("camilleImportBanner")) return;
-
-  const div = document.createElement("div");
-  div.id = "camilleImportBanner";
-  div.textContent = text;
-  div.style.margin = "10px 0 14px";
-  div.style.padding = "10px 12px";
-  div.style.borderRadius = "12px";
-  div.style.border = "1px solid var(--border-subtle)";
-  div.style.background = "rgba(14, 165, 233, 0.08)";
-  div.style.color = "var(--text-main)";
-  div.style.fontSize = "0.9rem";
-
-  form.prepend(div);
-}
+/* -------------------- Rôles -------------------- */
 
 function isSuperAdmin() {
   try {
     const u = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-    return (u && u.role === "superadmin") || false;
+    return !!(u && u.role === "superadmin");
   } catch {
     return false;
   }
 }
+
+/* -------------------- Handlers -------------------- */
 
 function attachGenerateHandlers() {
   const form = document.getElementById("generateForm");
@@ -116,7 +40,7 @@ function attachGenerateHandlers() {
     });
   }
 
-  // Fallback click
+  // Fallback click (au cas où)
   document.addEventListener(
     "click",
     (e) => {
@@ -130,7 +54,7 @@ function attachGenerateHandlers() {
     true
   );
 
-  // Bouton type safe
+  // Sécurise type du bouton
   if (btn && !btn.getAttribute("type")) btn.setAttribute("type", "button");
 }
 
@@ -142,34 +66,62 @@ function getUserLanguageFallback() {
   return "fr";
 }
 
+/* -------------------- Langues (libellés lisibles) -------------------- */
+
+function langLabel(code) {
+  const c = (code || "fr").toLowerCase();
+  const map = {
+    fr: "Français",
+    en: "Anglais",
+    es: "Espagnol",
+    de: "Allemand",
+    it: "Italien",
+    pt: "Portugais",
+    nl: "Néerlandais",
+    zh: "Chinois",
+    ja: "Japonais",
+    ar: "Arabe",
+  };
+  return map[c] || c;
+}
+
+/* -------------------- Prompt -------------------- */
+
 function buildPrompt({ format, targetLang, userLang, tone, objective, recipient, draft, context }) {
+  const targetLabel = langLabel(targetLang);
+
+  // ⚠️ Changement clé :
+  // - On impose "ÉCRIS EXCLUSIVEMENT EN <LANGUE>"
+  // - On demande une sortie en 2 blocs, mais courte (pro)
+  // - On impose que MESSAGE_FINAL soit dans la langue cible, sans mélange.
+
   const base = `
 Tu es Camille, spécialiste en communication professionnelle et en rédaction orientée résultat.
-Tu écris comme un HUMAIN NATIF dans la langue cible (expressions idiomatiques, fluidité, naturel), sans formulations robotiques.
 
-RÈGLES ABSOLUES :
-- Tu dois produire un contenu COMPLET et exploitable, jamais un message vide.
-- Si une information manque, tu proposes une formulation neutre + une variante.
-- Tu n’inventes PAS de faits sensibles (montants, dates, identités) si non fournis ; utilise [à compléter] si nécessaire.
-- Pas de blabla : va droit au but.
+RÈGLE CRITIQUE (obligatoire) :
+- ÉCRIS EXCLUSIVEMENT en ${targetLabel} (code: ${targetLang}). Ne mélange aucune autre langue.
+- Si l'utilisateur écrit dans une autre langue, tu réponds quand même intégralement en ${targetLabel}.
 
-SORTIE OBLIGATOIRE EN 2 BLOCS :
-1) MESSAGE_FINAL (langue cible)
-2) EXPLICATION_UTILISATEUR (langue utilisateur) : 4 à 8 puces max (intention, structure, points d’attention).
+STYLE :
+- Professionnel, concis, actionnable.
+- Zéro blabla, zéro meta.
+- Si une info manque : utilise [à compléter] plutôt que d'inventer.
+
+FORMAT DU LIVRABLE (obligatoire, court) :
+1) MESSAGE_FINAL (en ${targetLabel})
+2) NOTES (en ${langLabel(userLang)}) : 3 à 6 puces max (intention, ton, points de vigilance)
 
 PARAMÈTRES :
-FORMAT = ${format}
-LANGUE_CIBLE = ${targetLang}
-LANGUE_UTILISATEUR = ${userLang}
+- FORMAT = ${format}
+- LANGUE_CIBLE = ${targetLang}
+- LANGUE_UTILISATEUR = ${userLang}
 `.trim();
 
   const parts = [base];
 
   const add = (label, value) => {
     const v = (value || "").trim();
-    if (v) {
-      parts.push(`\n---\n${label}:\n${v}\n`);
-    }
+    if (v) parts.push(`\n---\n${label}:\n${v}\n`);
   };
 
   add("TON_SOUHAITÉ", tone);
@@ -179,18 +131,23 @@ LANGUE_UTILISATEUR = ${userLang}
   add("TEXTE_DEPART (optionnel)", draft);
 
   parts.push(`
---- RENDU ATTENDU (strict)
+--- RENDU ATTENDU (strict) ---
 MESSAGE_FINAL:
-(texte complet)
+(texte complet prêt à envoyer)
 
-EXPLICATION_UTILISATEUR:
+NOTES:
 - ...
 `.trim());
 
   return parts.join("\n");
 }
 
+/* -------------------- Debug UI (superadmin only) -------------------- */
+
 function ensurePromptDebugUI() {
+  // Ne rien afficher si pas superadmin
+  if (!isSuperAdmin()) return null;
+
   let wrap = document.getElementById("genPromptDebugWrap");
   if (wrap) return wrap;
 
@@ -228,7 +185,7 @@ function ensurePromptDebugUI() {
       await navigator.clipboard.writeText(pre.textContent || "");
       btnCopy.textContent = "Copié ✓";
       setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
-    } catch {
+    } catch (e) {
       btnCopy.textContent = "Copie impossible";
       setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
     }
@@ -237,16 +194,20 @@ function ensurePromptDebugUI() {
   wrap.appendChild(title);
   wrap.appendChild(pre);
   wrap.appendChild(btnCopy);
-  outEl.parentElement.appendChild(wrap);
 
+  outEl.parentElement.appendChild(wrap);
   return wrap;
 }
+
+/* -------------------- Lecture champs -------------------- */
 
 function readValue(id) {
   const el = document.getElementById(id);
   if (!el) return { found: false, value: "" };
   return { found: true, value: (el.value ?? "").toString() };
 }
+
+/* -------------------- Run -------------------- */
 
 async function runGenerate() {
   const btn = document.getElementById("genSubmit");
@@ -265,19 +226,23 @@ async function runGenerate() {
   const ctxR = readValue("genContext");
 
   const missing = [
-    ["genFormat", formatR.found],
     ["genLanguage", langR.found],
     ["genTone", toneR.found],
     ["genObjective", objR.found],
     ["genRecipient", recR.found],
     ["genDraft", draftR.found],
     ["genContext", ctxR.found],
+    ["genFormat", formatR.found],
   ]
     .filter((x) => !x[1])
     .map((x) => x[0]);
 
   if (missing.length) {
-    if (errorEl) errorEl.textContent = `Champs introuvables : ${missing.join(", ")}. Vérifiez les id.`;
+    if (errorEl) {
+      errorEl.textContent = `Champs introuvables dans le HTML : ${missing.join(
+        ", "
+      )}. Vérifiez les id.`;
+    }
     return;
   }
 
@@ -296,14 +261,17 @@ async function runGenerate() {
     context: ctxR.value,
   });
 
-  // Debug prompt (superadmin uniquement)
-if (isSuperAdmin()) {
-  ensurePromptDebugUI();
-  const dbg = document.getElementById("genPromptDebug");
-  if (dbg) dbg.textContent = prompt;
-}
+  // Debug superadmin
+  const wrap = ensurePromptDebugUI();
+  if (wrap) {
+    const dbg = document.getElementById("genPromptDebug");
+    if (dbg) dbg.textContent = prompt;
+  }
 
-  const payload = { prompt, meta: { format, targetLang, userLang } };
+  const payload = {
+    prompt,
+    meta: { format, targetLang, userLang },
+  };
 
   const originalLabel = btn ? btn.textContent : "";
   if (btn) {
@@ -313,11 +281,20 @@ if (isSuperAdmin()) {
 
   try {
     const data = await apiRequest("/ai/generate", "POST", payload);
+
+    // Formats possibles selon backend
     const text = data?.result?.text ?? data?.result ?? data?.text ?? "";
     if (!text) throw new Error("Réponse inattendue du moteur de génération.");
+
     if (outEl) outEl.textContent = text;
   } catch (err) {
-    if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
+    if (errorEl) {
+      if (err?.message === "Failed to fetch") {
+        errorEl.textContent = "Impossible de contacter le serveur (API hors ligne ?).";
+      } else {
+        errorEl.textContent = err.message || "Erreur lors de la génération.";
+      }
+    }
   } finally {
     if (btn) {
       btn.disabled = false;
