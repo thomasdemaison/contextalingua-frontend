@@ -12,8 +12,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   importCamilleBriefIntoGenerate();
+  setupLanguageFlags();
   attachGenerateHandlers();
 });
+
+function setupLanguageFlags() {
+  const select = document.getElementById("genLanguage");
+  const free = document.getElementById("genLanguageFree");
+  const wrap = document.getElementById("langFlags");
+  if (!select || !wrap) return;
+
+  wrap.addEventListener("click", (e) => {
+    const btn = e.target?.closest?.("[data-lang]");
+    if (!btn) return;
+    const lang = btn.getAttribute("data-lang");
+    if (lang) {
+      select.value = lang;
+      if (free) free.value = "";
+    }
+  });
+
+  if (free) {
+    free.addEventListener("input", () => {
+      const v = (free.value || "").trim().toLowerCase();
+      if (v) select.value = v;
+    });
+  }
+}
+
 
 function importCamilleBriefIntoGenerate() {
   let payload = null;
