@@ -1,52 +1,86 @@
 // js/api.js
-// Helper global pour appeler le backend ContextaLingua
-(function () {
-  // Stratégie :
-  // - Par défaut : API sur la même origine => "/api" (compatible HTTPS, évite PNA)
-  // - Override possible via window.API_BASE_URL (ex: en local)
+// Objectif : API_BASE_URL fiable + override simple
+// - Par défaut : même origine => "/api" (si vous avez un reverse proxy)
+// - Override possible via :
+//   1) window.API_BASE_URL (recommandé)
+//   2) localStorage("API_BASE_URL") (pratique en dev)
+//   3) fallback local si on est sur localhost
 
-  if (!window.API_BASE_URL) {
-    // Si le frontend est servi depuis https://contextalingua.fr
-    // alors l'API doit idéalement être accessible via https://contextalingua.fr/api
-    window.API_BASE_URL = "/api";
+(function () {
+  function guessDefaultApiBase() {
+    // Si vous testez le front en local (ex: http://localhost:5500)
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      return "http://localhost:4000/api";
+    }
+    // En prod, on suppose un reverse-proxy sur le même domaine :
+    // https://contextalingua.fr/api/...
+    return location.origin + "/api";
   }
 
-  async function apiRequest(endpoint, method = "GET", body = null, withAuth = true) {
-    const headers = { "Content-Type": "application/json" };
-
-    if (withAuth) {
-      const token = localStorage.getItem("token");
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+  const fromWindow = typeof window !== "undefined" ? window.API_BASE_URL : null;
+  const fromStorage = (() => {
+    try {
+      return localStorage.getItem("API_BASE_URL");
+    } catch {
+      return null;
     }
+  })();
 
-    const response = await fetch(window.API_BASE_URL + endpoint, {
+  const API_BASE_URL = (fromWindow || fromStorage || guessDefaultApiBase()).replace(/\/+$/, "");
+  window.API_BASE_URL = API_BASE_URL; // exposé pour debug
+
+  console.log("[api.js] API_BASE_URL =", API_BASE_URL);
+
+  async function apiRequest(path, method = "GET", body = null) {
+    const token = localStorage.getItem("token");
+    const url = API_BASE_URL + (path.startsWith("/") ? path : "/" + path);
+
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const options = {
       method,
       headers,
-      body: body ? JSON.stringify(body) : null,
-      // Important si vous passez ensuite en cookies/sessions :
+      // IMPORTANT: si vous utilisez des cookies côté API, mettez credentials:"include"
       // credentials: "include",
-    });
+    };
 
-    const rawText = await response.text();
+    if (body && method !== "GET") options.body = JSON.stringify(body);
+
+    let res;
+    try {
+      res = await fetch(url, options);
+    } catch (e) {
+      const err = new Error("Failed to fetch");
+      err.status = 0;
+      throw err;
+    }
+
     let data = null;
-
-    if (rawText) {
+    const text = await res.text();
+    if (text) {
       try {
-        data = JSON.parse(rawText);
+        data = JSON.parse(text);
       } catch {
-        data = rawText;
+        data = { raw: text };
       }
     }
 
-    if (!response.ok) {
-      const error = new Error((data && data.message) || response.statusText || "Erreur API");
-      error.status = response.status;
-      error.data = data;
-      throw error;
+    if (!res.ok) {
+      const err = new Error((data && data.message) || "Erreur API");
+      err.status = res.status;
+      err.data = data;
+      err.url = url;
+      throw err;
     }
 
     return data;
   }
 
+  // Helpers pratiques pour vous (dev)
   window.apiRequest = apiRequest;
+  window.setApiBaseUrl = function (value) {
+    localStorage.setItem("API_BASE_URL", value);
+    console.log("[api.js] API_BASE_URL set to", value, "→ rechargez la page");
+  };
 })();
