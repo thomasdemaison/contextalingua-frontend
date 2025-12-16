@@ -1,0 +1,9 @@
+<svg class="flag">
+  <use href="assets/flags/flags.svg#flag-fr"></use>
+</svg>
+.flag {
+  width: 20px;
+  height: 14px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
