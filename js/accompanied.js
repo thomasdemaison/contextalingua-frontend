@@ -44,7 +44,6 @@ const acAnswers = {
     constraints: "",
   },
   interpret: {
-    sourceLanguage: "fr",
     summaryLanguage: "fr",
     questionType: "analyse_globale",
     text: "",
@@ -320,11 +319,6 @@ function renderCurrentStep() {
           </div>
 
           <div class="form-field">
-            <span>Langue du message</span>
-            <input id="acIntSourceLanguage" type="text" placeholder="fr, en, es..." value="${escapeHtml(a.sourceLanguage || "fr")}">
-          </div>
-
-          <div class="form-field">
             <span>Type d'analyse</span>
             <select id="acIntQuestionType">
               <option value="analyse_globale" ${a.questionType === "analyse_globale" ? "selected" : ""}>Analyse globale (ton, intention, risques)</option>
@@ -448,11 +442,9 @@ function saveCurrentStep() {
     switch (step) {
       case 0: {
         const text = document.getElementById("acIntText")?.value.trim();
-        const lang = document.getElementById("acIntSourceLanguage")?.value.trim();
         const qt = document.getElementById("acIntQuestionType")?.value.trim();
 
         a.text = text || "";
-        a.sourceLanguage = lang || "fr";
         a.questionType = qt || "analyse_globale";
 
         if (!a.text) {
@@ -586,7 +578,6 @@ function buildBriefData() {
       intQuestionType: a.questionType || "analyse_globale",
       intText: a.text || "",
       intContext: [
-        a.sourceLanguage ? `Langue source : ${a.sourceLanguage}` : "",
         a.relation ? `Relation : ${a.relation}` : "",
         a.importance ? `Enjeu : ${a.importance}` : "",
         a.context ? `Contexte : ${a.context}` : "",
