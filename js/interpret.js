@@ -1,11 +1,10 @@
 // js/interpret.js
-// Page "Interprétation" (interpret.html)
-// Utilise l'endpoint backend : POST /api/ai/interpret
-// Objectifs :
-// - Rediriger si non connecté
-// - Ne PAS demander la langue d'origine (détection côté IA)
-// - Ajouter un debug (requête envoyée) uniquement pour SUPERADMIN
-// - Éviter les erreurs de scope type "language is not defined"
+// Page "Interprétation"
+// Endpoint backend : POST /api/ai/interpret
+// - Langue d'origine : NON demandée (détection automatique par l'IA)
+// - Langue cible : UX (drapeaux + noms complets)
+// - Mode rapide / approfondi
+// - Debug superadmin only (payload envoyé)
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -14,25 +13,164 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  try {
-    setupInterpretPage();
-  } catch (err) {
-    console.error("[interpret.js] Erreur setupInterpretPage :", err);
-  }
+  initInterpretLanguagePicker();
+  setupInterpretPage();
 });
 
-/* -------------------- Helpers -------------------- */
+/* -------------------- Rôles -------------------- */
 
-function isSuperAdmin() {
+function getUserSafe() {
   try {
-    const u = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-    return !!(u && u.role === "superadmin");
+    return typeof getCurrentUser === "function" ? getCurrentUser() : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
+function isSuperAdmin() {
+  const u = getUserSafe();
+  return !!(u && u.role === "superadmin");
+}
+
+/* -------------------- Langues (même liste que generate) -------------------- */
+
+const LANGUAGES = [
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "en", name: "Anglais", flag: "🇬🇧" },
+  { code: "en-US", name: "Anglais (US)", flag: "🇺🇸" },
+  { code: "es", name: "Espagnol", flag: "🇪🇸" },
+  { code: "de", name: "Allemand", flag: "🇩🇪" },
+  { code: "it", name: "Italien", flag: "🇮🇹" },
+  { code: "pt", name: "Portugais", flag: "🇵🇹" },
+  { code: "pt-BR", name: "Portugais (Brésil)", flag: "🇧🇷" },
+  { code: "nl", name: "Néerlandais", flag: "🇳🇱" },
+  { code: "sv", name: "Suédois", flag: "🇸🇪" },
+  { code: "no", name: "Norvégien", flag: "🇳🇴" },
+  { code: "da", name: "Danois", flag: "🇩🇰" },
+  { code: "fi", name: "Finnois", flag: "🇫🇮" },
+  { code: "pl", name: "Polonais", flag: "🇵🇱" },
+  { code: "cs", name: "Tchèque", flag: "🇨🇿" },
+  { code: "sk", name: "Slovaque", flag: "🇸🇰" },
+  { code: "hu", name: "Hongrois", flag: "🇭🇺" },
+  { code: "ro", name: "Roumain", flag: "🇷🇴" },
+  { code: "bg", name: "Bulgare", flag: "🇧🇬" },
+  { code: "el", name: "Grec", flag: "🇬🇷" },
+  { code: "tr", name: "Turc", flag: "🇹🇷" },
+  { code: "ru", name: "Russe", flag: "🇷🇺" },
+  { code: "uk", name: "Ukrainien", flag: "🇺🇦" },
+  { code: "ar", name: "Arabe", flag: "🇸🇦" },
+  { code: "he", name: "Hébreu", flag: "🇮🇱" },
+  { code: "zh", name: "Chinois", flag: "🇨🇳" },
+  { code: "zh-TW", name: "Chinois (Traditionnel)", flag: "🇹🇼" },
+  { code: "ja", name: "Japonais", flag: "🇯🇵" },
+  { code: "ko", name: "Coréen", flag: "🇰🇷" },
+  { code: "hi", name: "Hindi", flag: "🇮🇳" },
+  { code: "th", name: "Thaï", flag: "🇹🇭" },
+  { code: "vi", name: "Vietnamien", flag: "🇻🇳" },
+  { code: "id", name: "Indonésien", flag: "🇮🇩" },
+];
+
+function normalize(str) {
+  return (str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+function findLanguageByName(input) {
+  const q = normalize(input);
+  if (!q) return null;
+  return (
+    LANGUAGES.find((l) => normalize(l.name) === q) ||
+    LANGUAGES.find((l) => normalize(l.name).includes(q)) ||
+    null
+  );
+}
+
+/* -------------------- Picker UI -------------------- */
+
+function setInterpretSelectedLanguage(lang) {
+  const codeEl = document.getElementById("intLanguageCode");
+  const nameEl = document.getElementById("intLanguageName");
+  const labelEl = document.getElementById("intLanguageSelectedLabel");
+
+  if (codeEl) codeEl.value = lang.code;
+  if (nameEl) nameEl.value = lang.name;
+  if (labelEl) labelEl.textContent = `${lang.flag} ${lang.name}`;
+
+  document.querySelectorAll(".int-lang-pill").forEach((btn) => {
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-secondary");
+    btn.style.borderColor = "rgba(148, 163, 184, 0.35)";
+  });
+
+  const activeBtn = document.querySelector(`.int-lang-pill[data-code="${lang.code}"]`);
+  if (activeBtn) {
+    activeBtn.classList.remove("btn-secondary");
+    activeBtn.classList.add("btn-primary");
+    activeBtn.style.borderColor = "rgba(37, 99, 235, 0.8)";
+  }
+}
+
+function renderInterpretLanguageGrid(filterText = "") {
+  const grid = document.getElementById("intLanguageGrid");
+  if (!grid) return;
+
+  const q = normalize(filterText);
+  const items = q
+    ? LANGUAGES.filter((l) => normalize(l.name).includes(q))
+    : LANGUAGES;
+
+  grid.innerHTML = "";
+
+  items.slice(0, 40).forEach((lang) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-secondary int-lang-pill";
+    btn.dataset.code = lang.code;
+    btn.style.justifyContent = "flex-start";
+    btn.style.gap = "10px";
+    btn.style.padding = "10px 12px";
+    btn.style.borderRadius = "14px";
+
+    const left = document.createElement("span");
+    left.textContent = lang.flag;
+    left.style.fontSize = "1.05rem";
+
+    const right = document.createElement("span");
+    right.textContent = lang.name;
+    right.style.fontSize = "0.92rem";
+
+    btn.appendChild(left);
+    btn.appendChild(right);
+
+    btn.addEventListener("click", () => setInterpretSelectedLanguage(lang));
+    grid.appendChild(btn);
+  });
+}
+
+function initInterpretLanguagePicker() {
+  const search = document.getElementById("intLanguageSearch");
+  renderInterpretLanguageGrid("");
+
+  const defaultLang = LANGUAGES.find((l) => l.code === "fr") || LANGUAGES[0];
+  setInterpretSelectedLanguage(defaultLang);
+
+  if (search) {
+    search.addEventListener("input", () => {
+      renderInterpretLanguageGrid(search.value);
+      const found = findLanguageByName(search.value);
+      if (found) setInterpretSelectedLanguage(found);
+    });
+  }
+}
+
+/* -------------------- Debug UI (superadmin only) -------------------- */
+
 function ensureInterpretDebugUI() {
+  if (!isSuperAdmin()) return null;
+
   let wrap = document.getElementById("intDebugWrap");
   if (wrap) return wrap;
 
@@ -44,7 +182,7 @@ function ensureInterpretDebugUI() {
   wrap.style.marginTop = "14px";
 
   const title = document.createElement("h4");
-  title.textContent = "Debug – Requête envoyée (copiable)";
+  title.textContent = "Debug – Payload envoyé (copiable)";
   title.style.margin = "10px 0 6px";
   title.style.color = "var(--text-strong)";
 
@@ -58,22 +196,20 @@ function ensureInterpretDebugUI() {
   pre.style.padding = "12px";
   pre.style.border = "1px solid var(--border-subtle)";
   pre.style.minHeight = "60px";
-  pre.textContent = "(la requête apparaîtra ici après clic sur “Interpréter le message”)";
 
   const btnCopy = document.createElement("button");
   btnCopy.type = "button";
   btnCopy.className = "btn btn-secondary";
   btnCopy.style.marginTop = "8px";
-  btnCopy.textContent = "Copier la requête";
-
+  btnCopy.textContent = "Copier le payload";
   btnCopy.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(pre.textContent || "");
       btnCopy.textContent = "Copié ✓";
-      setTimeout(() => (btnCopy.textContent = "Copier la requête"), 1200);
-    } catch (e) {
+      setTimeout(() => (btnCopy.textContent = "Copier le payload"), 1200);
+    } catch {
       btnCopy.textContent = "Copie impossible";
-      setTimeout(() => (btnCopy.textContent = "Copier la requête"), 1200);
+      setTimeout(() => (btnCopy.textContent = "Copier le payload"), 1200);
     }
   });
 
@@ -88,90 +224,65 @@ function ensureInterpretDebugUI() {
 /* -------------------- Main -------------------- */
 
 function setupInterpretPage() {
-  const languageEl = document.getElementById("intLanguage");
-  const questionTypeEl = document.getElementById("intQuestionType");
-  const textEl = document.getElementById("intText");
-  const contextEl = document.getElementById("intContext");
   const submitBtn = document.getElementById("intSubmit");
   const errorEl = document.getElementById("intError");
   const resultEl = document.getElementById("intOutput");
 
-  if (!submitBtn) {
-    console.warn("[interpret.js] Bouton intSubmit introuvable.");
-    return;
-  }
+  if (!submitBtn) return;
 
   submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    // Nettoyage UI
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
 
-    // Valeurs (bien dans le scope !)
-    const language = (languageEl && languageEl.value) ? languageEl.value : "fr";
-    const questionType = (questionTypeEl && questionTypeEl.value)
-      ? questionTypeEl.value
-      : "analyse_globale";
-    const textToInterpret = textEl ? (textEl.value || "").trim() : "";
-    const context = contextEl ? (contextEl.value || "").trim() : "";
+    const langCode = (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
+    const langName = (document.getElementById("intLanguageName")?.value || "Français").trim() || "Français";
+    const depth = (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
+
+    const textToInterpret = (document.getElementById("intText")?.value || "").trim();
+    const context = (document.getElementById("intContext")?.value || "").trim();
 
     if (!textToInterpret) {
       if (errorEl) errorEl.textContent = "Merci de coller le texte à analyser.";
       return;
     }
 
-    // Payload envoyé au backend
-    const payload = {
-      language,           // langue de la réponse souhaitée
-      questionType,       // type d'analyse
-      textToInterpret,    // texte collé
-      context             // contexte optionnel
-      // IMPORTANT : pas de langue d'origine -> l'IA déduira
-    };
-
-    // Debug superadmin uniquement
-    if (isSuperAdmin()) {
-      ensureInterpretDebugUI();
-      const pre = document.getElementById("intDebugPayload");
-      if (pre) pre.textContent = JSON.stringify(payload, null, 2);
-    }
-
-    // UI état chargement
-    const originalLabel = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = "Camille analyse…";
 
     try {
+      // Convention :
+      // - language = langue de la réponse (backend peut utiliser le code ou le nom)
+      // - depth = quick/detailed (backend adapte le prompt)
+      // - languageName = utile pour logs / prompt si besoin
+      const payload = {
+        language: langCode,
+        languageName: langName,
+        depth,
+        textToInterpret,
+        context,
+      };
+
+      const wrap = ensureInterpretDebugUI();
+      if (wrap) {
+        const pre = document.getElementById("intDebugPayload");
+        if (pre) pre.textContent = JSON.stringify(payload, null, 2);
+      }
+
       const data = await apiRequest("/ai/interpret", "POST", payload);
 
-      // Formats possibles selon votre backend
-      // - { ok: true, result: { text: "..." } }
-      // - { result: "..." }
-      // - { text: "..." }
-      const text =
-        data?.result?.text ??
-        data?.result ??
-        data?.text ??
-        "";
-
-      if (!text) {
+      // Compat : backend actuel
+      if (!data || !data.ok || !data.result) {
         throw new Error("Réponse inattendue du moteur d'interprétation.");
       }
 
-      if (resultEl) resultEl.textContent = text;
+      if (resultEl) resultEl.textContent = data.result.text || "";
     } catch (err) {
-      console.error("[interpret.js] Erreur /ai/interpret :", err);
-      if (errorEl) {
-        if (err?.message === "Failed to fetch") {
-          errorEl.textContent = "Impossible de contacter le serveur (API hors ligne ?).";
-        } else {
-          errorEl.textContent = err?.message || "Une erreur est survenue lors de l’analyse.";
-        }
-      }
+      if (errorEl) errorEl.textContent = err.message || "Une erreur est survenue lors de l’analyse.";
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = originalLabel || "Interpréter le message";
+      submitBtn.textContent = "Interpréter le message";
     }
   });
 }
