@@ -5,7 +5,6 @@
     <title>Rédaction – ContextaLingua</title>
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
-
   <body>
     <header class="site-header">
       <div class="container header-inner">
@@ -57,43 +56,47 @@
                 </select>
               </div>
 
-              <!-- ✅ Sélecteur langues : recherche + drapeaux + noms complets -->
               <div class="form-field">
                 <span>Langue cible</span>
 
-                <input
-                  id="genLanguageSearch"
-                  type="text"
-                  placeholder="Tapez une langue (ex : Chinois, Allemand, Arabe…) ou cliquez sur un drapeau"
-                  style="margin-bottom:10px;"
-                />
+                <!-- Picker -->
+                <div class="lang-picker" id="genLangPicker">
+                  <div class="lang-picker-input">
+                    <input
+                      id="genLanguageLabel"
+                      type="text"
+                      placeholder="Rechercher une langue (ex : allemand, chinois, arabe...)"
+                      autocomplete="off"
+                    />
+                    <!-- code interne, invisible -->
+                    <input id="genLanguageCode" type="hidden" value="fr" />
+                    <button id="genLangOpenBtn" type="button" class="btn btn-secondary">Choisir</button>
+                  </div>
 
-                <!-- Valeur réelle envoyée (code interne) -->
-                <input type="hidden" id="genLanguageCode" value="fr" />
-                <!-- Valeur lisible (nom complet) -->
-                <input type="hidden" id="genLanguageName" value="Français" />
+                  <div class="lang-picker-panel" id="genLangPanel">
+                    <div class="form-field" style="margin-bottom: 10px;">
+                      <span>Recherche</span>
+                      <input id="genLangSearch" type="text" placeholder="Tapez pour filtrer..." autocomplete="off" />
+                    </div>
 
-                <div
-                  id="genLanguageGrid"
-                  style="
-                    display:grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap:10px;
-                  "
-                ></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                      <span class="eyebrow light" style="margin:0;">Favoris</span>
+                      <span class="lang-picker-meta">Cliquez ☆ pour épingler</span>
+                    </div>
+                    <div id="genLangFavList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
 
-                <p style="margin-top:8px;color:var(--text-muted);font-size:0.85rem;">
-                  Sélection actuelle : <strong id="genLanguageSelectedLabel">🇫🇷 Français</strong>
-                </p>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                      <span class="eyebrow light" style="margin:0;">Toutes les langues</span>
+                      <span class="lang-picker-meta">Sélection = 1 clic</span>
+                    </div>
+                    <div id="genLangAllList" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;"></div>
+                  </div>
+                </div>
               </div>
 
               <div class="form-field">
                 <span>Ton souhaité</span>
-                <input
-                  type="text"
-                  id="genTone"
-                  placeholder="Ex : professionnel, chaleureux, ferme mais poli…"
-                />
+                <input type="text" id="genTone" placeholder="Ex : professionnel, chaleureux, ferme mais poli…" />
               </div>
 
               <div class="form-field">
@@ -137,27 +140,16 @@
                 style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"
               ></p>
 
-              <button id="genSubmit" type="submit" class="btn btn-primary">
-                Lancer la rédaction
-              </button>
+              <button id="genSubmit" type="submit" class="btn btn-primary">Lancer la rédaction</button>
             </form>
 
-            <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">
-              Proposition de Camille
-            </h3>
+            <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">Proposition de Camille</h3>
             <pre
               id="genOutput"
-              style="
-                white-space: pre-wrap;
-                font-size: 0.95rem;
-                color: var(--text-main);
-                background:#020617;
-                border-radius: 12px;
-                padding: 12px;
-                border: 1px solid var(--border-subtle);
-                min-height: 80px;
-              "
+              style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617; border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"
             ></pre>
+
+            <!-- Debug (superadmin only) injecté par JS -->
           </div>
         </div>
       </section>
@@ -174,6 +166,7 @@
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/languages.js"></script>
     <script src="js/generate.js"></script>
   </body>
 </html>
