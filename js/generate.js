@@ -1,17 +1,73 @@
 // js/generate.js
 // Rédaction - POST /api/ai/generate
+// + Import automatique du brief du Mode accompagné (camilleBriefV1)
+
+const CAMILLE_BRIEF_KEY = "camilleBriefV1";
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[generate.js] DOM chargé, initialisation…");
-
   const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
   }
 
+  importCamilleBriefIntoGenerate();
   attachGenerateHandlers();
 });
+
+function importCamilleBriefIntoGenerate() {
+  let payload = null;
+  try {
+    const raw = localStorage.getItem(CAMILLE_BRIEF_KEY);
+    if (!raw) return;
+    payload = JSON.parse(raw);
+  } catch (e) {
+    console.warn("[generate] brief JSON parse error:", e);
+    return;
+  }
+
+  const briefData = payload?.briefData;
+  if (!briefData || briefData.mode !== "write" || !briefData.form) return;
+
+  const map = briefData.form;
+
+  const setVal = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = value ?? "";
+  };
+
+  setVal("genFormat", map.genFormat);
+  setVal("genLanguage", map.genLanguage);
+  setVal("genTone", map.genTone);
+  setVal("genObjective", map.genObjective);
+  setVal("genRecipient", map.genRecipient);
+  setVal("genDraft", map.genDraft);
+  setVal("genContext", map.genContext);
+
+  showImportBanner("Brief importé depuis le Mode accompagné ✓");
+}
+
+function showImportBanner(text) {
+  const form = document.getElementById("generateForm");
+  if (!form) return;
+
+  // Evite doublons
+  if (document.getElementById("camilleImportBanner")) return;
+
+  const div = document.createElement("div");
+  div.id = "camilleImportBanner";
+  div.textContent = text;
+  div.style.margin = "10px 0 14px";
+  div.style.padding = "10px 12px";
+  div.style.borderRadius = "12px";
+  div.style.border = "1px solid var(--border-subtle)";
+  div.style.background = "rgba(14, 165, 233, 0.08)";
+  div.style.color = "var(--text-main)";
+  div.style.fontSize = "0.9rem";
+
+  form.prepend(div);
+}
 
 function attachGenerateHandlers() {
   const form = document.getElementById("generateForm");
@@ -25,12 +81,12 @@ function attachGenerateHandlers() {
     });
   }
 
-  // fallback click
+  // Fallback click
   document.addEventListener(
     "click",
     (e) => {
-      const t = e.target;
-      if (t && t.id === "genSubmit") {
+      const target = e.target;
+      if (target && target.id === "genSubmit") {
         e.preventDefault();
         e.stopPropagation();
         runGenerate();
@@ -39,6 +95,7 @@ function attachGenerateHandlers() {
     true
   );
 
+  // Bouton type safe
   if (btn && !btn.getAttribute("type")) btn.setAttribute("type", "button");
 }
 
@@ -63,7 +120,7 @@ RÈGLES ABSOLUES :
 
 SORTIE OBLIGATOIRE EN 2 BLOCS :
 1) MESSAGE_FINAL (langue cible)
-2) EXPLICATION_UTILISATEUR (langue utilisateur) : 4 à 8 puces max.
+2) EXPLICATION_UTILISATEUR (langue utilisateur) : 4 à 8 puces max (intention, structure, points d’attention).
 
 PARAMÈTRES :
 FORMAT = ${format}
@@ -75,8 +132,9 @@ LANGUE_UTILISATEUR = ${userLang}
 
   const add = (label, value) => {
     const v = (value || "").trim();
-    if (!v) return;
-    parts.push(`\n---\n${label}:\n${v}\n`);
+    if (v) {
+      parts.push(`\n---\n${label}:\n${v}\n`);
+    }
   };
 
   add("TON_SOUHAITÉ", tone);
@@ -85,16 +143,14 @@ LANGUE_UTILISATEUR = ${userLang}
   add("CONTEXTE_ET_CONTRAINTES", context);
   add("TEXTE_DEPART (optionnel)", draft);
 
-  parts.push(
-    `
+  parts.push(`
 --- RENDU ATTENDU (strict)
 MESSAGE_FINAL:
 (texte complet)
 
 EXPLICATION_UTILISATEUR:
 - ...
-`.trim()
-  );
+`.trim());
 
   return parts.join("\n");
 }
@@ -146,8 +202,8 @@ function ensurePromptDebugUI() {
   wrap.appendChild(title);
   wrap.appendChild(pre);
   wrap.appendChild(btnCopy);
-
   outEl.parentElement.appendChild(wrap);
+
   return wrap;
 }
 
@@ -186,9 +242,7 @@ async function runGenerate() {
     .map((x) => x[0]);
 
   if (missing.length) {
-    if (errorEl) {
-      errorEl.textContent = `Champs introuvables : ${missing.join(", ")} (IDs HTML à corriger).`;
-    }
+    if (errorEl) errorEl.textContent = `Champs introuvables : ${missing.join(", ")}. Vérifiez les id.`;
     return;
   }
 
@@ -196,18 +250,16 @@ async function runGenerate() {
   const targetLang = (langR.value || "fr").trim() || "fr";
   const userLang = getUserLanguageFallback();
 
-  const tone = toneR.value;
-  const objective = objR.value;
-  const recipient = recR.value;
-  const draft = draftR.value;
-  const context = ctxR.value;
-
-  if (!objective.trim() && !draft.trim()) {
-    if (errorEl) errorEl.textContent = "Renseignez au moins un objectif ou un texte de départ.";
-    return;
-  }
-
-  const prompt = buildPrompt({ format, targetLang, userLang, tone, objective, recipient, draft, context });
+  const prompt = buildPrompt({
+    format,
+    targetLang,
+    userLang,
+    tone: toneR.value,
+    objective: objR.value,
+    recipient: recR.value,
+    draft: draftR.value,
+    context: ctxR.value,
+  });
 
   ensurePromptDebugUI();
   const dbg = document.getElementById("genPromptDebug");
@@ -223,23 +275,11 @@ async function runGenerate() {
 
   try {
     const data = await apiRequest("/ai/generate", "POST", payload);
-
-    const text =
-      data?.result?.text ??
-      data?.result ??
-      data?.text ??
-      "";
-
-    if (!text) throw new Error("Réponse inattendue du moteur de génération (texte vide).");
+    const text = data?.result?.text ?? data?.result ?? data?.text ?? "";
+    if (!text) throw new Error("Réponse inattendue du moteur de génération.");
     if (outEl) outEl.textContent = text;
   } catch (err) {
-    if (errorEl) {
-      if (err.message === "Failed to fetch") {
-        errorEl.textContent = "Impossible de contacter le serveur (API hors ligne ?).";
-      } else {
-        errorEl.textContent = err.message || "Erreur lors de la génération.";
-      }
-    }
+    if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
   } finally {
     if (btn) {
       btn.disabled = false;
