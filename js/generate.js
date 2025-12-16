@@ -270,9 +270,12 @@ async function runGenerate() {
     context: ctxR.value,
   });
 
+  // Debug prompt (superadmin uniquement)
+if (isSuperAdmin()) {
   ensurePromptDebugUI();
   const dbg = document.getElementById("genPromptDebug");
   if (dbg) dbg.textContent = prompt;
+}
 
   const payload = { prompt, meta: { format, targetLang, userLang } };
 
