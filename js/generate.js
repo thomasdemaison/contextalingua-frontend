@@ -69,6 +69,15 @@ function showImportBanner(text) {
   form.prepend(div);
 }
 
+function isSuperAdmin() {
+  try {
+    const u = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+    return (u && u.role === "superadmin") || false;
+  } catch {
+    return false;
+  }
+}
+
 function attachGenerateHandlers() {
   const form = document.getElementById("generateForm");
   const btn = document.getElementById("genSubmit");
