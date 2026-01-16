@@ -208,51 +208,57 @@ function setupLoginForm() {
   const errorEl       = document.getElementById("loginError");
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (errorEl) errorEl.textContent = "";
+  e.preventDefault();
+  console.log("[auth.js] submit loginForm");
 
-    const email    = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value : "";
+  if (errorEl) errorEl.textContent = "";
 
-    if (!email || !password) {
-      if (errorEl) errorEl.textContent = "Email et mot de passe requis.";
+  const email = emailInput ? emailInput.value.trim() : "";
+  const password = passwordInput ? passwordInput.value : "";
+
+  console.log("[auth.js] email =", email, "pwdLen =", password ? password.length : 0);
+
+  if (!email || !password) {
+    if (errorEl) errorEl.textContent = "Email et mot de passe requis.";
+    return;
+  }
+
+  try {
+    console.log("[auth.js] calling /auth/login with", email);
+
+    const data = await apiRequest(
+      "/auth/login",
+      "POST",
+      { email, password }
+    );
+
+    console.log("[auth.js] login OK, got token?", !!data?.token);
+
+    if (!data || !data.token || !data.user) {
+      if (errorEl) {
+        errorEl.textContent =
+          "Réponse inattendue du serveur. Vérifiez le backend.";
+      }
       return;
     }
 
-    try {
-      const data = await apiRequest(
-        "/auth/login",
-        "POST",
-        { email, password },
-        false
-      );
-console.log("[auth.js] calling /auth/login with", email);
-  
-      if (!data || !data.token || !data.user) {
-        if (errorEl) {
-          errorEl.textContent =
-            "Réponse inattendue du serveur. Vérifiez le backend.";
-        }
-        return;
-      }
+    saveAuth(data.token, data.user);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    console.error("[auth.js] Erreur login :", err);
 
-      saveAuth(data.token, data.user);
-      window.location.href = "dashboard.html";
-    } catch (err) {
-      console.error("Erreur login :", err);
-      if (errorEl) {
-        if (err.status === 401) {
-          errorEl.textContent = "Identifiants invalides.";
-        } else if (err.message === "Failed to fetch") {
-          errorEl.textContent =
-            "Impossible de contacter le serveur (API hors ligne ?).";
-        } else {
-          errorEl.textContent =
-            err.message || "Erreur lors de la connexion.";
-        }
+    if (errorEl) {
+      if (err.status === 401) {
+        errorEl.textContent = "Identifiants invalides.";
+      } else if (err.message === "Failed to fetch") {
+        errorEl.textContent = "Impossible de contacter le serveur.";
+      } else {
+        errorEl.textContent = err.message || "Erreur lors de la connexion.";
       }
     }
-  });
+  }
+});
+
 }
 
 // ---------- Register ----------
