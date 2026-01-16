@@ -1,8 +1,8 @@
-// js/generate.js
+// js/generate.js (SECURE)
 // Rédaction - POST /api/ai/generate
-// - Langues : picker (nom complet visible, code interne invisible)
-// - Debug prompt : uniquement superadmin
-// - Sécurise submit (pas de reload)
+// - Le prompt n'est PLUS construit côté front (secret côté backend)
+// - Le front envoie uniquement des champs "input" + "meta"
+// - Debug prompt côté client supprimé (sinon ça fuite)
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -18,15 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initLanguagePickerGenerate();
   attachGenerateHandlers();
 });
-
-function isSuperAdmin() {
-  try {
-    const u = getCurrentUser();
-    return u && u.role === "superadmin";
-  } catch {
-    return false;
-  }
-}
 
 function attachGenerateHandlers() {
   const form = document.getElementById("generateForm");
@@ -65,112 +56,6 @@ function getUserLanguageFallback() {
   return "fr";
 }
 
-function buildPrompt({ format, targetLangName, targetLangCode, userLang, tone, objective, recipient, draft, context }) {
-  const base = `
-Tu es Camille, spécialiste en communication professionnelle et en rédaction orientée résultat.
-Tu écris comme un HUMAIN NATIF dans la langue cible (expressions idiomatiques, fluidité, naturel), sans formulations robotiques.
-
-RÈGLES ABSOLUES :
-- Tu dois produire un contenu COMPLET et exploitable, jamais un message vide.
-- Si une information manque, tu proposes une formulation neutre + une variante.
-- Tu n’inventes PAS de faits sensibles (montants, dates, identités) si non fournis ; utilise [à compléter] si nécessaire.
-- Pas de blabla : va droit au but.
-
-CONTRAINTE DE LANGUE (prioritaire) :
-- Tu rédiges intégralement en : "${targetLangName}".
-- Si tu détectes une autre langue dans le brief, tu l’ignores pour le MESSAGE_FINAL.
-
-SORTIE OBLIGATOIRE EN 2 BLOCS :
-1) MESSAGE_FINAL (langue cible)
-2) EXPLICATION_UTILISATEUR (langue utilisateur) : 4 à 8 puces max (intention, structure, points d’attention).
-
-PARAMÈTRES :
-FORMAT = ${format}
-LANGUE_CIBLE_NOM = ${targetLangName}
-LANGUE_CIBLE_CODE_INTERNE = ${targetLangCode}
-LANGUE_UTILISATEUR = ${userLang}
-`.trim();
-
-  const parts = [base];
-  const add = (label, value) => {
-    const v = (value || "").trim();
-    if (v) parts.push(`\n---\n${label}:\n${v}\n`);
-  };
-
-  add("TON_SOUHAITÉ", tone);
-  add("OBJECTIF_PRINCIPAL", objective);
-  add("PROFIL_DESTINATAIRE", recipient);
-  add("CONTEXTE_ET_CONTRAINTES", context);
-  add("TEXTE_DEPART (optionnel)", draft);
-
-  parts.push(
-    `
---- RENDU ATTENDU (strict)
-MESSAGE_FINAL:
-(texte complet)
-
-EXPLICATION_UTILISATEUR:
-- ...
-`.trim()
-  );
-
-  return parts.join("\n");
-}
-
-function ensurePromptDebugUI() {
-  if (!isSuperAdmin()) return null;
-
-  let wrap = document.getElementById("genPromptDebugWrap");
-  if (wrap) return wrap;
-
-  const outEl = document.getElementById("genOutput");
-  if (!outEl || !outEl.parentElement) return null;
-
-  wrap = document.createElement("div");
-  wrap.id = "genPromptDebugWrap";
-  wrap.style.marginTop = "14px";
-
-  const title = document.createElement("h4");
-  title.textContent = "Debug – Prompt envoyé (superadmin)";
-  title.style.margin = "10px 0 6px";
-  title.style.color = "var(--text-strong)";
-
-  const pre = document.createElement("pre");
-  pre.id = "genPromptDebug";
-  pre.style.whiteSpace = "pre-wrap";
-  pre.style.fontSize = "0.85rem";
-  pre.style.color = "var(--text-muted)";
-  pre.style.background = "#020617";
-  pre.style.borderRadius = "12px";
-  pre.style.padding = "12px";
-  pre.style.border = "1px solid var(--border-subtle)";
-  pre.style.minHeight = "60px";
-  pre.textContent = "(le prompt apparaîtra ici après génération)";
-
-  const btnCopy = document.createElement("button");
-  btnCopy.type = "button";
-  btnCopy.className = "btn btn-secondary";
-  btnCopy.style.marginTop = "8px";
-  btnCopy.textContent = "Copier le prompt";
-  btnCopy.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(pre.textContent || "");
-      btnCopy.textContent = "Copié ✓";
-      setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
-    } catch {
-      btnCopy.textContent = "Copie impossible";
-      setTimeout(() => (btnCopy.textContent = "Copier le prompt"), 1200);
-    }
-  });
-
-  wrap.appendChild(title);
-  wrap.appendChild(pre);
-  wrap.appendChild(btnCopy);
-
-  outEl.parentElement.appendChild(wrap);
-  return wrap;
-}
-
 function readValue(id) {
   const el = document.getElementById(id);
   if (!el) return { found: false, value: "" };
@@ -200,25 +85,15 @@ async function runGenerate() {
   const format = (formatR.found ? formatR.value : "email") || "email";
   const userLang = getUserLanguageFallback();
 
-  const prompt = buildPrompt({
-    format,
-    targetLangName: langLabel,
-    targetLangCode: langCode,
-    userLang,
-    tone: toneR.value,
-    objective: objR.value,
-    recipient: recR.value,
-    draft: draftR.value,
-    context: ctxR.value,
-  });
-
-  // Debug superadmin only
-  ensurePromptDebugUI();
-  const dbg = document.getElementById("genPromptDebug");
-  if (dbg && isSuperAdmin()) dbg.textContent = prompt;
-
+  // ✅ On n'envoie plus de prompt, seulement les champs
   const payload = {
-    prompt,
+    input: {
+      tone: toneR.value,
+      objective: objR.value,
+      recipient: recR.value,
+      draft: draftR.value,
+      context: ctxR.value,
+    },
     meta: {
       format,
       targetLangName: langLabel,
@@ -235,6 +110,8 @@ async function runGenerate() {
 
   try {
     const data = await apiRequest("/ai/generate", "POST", payload);
+
+    // Compat : tu avais plusieurs formats de retour
     const text = data?.result?.text ?? data?.result ?? data?.text ?? "";
     if (!text) throw new Error("Réponse inattendue du moteur de génération.");
     if (outEl) outEl.textContent = text;
