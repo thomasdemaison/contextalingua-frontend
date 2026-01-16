@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr" class="page">
 <head>
-    <meta charset="UTF-8">
-    <title>Tableau de bord – ContextaLingua</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>Tableau de bord – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
 <header class="site-header">
   <div class="container header-inner">
@@ -48,120 +50,117 @@
   </div>
 </header>
 
-
+<!-- ✅ TOAST (injecté/contrôlé par dashboard.js) -->
+<div id="toastContainer"
+     style="position:fixed;right:16px;top:16px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+</div>
 
 <main>
-    <section class="hero">
-        <div class="container hero-grid hero-grid-simple">
-            <!-- Carte utilisateur -->
-            <div class="card" style="margin-bottom: 20px;">
-                <h2 style="margin-bottom: 10px; color: var(--text-strong);">Votre espace</h2>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">
-                    Suivez vos crédits et accédez rapidement aux modes rédaction et interprétation.
-                </p>
+  <section class="hero">
+    <div class="container hero-grid hero-grid-simple">
 
-                <div style="margin-top: 16px;">
-                    <p style="font-size: 1.1rem;">
-                        Crédits disponibles : <strong id="creditBalance">…</strong>
-                    </p>
-                </div>
+      <!-- Carte utilisateur -->
+      <div class="card" style="margin-bottom: 20px;">
+        <h2 style="margin-bottom: 10px; color: var(--text-strong);">Votre espace</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Suivez vos crédits et accédez rapidement aux modes rédaction et interprétation.
+        </p>
 
-                <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
-                    <a href="generate.html" class="btn btn-primary">✍ Mode rédaction</a>
-                    <a href="interpret.html" class="btn btn-secondary">🔎 Mode interprétation</a>
-                </div>
-            </div>
-
-            <!-- Carte opérations -->
-            <div class="card">
-                <h3 style="margin-bottom: 10px; color: var(--text-strong);">Dernières opérations de crédits</h3>
-                <ul id="transactionsList" style="font-size: 0.9rem; color: var(--text-muted);">
-                    <li>Chargement en cours…</li>
-                </ul>
-            </div>
-
-            <!-- Carte ADMIN -->
-            <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
-                <h3 style="margin-bottom: 10px; color: var(--text-strong);">
-                    Administration – Gestion des crédits
-                </h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px;">
-                    Ajustez les crédits d’un utilisateur, y compris votre propre compte.
-                </p>
-
-                <form id="adminCreditForm">
-                    <div class="form-field">
-                        <span>Email de l’utilisateur</span>
-                        <input type="email" id="adminEmail" placeholder="utilisateur@exemple.com" required>
-                    </div>
-
-                    <div class="form-field">
-                        <span>Montant de crédits (positif ou négatif)</span>
-                        <input type="number" id="adminAmount" placeholder="Ex : 20 ou -10" required>
-                    </div>
-
-                    <div class="form-field">
-                        <span>Motif (optionnel)</span>
-                        <input type="text" id="adminDescription" placeholder="Offre, ajustement, test…">
-                    </div>
-
-                    <p id="adminMessage"
-                       style="font-size:0.9rem; min-height:1.2em; margin-bottom:8px;"></p>
-
-                    <button type="submit" class="btn btn-primary">
-                        Mettre à jour les crédits
-                    </button>
-                </form>
-            </div>
+        <div style="margin-top: 16px;">
+          <p style="font-size: 1.1rem;">
+            Crédits disponibles : <strong id="creditBalance">…</strong>
+          </p>
         </div>
-    </section>
 
-<!-- Bloc réservé au superadmin : gestion des rôles -->
-<section class="card" id="rolePanel">
-  <h2>Administration – Rôles des utilisateurs</h2>
-  <p>Affectez ou retirez le rôle administrateur à partir de l’adresse email.</p>
+        <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="generate.html" class="btn btn-primary">✍ Mode rédaction</a>
+          <a href="interpret.html" class="btn btn-secondary">🔎 Mode interprétation</a>
+        </div>
+      </div>
 
-  <form id="roleForm" class="admin-form">
-    <div class="form-field">
-      <label for="roleEmail">Email de l'utilisateur</label>
-      <input
-        type="email"
-        id="roleEmail"
-        placeholder="utilisateur@example.com"
-        required
-      />
+      <!-- Carte opérations -->
+      <div class="card">
+        <h3 style="margin-bottom: 10px; color: var(--text-strong);">Dernières opérations de crédits</h3>
+        <ul id="transactionsList" style="font-size: 0.9rem; color: var(--text-muted);">
+          <li>Chargement en cours…</li>
+        </ul>
+      </div>
+
+      <!-- Carte ADMIN -->
+      <div id="adminPanel" class="card" style="margin-top: 24px; display:none;">
+        <h3 style="margin-bottom: 10px; color: var(--text-strong);">
+          Administration – Gestion des crédits
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px;">
+          Ajustez les crédits d’un utilisateur, y compris votre propre compte.
+        </p>
+
+        <form id="adminCreditForm">
+          <div class="form-field">
+            <span>Email de l’utilisateur</span>
+            <input type="email" id="adminEmail" placeholder="utilisateur@exemple.com" required>
+          </div>
+
+          <div class="form-field">
+            <span>Montant de crédits (positif ou négatif)</span>
+            <input type="number" id="adminAmount" placeholder="Ex : 20 ou -10" required>
+          </div>
+
+          <div class="form-field">
+            <span>Motif (optionnel)</span>
+            <input type="text" id="adminDescription" placeholder="Offre, ajustement, test…">
+          </div>
+
+          <p id="adminMessage" style="font-size:0.9rem; min-height:1.2em; margin-bottom:8px;"></p>
+
+          <button type="submit" class="btn btn-primary">
+            Mettre à jour les crédits
+          </button>
+        </form>
+      </div>
+
     </div>
+  </section>
 
-    <div class="form-field">
-      <label for="roleSelect">Rôle</label>
-      <select id="roleSelect">
-        <option value="admin">Admin</option>
-        <option value="user">Utilisateur simple</option>
-      </select>
-    </div>
+  <!-- Bloc réservé au superadmin : gestion des rôles -->
+  <section class="card" id="rolePanel" style="display:none;">
+    <h2>Administration – Rôles des utilisateurs</h2>
+    <p>Affectez ou retirez le rôle administrateur à partir de l’adresse email.</p>
 
-    <button type="submit" class="btn btn-primary btn-large">
-      Mettre à jour le rôle
-    </button>
+    <form id="roleForm" class="admin-form">
+      <div class="form-field">
+        <label for="roleEmail">Email de l'utilisateur</label>
+        <input type="email" id="roleEmail" placeholder="utilisateur@example.com" required />
+      </div>
 
-    <p id="roleMessage" style="margin-top:8px;font-size:0.9rem;"></p>
-  </form>
-</section>
-    
+      <div class="form-field">
+        <label for="roleSelect">Rôle</label>
+        <select id="roleSelect">
+          <option value="admin">Admin</option>
+          <option value="user">Utilisateur simple</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-large">
+        Mettre à jour le rôle
+      </button>
+
+      <p id="roleMessage" style="margin-top:8px;font-size:0.9rem;"></p>
+    </form>
+  </section>
 </main>
-    
+
 <footer class="site-footer">
-    <div class="container footer-inner">
-        <span>© ContextaLingua</span>
-        <nav class="footer-nav">
-            <a href="contact.html">Contact</a>
-        </nav>
-    </div>
+  <div class="container footer-inner">
+    <span>© ContextaLingua</span>
+    <nav class="footer-nav">
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
 </footer>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/dashboard.js"></script>
-
-  </body>
+</body>
 </html>
