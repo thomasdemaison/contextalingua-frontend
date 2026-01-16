@@ -8,14 +8,18 @@
 
 (function () {
   function guessDefaultApiBase() {
-    // Si vous testez le front en local (ex: http://localhost:5500)
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-      return "http://localhost:4000/api";
-    }
-    // En prod, on suppose un reverse-proxy sur le même domaine :
-    // https://contextalingua.fr/api/...
-    return location.origin + "/api";
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    return "http://localhost:4000/api";
   }
+
+  // Si tu es sur contextalingua.fr, API sur api.contextalingua.fr
+  if (location.hostname.endsWith("contextalingua.fr")) {
+    return "https://api.contextalingua.fr/api";
+  }
+
+  // fallback générique
+  return "https://api.contextalingua.fr/api";
+}
 
   const fromWindow = typeof window !== "undefined" ? window.API_BASE_URL : null;
   const fromStorage = (() => {
