@@ -1,10 +1,8 @@
-// js/interpret.js
+// js/interpret.js (SECURE)
 // Page "Interprétation"
 // Endpoint backend : POST /api/ai/interpret
-// - Langue d'origine : NON demandée (détection automatique par l'IA)
-// - Langue cible : UX (drapeaux + noms complets)
-// - Mode rapide / approfondi
-// - Debug superadmin only (payload envoyé)
+// - Pas de prompt côté front
+// - Debug superadmin only : payload (OK, pas de fuite prompt)
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -32,7 +30,7 @@ function isSuperAdmin() {
   return !!(u && u.role === "superadmin");
 }
 
-/* -------------------- Langues (même liste que generate) -------------------- */
+/* -------------------- Langues -------------------- */
 
 const LANGUAGES = [
   { code: "fr", name: "Français", flag: "🇫🇷" },
@@ -118,9 +116,7 @@ function renderInterpretLanguageGrid(filterText = "") {
   if (!grid) return;
 
   const q = normalize(filterText);
-  const items = q
-    ? LANGUAGES.filter((l) => normalize(l.name).includes(q))
-    : LANGUAGES;
+  const items = q ? LANGUAGES.filter((l) => normalize(l.name).includes(q)) : LANGUAGES;
 
   grid.innerHTML = "";
 
@@ -252,10 +248,6 @@ function setupInterpretPage() {
     submitBtn.textContent = "Camille analyse…";
 
     try {
-      // Convention :
-      // - language = langue de la réponse (backend peut utiliser le code ou le nom)
-      // - depth = quick/detailed (backend adapte le prompt)
-      // - languageName = utile pour logs / prompt si besoin
       const payload = {
         language: langCode,
         languageName: langName,
@@ -272,7 +264,6 @@ function setupInterpretPage() {
 
       const data = await apiRequest("/ai/interpret", "POST", payload);
 
-      // Compat : backend actuel
       if (!data || !data.ok || !data.result) {
         throw new Error("Réponse inattendue du moteur d'interprétation.");
       }
