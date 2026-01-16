@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupLoginForm();
   } catch (e) {
     console.error("Erreur setupLoginForm :", e);
+    console.log("[auth.js] submit loginForm");
   }
 
   try {
@@ -225,7 +226,8 @@ function setupLoginForm() {
         { email, password },
         false
       );
-
+console.log("[auth.js] calling /auth/login with", email);
+  
       if (!data || !data.token || !data.user) {
         if (errorEl) {
           errorEl.textContent =
