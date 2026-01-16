@@ -122,94 +122,9 @@
         </nav>
       </div>
     </footer>
-
-    <!-- Script de login AUTONOME -->
-    <script>
-      const API_BASE_URL =
-  location.hostname === "localhost" || location.hostname === "127.0.0.1"
-    ? "http://localhost:4000/api"
-    : "https://api.contextalingua.fr/api";
-
-      async function handleLogin(event) {
-        event.preventDefault();
-        console.log("[Login] submit déclenché");
-
-        const emailInput = document.getElementById("loginEmail");
-        const passwordInput = document.getElementById("loginPassword");
-        const errorEl = document.getElementById("loginError");
-
-        if (errorEl) errorEl.textContent = "";
-
-        const email = emailInput ? emailInput.value.trim() : "";
-        const password = passwordInput ? passwordInput.value : "";
-
-        if (!email || !password) {
-          if (errorEl) {
-            errorEl.textContent = "Email et mot de passe requis.";
-          }
-          return false;
-        }
-
-        try {
-          const response = await fetch(API_BASE_URL + "/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email, password })
-          });
-
-          console.log("[Login] status:", response.status);
-
-          let data = null;
-          const text = await response.text();
-          if (text) {
-            try {
-              data = JSON.parse(text);
-            } catch (e) {
-              console.warn("Réponse non JSON :", text);
-              data = { raw: text };
-            }
-          }
-
-          if (!response.ok) {
-            if (errorEl) {
-              if (response.status === 401) {
-                errorEl.textContent = "Identifiants invalides.";
-              } else {
-                errorEl.textContent =
-                  (data && data.message) ||
-                  "Erreur lors de la connexion (code " + response.status + ").";
-              }
-            }
-            return false;
-          }
-
-          if (!data || !data.token || !data.user) {
-            if (errorEl) {
-              errorEl.textContent =
-                "Réponse inattendue du serveur. Vérifiez le backend.";
-            }
-            console.log("[Login] data reçu :", data);
-            return false;
-          }
-
-          // Stockage du token et de l'utilisateur
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          console.log("[Login] connexion OK, redirection vers dashboard.html");
-          window.location.href = "dashboard.html";
-          return false;
-        } catch (err) {
-          console.error("[Login] erreur réseau :", err);
-          if (errorEl) {
-            errorEl.textContent =
-              "Impossible de contacter le serveur (API hors ligne ?).";
-          }
-          return false;
-        }
-      }
-    </script>
-  </body>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
 </html>
+
+   
