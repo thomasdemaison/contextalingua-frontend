@@ -62,7 +62,7 @@
             </p>
 
             <!-- Formulaire de connexion -->
-            <form id="loginForm" onsubmit="return handleLogin(event)" style="margin-top: 20px;">
+            <form id="loginForm" style="margin-top: 20px;">
               <div class="form-field">
                 <label for="loginEmail">Email</label>
                 <input
@@ -210,9 +210,6 @@
           return false;
         }
       }
-
-      // On expose la fonction dans le scope global pour onsubmit
-      window.handleLogin = handleLogin;
     </script>
   </body>
 </html>
