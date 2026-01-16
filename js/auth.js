@@ -55,10 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   try {
     setupLoginForm();
-  } catch (e) {
-    console.error("Erreur setupLoginForm :", e);
-    console.log("[auth.js] submit loginForm");
-  }
 
   try {
     setupRegisterForm();
