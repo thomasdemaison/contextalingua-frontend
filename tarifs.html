@@ -177,7 +177,7 @@
     </div>
   </div>
 </section>
-    
+
     <!-- PACKS DE CRÉDITS -->
     <section class="section section-alt">
         <div class="container">
@@ -199,7 +199,9 @@
                         <li>Accès à toutes les langues</li>
                         <li>Idéal pour 10 à 20 textes courts</li>
                     </ul>
-                    <a href="#" class="btn btn-secondary btn-full">Choisir ce pack</a>
+                    <button class="btn btn-secondary btn-full js-buy-pack" data-pack="starter">
+                      Choisir ce pack
+                    </button>
                 </article>
 
                 <!-- Moyen pack -->
@@ -214,7 +216,9 @@
                         <li>Utilisable par toute votre équipe</li>
                         <li>Convient pour 1 à 2 campagnes par mois</li>
                     </ul>
-                    <a href="#" class="btn btn-primary btn-full">Choisir ce pack</a>
+                    <button class="btn btn-primary btn-full js-buy-pack" data-pack="pro">
+                      Choisir ce pack
+                    </button>
                 </article>
 
                 <!-- Grand pack -->
@@ -228,9 +232,13 @@
                         <li>Gestion multi-utilisateurs</li>
                         <li>Idéal pour un volume soutenu</li>
                     </ul>
-                    <a href="#" class="btn btn-secondary btn-full">Choisir ce pack</a>
+                    <button class="btn btn-secondary btn-full js-buy-pack" data-pack="expert">
+                      Choisir ce pack
+                    </button>
                 </article>
             </div>
+
+            <p id="buyPackError" style="margin-top:12px;color:var(--danger);min-height:1.2em;"></p>
         </div>
     </section>
 
@@ -380,8 +388,55 @@
         </nav>
     </div>
 </footer>
-    <!-- Scripts communs -->
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-  </body>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+(function () {
+  function showError(msg) {
+    const el = document.getElementById("buyPackError");
+    if (el) el.textContent = msg || "";
+    else if (msg) alert(msg);
+  }
+
+  async function buyPack(packId) {
+    showError("");
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+      const data = await apiRequest("/payments/mollie/create-checkout", "POST", { packId });
+
+      if (!data || !data.checkoutUrl) {
+        showError("Impossible de démarrer le paiement (checkoutUrl manquante).");
+        return;
+      }
+
+      window.location.href = data.checkoutUrl;
+    } catch (err) {
+      console.error("[tarifs] create-checkout error:", err);
+      if (err.status === 401) showError("Votre session a expiré. Reconnectez-vous.");
+      else showError(err.message || "Erreur lors du démarrage du paiement.");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".js-buy-pack").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const packId = btn.getAttribute("data-pack");
+        if (!packId) return;
+        buyPack(packId);
+      });
+    });
+  });
+})();
+</script>
+
+</body>
 </html>
