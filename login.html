@@ -125,7 +125,10 @@
 
     <!-- Script de login AUTONOME -->
     <script>
-      const API_BASE_URL = "http://localhost:4000/api"; // à adapter plus tard si besoin
+      const API_BASE_URL =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:4000/api"
+    : "https://api.contextalingua.fr/api";
 
       async function handleLogin(event) {
         event.preventDefault();
