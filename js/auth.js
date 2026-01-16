@@ -1,6 +1,8 @@
 // js/auth.js
 // Gestion de l'authentification + header (espace public / espace utilisateur)
 
+console.log("[auth.js] loaded");
+
 // ---------- Helpers de stockage ----------
 
 function saveAuth(token, user) {
@@ -89,7 +91,7 @@ function setupHeaderNavigation() {
     });
   }
 
-  // IMPORTANT : on ne doit PAS intercepter les boutons submit des formulaires
+  // IMPORTANT : ne PAS intercepter les boutons submit des formulaires
   const clickable = Array.from(document.querySelectorAll("a, button"));
 
   clickable.forEach((el) => {
@@ -99,7 +101,10 @@ function setupHeaderNavigation() {
     if (el.id === "btnLogout") return;
 
     // Ignore les boutons de formulaire (login/register etc.)
-    if (el.tagName === "BUTTON" && (el.type === "submit" || el.closest("form"))) {
+    if (
+      el.tagName === "BUTTON" &&
+      (el.type === "submit" || el.closest("form"))
+    ) {
       return;
     }
 
@@ -107,13 +112,23 @@ function setupHeaderNavigation() {
     if (txt.includes("se connecter")) {
       el.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = hasToken ? "dashboard.html" : "login.html";
+        if (hasToken) {
+          window.location.href = "dashboard.html";
+        } else {
+          // évite reload si déjà sur login
+          if (!location.pathname.endsWith("/login.html")) {
+            window.location.href = "login.html";
+          }
+        }
       });
       return;
     }
 
     // Commencer / Essayer gratuitement
-    if (txt.includes("commencer gratuitement") || txt.includes("essayer gratuitement")) {
+    if (
+      txt.includes("commencer gratuitement") ||
+      txt.includes("essayer gratuitement")
+    ) {
       el.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = hasToken ? "dashboard.html" : "register.html";
@@ -149,7 +164,11 @@ function setupHeaderNavigation() {
     }
 
     // Mode accompagné
-    if (txt.includes("mode accompagne") || txt === "accompagne" || txt.includes("accompagne")) {
+    if (
+      txt.includes("mode accompagne") ||
+      txt === "accompagne" ||
+      txt.includes("accompagne")
+    ) {
       el.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = hasToken ? "accompanied.html" : "login.html";
@@ -199,7 +218,8 @@ function setupLoginForm() {
       console.error("[auth.js] Erreur login :", err);
       if (errorEl) {
         if (err.status === 401) errorEl.textContent = "Identifiants invalides.";
-        else if (err.message === "Failed to fetch") errorEl.textContent = "Impossible de contacter le serveur.";
+        else if (err.message === "Failed to fetch")
+          errorEl.textContent = "Impossible de contacter le serveur.";
         else errorEl.textContent = err.message || "Erreur lors de la connexion.";
       }
     }
@@ -246,7 +266,9 @@ function setupRegisterForm() {
       window.location.href = "dashboard.html";
     } catch (err) {
       console.error("[auth.js] Erreur register :", err);
-      if (errorEl) errorEl.textContent = err.message || "Erreur lors de la création du compte.";
+      if (errorEl)
+        errorEl.textContent =
+          err.message || "Erreur lors de la création du compte.";
     }
   });
 }
