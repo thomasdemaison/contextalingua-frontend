@@ -91,36 +91,32 @@ function setupHeaderNavigation() {
     });
   }
 
-  // IMPORTANT : ne PAS intercepter les boutons submit des formulaires
-  const clickable = Array.from(document.querySelectorAll("a, button"));
+   // Liens publics (header)
+  const goLogin = document.querySelectorAll(".js-go-login");
+  const goRegister = document.querySelectorAll(".js-go-register");
 
-  clickable.forEach((el) => {
-    const txt = normalizeText(el.textContent || "");
-    if (!txt) return;
-
-    if (el.id === "btnLogout") return;
-
-    // Ignore les boutons de formulaire (login/register etc.)
-    if (
-      el.tagName === "BUTTON" &&
-      (el.type === "submit" || el.closest("form"))
-    ) {
-      return;
-    }
-
-    // Se connecter
-    if (txt.includes("se connecter")) {
-      el.addEventListener("click", (e) => {
+  goLogin.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      // si déjà connecté -> dashboard
+      if (hasToken) {
         e.preventDefault();
-        if (hasToken) {
-          window.location.href = "dashboard.html";
-        } else {
-          // évite reload si déjà sur login
-          if (!location.pathname.endsWith("/login.html")) {
-            window.location.href = "login.html";
-          }
-        }
-      });
+        window.location.href = "dashboard.html";
+      }
+      // sinon on laisse le href faire son travail (login.html)
+    });
+  });
+
+  goRegister.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      // si connecté -> dashboard
+      if (hasToken) {
+        e.preventDefault();
+        window.location.href = "dashboard.html";
+      }
+      // sinon on laisse le href faire son travail (register.html)
+    });
+  });
+
       return;
     }
 
