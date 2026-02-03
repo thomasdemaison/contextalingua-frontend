@@ -91,40 +91,32 @@ function setupHeaderNavigation() {
     });
   }
 
-   // Liens publics (header)
-  const goLogin = document.querySelectorAll(".js-go-login");
-  const goRegister = document.querySelectorAll(".js-go-register");
+  // IMPORTANT : ne PAS intercepter les boutons submit des formulaires
+  const clickable = Array.from(document.querySelectorAll("a, button"));
 
-  goLogin.forEach((el) => {
-    el.addEventListener("click", (e) => {
-      // si déjà connecté -> dashboard
-      if (hasToken) {
+  clickable.forEach((el) => {
+    const txt = normalizeText(el.textContent || "");
+    if (!txt) return;
+
+    if (el.id === "btnLogout") return;
+
+    // Ignore les boutons de formulaire (login/register etc.)
+    if (el.tagName === "BUTTON" && (el.type === "submit" || el.closest("form"))) {
+      return;
+    }
+
+    // Se connecter
+    if (txt.includes("se connecter")) {
+      el.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = "dashboard.html";
-      }
-      // sinon on laisse le href faire son travail (login.html)
-    });
-  });
-
-  goRegister.forEach((el) => {
-    el.addEventListener("click", (e) => {
-      // si connecté -> dashboard
-      if (hasToken) {
-        e.preventDefault();
-        window.location.href = "dashboard.html";
-      }
-      // sinon on laisse le href faire son travail (register.html)
-    });
-  });
-
+        if (hasToken) window.location.href = "dashboard.html";
+        else if (!location.pathname.endsWith("/login.html")) window.location.href = "login.html";
+      });
       return;
     }
 
     // Commencer / Essayer gratuitement
-    if (
-      txt.includes("commencer gratuitement") ||
-      txt.includes("essayer gratuitement")
-    ) {
+    if (txt.includes("commencer gratuitement") || txt.includes("essayer gratuitement") || txt.includes("tester gratuitement")) {
       el.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = hasToken ? "dashboard.html" : "register.html";
@@ -160,11 +152,7 @@ function setupHeaderNavigation() {
     }
 
     // Mode accompagné
-    if (
-      txt.includes("mode accompagne") ||
-      txt === "accompagne" ||
-      txt.includes("accompagne")
-    ) {
+    if (txt.includes("mode accompagne") || txt === "accompagne" || txt.includes("accompagne")) {
       el.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = hasToken ? "accompanied.html" : "login.html";
@@ -186,14 +174,10 @@ function setupLoginForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("[auth.js] submit loginForm");
-
     if (errorEl) errorEl.textContent = "";
 
     const email = emailInput ? emailInput.value.trim() : "";
     const password = passwordInput ? passwordInput.value : "";
-
-    console.log("[auth.js] calling /auth/login with", email);
 
     if (!email || !password) {
       if (errorEl) errorEl.textContent = "Email et mot de passe requis.";
@@ -202,22 +186,18 @@ function setupLoginForm() {
 
     try {
       const data = await apiRequest("/auth/login", "POST", { email, password });
-
       if (!data || !data.token || !data.user) {
         if (errorEl) errorEl.textContent = "Réponse inattendue du serveur.";
         return;
       }
-
       saveAuth(data.token, data.user);
       window.location.href = "dashboard.html";
     } catch (err) {
       console.error("[auth.js] Erreur login :", err);
-      if (errorEl) {
-        if (err.status === 401) errorEl.textContent = "Identifiants invalides.";
-        else if (err.message === "Failed to fetch")
-          errorEl.textContent = "Impossible de contacter le serveur.";
-        else errorEl.textContent = err.message || "Erreur lors de la connexion.";
-      }
+      if (!errorEl) return;
+      if (err.status === 401) errorEl.textContent = "Identifiants invalides.";
+      else if (err.message === "Failed to fetch") errorEl.textContent = "Impossible de contacter le serveur.";
+      else errorEl.textContent = err.message || "Erreur lors de la connexion.";
     }
   });
 }
@@ -247,24 +227,16 @@ function setupRegisterForm() {
     }
 
     try {
-      const data = await apiRequest("/auth/register", "POST", {
-        email,
-        password,
-        defaultLanguage,
-      });
-
+      const data = await apiRequest("/auth/register", "POST", { email, password, defaultLanguage });
       if (!data || !data.token || !data.user) {
         if (errorEl) errorEl.textContent = "Réponse inattendue du serveur.";
         return;
       }
-
       saveAuth(data.token, data.user);
       window.location.href = "dashboard.html";
     } catch (err) {
       console.error("[auth.js] Erreur register :", err);
-      if (errorEl)
-        errorEl.textContent =
-          err.message || "Erreur lors de la création du compte.";
+      if (errorEl) errorEl.textContent = err.message || "Erreur lors de la création du compte.";
     }
   });
 }
