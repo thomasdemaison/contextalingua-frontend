@@ -1,392 +1,208 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Tarifs – ContextaLingua</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>Tarifs – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="page page-tarifs">
+
 <header class="site-header">
   <div class="container header-inner">
-    <!-- Logo -->
     <a href="index.html" class="header-logo">
       <span class="contexta">Contexta</span>
       <span class="lingua">Lingua</span>
     </a>
 
-    <!-- Navigation principale -->
     <nav class="main-nav">
-      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
       <a href="produit.html" class="nav-link nav-public-only">Produit</a>
       <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
       <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
-      <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
-      <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
-      <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
-      <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
+      <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
       <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
     </nav>
 
-    <!-- Zone de droite -->
     <div class="header-actions">
-      <!-- Email + déconnexion : visibles quand connecté -->
       <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
-        Déconnexion
-      </button>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-      <!-- Actions publiques : visibles quand NON connecté -->
-      <button class="btn btn-ghost nav-public-only">
-        Se connecter
-      </button>
-      <button class="btn btn-primary nav-public-only">
-        Commencer gratuitement
-      </button>
+      <a href="login.html" class="btn btn-ghost nav-public-only">Se connecter</a>
+      <a href="register.html" class="btn btn-primary nav-public-only">Tester gratuitement</a>
     </div>
   </div>
 </header>
 
-
 <main>
-    <!-- HERO TARIFS -->
-    <section class="hero hero-inner">
-        <div class="container hero-grid">
-            <div class="hero-content">
-                <p class="eyebrow">Tarifs</p>
-                <h1>Des tarifs simples, pensés pour vos textes, pas pour les lignes de contrat.</h1>
-                <p class="hero-subtitle">
-                    Vous chargez vos crédits, je m’occupe de vos messages. Langues Premium ou Standard,
-                    mode accompagné ou expert&nbsp;: vous ne payez que ce que vous utilisez, sans frais cachés.
-                </p>
-                <ul class="list-check">
-                    <li>Aucune mise en place</li>
-                    <li>Arrêt possible à tout moment</li>
-                    <li>Crédits utilisables sur tous les cas d’usage</li>
-                </ul>
-            </div>
-
-            <aside class="camille-card">
-                <div class="camille-photo-wrapper">
-                    <img src="assets/img/camille1.png" alt="Camille, votre assistante multilingue"
-                         class="camille-photo">
-                </div>
-                <div class="camille-text">
-                    <h3>Camille</h3>
-                    <p class="camille-role">Votre assistante multilingue</p>
-                    <p class="camille-quote">
-                        « Je préfère des tarifs clairs&nbsp;: vous savez à l’avance combien de textes vous pouvez
-                        générer et comment les crédits sont consommés. »
-                    </p>
-                    <a href="#" class="camille-link">Ouvrir un compte gratuit</a>
-                </div>
-            </aside>
-        </div>
-    </section>
-
-    <!-- FONCTIONNEMENT CRÉDITS -->
-    <section class="section">
-        <div class="container">
-            <h2>Comment fonctionnent les crédits&nbsp;?</h2>
-            <p class="section-intro">
-                Chaque génération de texte consomme un certain nombre de crédits. L’objectif est
-                de garder un système lisible, que vous soyez seul ou en équipe.
-            </p>
-
-            <div class="grid grid-2">
-                <div>
-                    <h3>Principe général</h3>
-                    <p>
-                        Vous chargez un portefeuille de crédits. Chaque texte généré consomme 1 ou 2 crédits
-                        selon la langue. Les crédits sont partagés entre les cas d’usage (recouvrement,
-                        commercial, administratif, etc.).
-                    </p>
-                    <p>
-                        Vous pouvez combiner <strong>achat d’unités</strong> et <strong>abonnements mensuels</strong>
-                        selon votre volume.
-                    </p>
-                </div>
-                <div class="card info-card">
-                    <h3>Résumé</h3>
-                    <ul class="list-check">
-                        <li>1 texte Standard = <strong>1 crédit</strong></li>
-                        <li>1 texte Premium = <strong>2 crédits</strong></li>
-                        <li>Langues en version bêta = <strong>1 crédit</strong></li>
-                        <li>Crédits valables sur tous les modes (accompagné &amp; expert)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-<section class="section">
-  <div class="container">
-    <p class="section-kicker">Compréhension & interprétation</p>
-    <h2 class="section-title">
-      Pas seulement traduire&nbsp;: comprendre, résumer et interpréter vos messages.
-    </h2>
-
-    <p class="section-intro">
-      ContextaLingua ne sert pas uniquement à rédiger des textes dans plusieurs langues.
-      Vous pouvez aussi lui confier des messages reçus (emails, échanges clients, notes
-      internes, extraits de contrats…) pour obtenir une compréhension claire,
-      contextualisée et exploitable, dans votre langue ou dans la langue d’origine.
-    </p>
-
-    <div class="grid grid-2">
-      <div>
-        <h3>Ce que Camille peut faire pour vous</h3>
+  <!-- HERO -->
+  <section class="hero hero-inner">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <p class="eyebrow">Tarifs</p>
+        <h1>3 packs. Pas d’abonnement. Vous rechargez quand vous voulez.</h1>
+        <p class="hero-subtitle">
+          Vous testez Camille sur un échantillon, puis vous choisissez un pack si la qualité vous convient.
+          Les crédits servent à la fois pour la <strong>rédaction</strong> et l’<strong>interprétation</strong>.
+        </p>
         <ul class="list-check">
-          <li>Expliquer en français un email reçu dans une autre langue, en termes simples.</li>
-          <li>Résumer un long message en quelques points clés pour gagner du temps.</li>
-          <li>Identifier le ton, le niveau de risque ou la sensibilité d’un message.</li>
-          <li>Proposer des pistes de réponse adaptées au contexte et à la relation client.</li>
-          <li>Clarifier des passages ambigus, sans se substituer à un conseil juridique.</li>
+          <li>Pas d’engagement</li>
+          <li>Crédits utilisables sur tous les usages</li>
+          <li>Paiement sécurisé (Mollie)</li>
         </ul>
       </div>
 
-      <div>
-        <h3>Combien cela coûte&nbsp;?</h3>
-        <p class="pricing-note">
-          Une analyse/interprétation est facturée comme une génération classique&nbsp;:
-          vous utilisez vos crédits, sans supplément spécifique.
-        </p>
-        <ul class="pricing-list">
-          <li>
-            <strong>Email ou message court</strong> (jusqu’à ~800&nbsp;mots) :
-            1&nbsp;crédit en langue Standard, 2&nbsp;crédits en langue Premium.
-          </li>
-          <li>
-            <strong>Document plus long</strong> (contrat, compte-rendu, dossier) :
-            le coût dépend du volume. À titre indicatif, comptez 1&nbsp;crédit
-            par bloc d’environ 800&nbsp;mots analysés.
-          </li>
-          <li>
-            Vous pouvez mixer rédaction et interprétation avec les mêmes packs
-            de crédits et les mêmes abonnements.
-          </li>
-        </ul>
-        <p class="pricing-note">
-          L’objectif est de rester cohérent avec le niveau de finesse et
-          d’interprétation offert par le moteur linguistique avancé qui alimente ContextaLingua,
-          tout en gardant une tarification simple à comprendre.
-        </p>
+      <aside class="camille-card">
+        <div class="camille-photo-wrapper">
+          <img src="assets/img/camille1.png" alt="Camille, votre agent IA" class="camille-photo">
+        </div>
+        <div class="camille-text">
+          <h3>Camille</h3>
+          <p class="camille-role">Agent IA – Rédaction & interprétation</p>
+          <p class="camille-quote">
+            « Vous payez au plus simple : un pack, des crédits, et vous les utilisez quand vous en avez besoin. »
+          </p>
+          <a href="register.html" class="camille-link">Tester sur un échantillon</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- COMMENT ÇA MARCHE -->
+  <section class="section">
+    <div class="container">
+      <h2>Comment fonctionnent les crédits ?</h2>
+      <p class="section-intro">
+        Les crédits servent à produire des textes (rédaction) ou à comprendre un message (interprétation).
+        L’objectif : rester lisible et prévisible.
+      </p>
+
+      <div class="grid grid-2">
+        <div class="card info-card">
+          <h3>Règle simple</h3>
+          <ul class="list-check">
+            <li>1 action Standard ≈ <strong>1 crédit</strong></li>
+            <li>1 action Premium ≈ <strong>2 crédits</strong> (si applicable)</li>
+            <li>Mêmes crédits pour rédaction & interprétation</li>
+          </ul>
+          <p style="margin-top:10px;">
+            Si tu veux, on pourra simplifier encore en “1 action = 1 crédit” partout,
+            mais je laisse ton modèle actuel intact.
+          </p>
+        </div>
+
+        <div>
+          <h3>Tester avant de payer</h3>
+          <p>
+            Commence par un échantillon (exemples courts). Ensuite, si tu es satisfait,
+            choisis un pack : Découverte, Pro ou Équipe.
+          </p>
+          <p>
+            <a href="register.html" class="btn btn-primary">Tester gratuitement</a>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-    <!-- PACKS DE CRÉDITS -->
-    <section class="section section-alt">
-        <div class="container">
-            <h2>Packs de crédits à la carte</h2>
-            <p class="section-intro">
-                Idéal pour commencer ou pour des besoins ponctuels. Vous rechargez quand vous le souhaitez,
-                sans engagement.
-            </p>
+  <!-- PACKS -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Packs de crédits</h2>
+      <p class="section-intro">
+        Pas d’abonnement pour le moment. Tu recharges quand tu veux.
+      </p>
 
-            <div class="grid grid-3 pricing-grid">
-                <!-- Petit pack -->
-                <article class="card pricing-card">
-                    <h3>Pack Découverte</h3>
-                    <p class="pricing-price">10&nbsp;€</p>
-                    <p class="pricing-credits">≈ 20 crédits</p>
-                    <p class="pricing-note">Parfait pour tester quelques cas d’usage ciblés.</p>
-                    <ul class="pricing-list">
-                        <li>Sans engagement</li>
-                        <li>Accès à toutes les langues</li>
-                        <li>Idéal pour 10 à 20 textes courts</li>
-                    </ul>
-                    <button class="btn btn-secondary btn-full js-buy-pack" data-pack="starter">
-                      Choisir ce pack
-                    </button>
-                </article>
+      <div class="grid grid-3 pricing-grid">
+        <article class="card pricing-card">
+          <h3>Pack Découverte</h3>
+          <p class="pricing-price">10&nbsp;€</p>
+          <p class="pricing-credits">20 crédits</p>
+          <p class="pricing-note">Pour valider la qualité sur des cas réels.</p>
+          <ul class="pricing-list">
+            <li>Rédaction + interprétation</li>
+            <li>Idéal pour un test sérieux</li>
+            <li>Sans engagement</li>
+          </ul>
+          <button class="btn btn-secondary btn-full js-buy-pack" data-pack="decouverte">
+            Choisir ce pack
+          </button>
+        </article>
 
-                <!-- Moyen pack -->
-                <article class="card pricing-card pricing-card-highlight">
-                    <div class="badge">Le plus choisi</div>
-                    <h3>Pack Pro</h3>
-                    <p class="pricing-price">30&nbsp;€</p>
-                    <p class="pricing-credits">≈ 70 crédits</p>
-                    <p class="pricing-note">Pour un suivi régulier de vos dossiers et relances.</p>
-                    <ul class="pricing-list">
-                        <li>Tarif au crédit plus avantageux</li>
-                        <li>Utilisable par toute votre équipe</li>
-                        <li>Convient pour 1 à 2 campagnes par mois</li>
-                    </ul>
-                    <button class="btn btn-primary btn-full js-buy-pack" data-pack="pro">
-                      Choisir ce pack
-                    </button>
-                </article>
+        <article class="card pricing-card pricing-card-highlight">
+          <div class="badge">Le plus choisi</div>
+          <h3>Pack Pro</h3>
+          <p class="pricing-price">30&nbsp;€</p>
+          <p class="pricing-credits">70 crédits</p>
+          <p class="pricing-note">Pour une utilisation régulière.</p>
+          <ul class="pricing-list">
+            <li>Rédaction + interprétation</li>
+            <li>Bon ratio prix / volume</li>
+            <li>Recharge quand tu veux</li>
+          </ul>
+          <button class="btn btn-primary btn-full js-buy-pack" data-pack="pro">
+            Choisir ce pack
+          </button>
+        </article>
 
-                <!-- Grand pack -->
-                <article class="card pricing-card">
-                    <h3>Pack Équipe</h3>
-                    <p class="pricing-price">50&nbsp;€</p>
-                    <p class="pricing-credits">≈ 130 crédits</p>
-                    <p class="pricing-note">Pour les structures qui gèrent plusieurs pays ou marques.</p>
-                    <ul class="pricing-list">
-                        <li>Meilleur prix au crédit</li>
-                        <li>Gestion multi-utilisateurs</li>
-                        <li>Idéal pour un volume soutenu</li>
-                    </ul>
-                    <button class="btn btn-secondary btn-full js-buy-pack" data-pack="expert">
-                      Choisir ce pack
-                    </button>
-                </article>
-            </div>
+        <article class="card pricing-card">
+          <h3>Pack Équipe</h3>
+          <p class="pricing-price">50&nbsp;€</p>
+          <p class="pricing-credits">130 crédits</p>
+          <p class="pricing-note">Pour plusieurs dossiers / plusieurs personnes.</p>
+          <ul class="pricing-list">
+            <li>Rédaction + interprétation</li>
+            <li>Meilleur prix au crédit</li>
+            <li>Recharge quand tu veux</li>
+          </ul>
+          <button class="btn btn-secondary btn-full js-buy-pack" data-pack="equipe">
+            Choisir ce pack
+          </button>
+        </article>
+      </div>
 
-            <p id="buyPackError" style="margin-top:12px;color:var(--danger);min-height:1.2em;"></p>
-        </div>
-    </section>
+      <p id="buyPackError" style="margin-top:12px;color:var(--danger);min-height:1.2em;"></p>
+    </div>
+  </section>
 
-    <!-- ABONNEMENTS -->
-    <section class="section">
-        <div class="container">
-            <h2>Abonnements mensuels</h2>
-            <p class="section-intro">
-                Pour les équipes qui produisent régulièrement des textes multilingues. Vos crédits sont
-                rechargés chaque mois, vous gardez le contrôle sur votre budget.
-            </p>
+  <!-- CADRE IA -->
+  <section class="section">
+    <div class="container">
+      <h2>IA & cadre légal</h2>
+      <p class="section-intro">
+        Camille est un agent IA d’assistance linguistique. Elle aide à rédiger et à interpréter,
+        mais ne remplace pas un conseil juridique ou réglementaire.
+      </p>
+    </div>
+  </section>
 
-            <div class="grid grid-4 pricing-grid">
-                <article class="card pricing-card">
-                    <h3>Essentiel</h3>
-                    <p class="pricing-price">30&nbsp;€ / mois</p>
-                    <p class="pricing-credits">≈ 70 crédits / mois</p>
-                    <ul class="pricing-list">
-                        <li>Idéal pour les indépendants</li>
-                        <li>Support e-mail</li>
-                        <li>Sans engagement, résiliable à tout moment</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary btn-full">Choisir Essentiel</a>
-                </article>
-
-                <article class="card pricing-card pricing-card-highlight">
-                    <div class="badge">Recommandé</div>
-                    <h3>Équipe</h3>
-                    <p class="pricing-price">60&nbsp;€ / mois</p>
-                    <p class="pricing-credits">≈ 150 crédits / mois</p>
-                    <ul class="pricing-list">
-                        <li>Jusqu’à 5 utilisateurs</li>
-                        <li>Priorité sur le support</li>
-                        <li>Parfait pour les PME</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary btn-full">Choisir Équipe</a>
-                </article>
-
-                <article class="card pricing-card">
-                    <h3>Business</h3>
-                    <p class="pricing-price">150&nbsp;€ / mois</p>
-                    <p class="pricing-credits">≈ 400 crédits / mois</p>
-                    <ul class="pricing-list">
-                        <li>Utilisation multi-départements</li>
-                        <li>Accompagnement onboarding</li>
-                        <li>Rapports d’usage mensuels</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary btn-full">Choisir Business</a>
-                </article>
-
-                <article class="card pricing-card">
-                    <h3>Sur mesure</h3>
-                    <p class="pricing-price">Sur devis</p>
-                    <p class="pricing-credits">Volumes élevés &amp; intégration</p>
-                    <ul class="pricing-list">
-                        <li>Intégration API ou outils internes</li>
-                        <li>Politique de crédits adaptée</li>
-                        <li>Accompagnement projet</li>
-                    </ul>
-                    <a href="contact.html" class="btn btn-secondary btn-full">Parler d’un projet</a>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- LANGUES / NIVEAUX -->
-    <section class="section section-alt">
-        <div class="container">
-            <h2>Langues, crédits et niveaux de qualité</h2>
-            <p class="section-intro">
-                Toutes les langues ne demandent pas le même niveau d’exigence. Les crédits reflètent
-                la qualité attendue et le travail de calibration derrière chaque langue.
-            </p>
-
-            <div class="grid grid-3 lang-grid">
-                <article class="card lang-card">
-                    <h3>Langues Premium – 2 crédits</h3>
-                    <p>Rendu natif, expressions usuelles, ton professionnel adapté aux échanges clients.</p>
-                    <ul>
-                        <li>Français</li>
-                        <li>Anglais (US / UK)</li>
-                        <li>Espagnol</li>
-                        <li>Allemand</li>
-                        <li>Italien</li>
-                        <li>Portugais (PT / BR)</li>
-                        <li>Néerlandais</li>
-                        <li>Autres langues européennes à fort usage pro</li>
-                    </ul>
-                </article>
-
-                <article class="card lang-card">
-                    <h3>Langues Standard – 1 crédit</h3>
-                    <p>Excellent rapport précision / coût pour les usages courants.</p>
-                    <ul>
-                        <li>Polonais</li>
-                        <li>Roumain</li>
-                        <li>Suédois</li>
-                        <li>Norvégien</li>
-                        <li>Danois</li>
-                        <li>Finnois</li>
-                        <li>Tchèque</li>
-                        <li>Et plusieurs autres langues européennes</li>
-                    </ul>
-                </article>
-
-                <article class="card lang-card">
-                    <h3>Langues en version bêta – 1 crédit</h3>
-                    <p>Langues disponibles mais encore en cours de réglage fin.</p>
-                    <ul>
-                        <li>Certaines langues asiatiques</li>
-                        <li>Certains dialectes ou variantes régionales</li>
-                        <li>Langues à faible volume d’usage pro</li>
-                    </ul>
-                    <p class="lang-note">
-                        Lorsqu’une langue atteint le niveau Premium, elle sort de la bêta et rejoint la
-                        grille correspondante.
-                    </p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA FINAL -->
-    <section class="cta-band">
-        <div class="container cta-band-inner">
-            <div>
-                <p class="eyebrow light">Prêt à démarrer&nbsp;?</p>
-                <h2>Chargez quelques crédits et laissez-moi m’occuper de vos textes.</h2>
-                <p class="cta-band-text">
-                    Vous pouvez commencer avec un petit pack, tester les usages qui comptent le plus
-                    pour vous, puis faire évoluer la formule ensuite.
-                </p>
-            </div>
-            <a href="#" class="btn btn-primary btn-large">Commencer avec 10&nbsp;€</a>
-        </div>
-    </section>
+  <section class="cta-band">
+    <div class="container cta-band-inner">
+      <div>
+        <p class="eyebrow light">Prêt à démarrer ?</p>
+        <h2>Teste sur un échantillon, puis choisis un pack.</h2>
+        <p class="cta-band-text">
+          Pas d’abonnement. Tu gardes le contrôle : tu recharges uniquement quand tu en as besoin.
+        </p>
+      </div>
+      <a href="register.html" class="btn btn-primary btn-large">Tester gratuitement</a>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
-    <div class="container footer-inner">
-        <p>© 2025 ContextaLingua — Tous droits réservés.</p>
-        <nav class="footer-nav">
-            <a href="produit.html">Produit</a>
-            <a href="tarifs.html">Tarifs</a>
-            <a href="faq.html">FAQ</a>
-            <a href="contact.html">Contact</a>
-        </nav>
-    </div>
+  <div class="container footer-inner">
+    <p>© 2025 ContextaLingua — Tous droits réservés.</p>
+    <nav class="footer-nav">
+      <a href="produit.html">Produit</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
 </footer>
 
 <script src="js/api.js"></script>
