@@ -3,53 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ContextaLingua – Traduction contextuelle professionnelle</title>
+  <title>ContextaLingua – Camille, votre agent IA de rédaction & interprétation</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
   <!-- HEADER -->
   <header class="site-header">
-  <div class="container header-inner">
-    <!-- Logo -->
-    <a href="index.html" class="header-logo">
-      <span class="contexta">Contexta</span>
-      <span class="lingua">Lingua</span>
-    </a>
+    <div class="container header-inner">
+      <a href="index.html" class="header-logo">
+        <span class="contexta">Contexta</span>
+        <span class="lingua">Lingua</span>
+      </a>
 
-    <!-- Navigation principale -->
-    <nav class="main-nav">
-      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
-      <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
-      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
+      <nav class="main-nav">
+        <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+        <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+        <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
-      <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
-      <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
-      <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
-      <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
-      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
-    </nav>
+        <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+        <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+        <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+        <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
+        <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+      </nav>
 
-    <!-- Zone de droite -->
-    <div class="header-actions">
-      <!-- Email + déconnexion : visibles quand connecté -->
-      <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
-        Déconnexion
-      </button>
+      <div class="header-actions">
+        <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+        <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-      <!-- Actions publiques : visibles quand NON connecté -->
-      <button class="btn btn-ghost nav-public-only">
-        Se connecter
-      </button>
-      <button class="btn btn-primary nav-public-only">
-        Commencer gratuitement
-      </button>
+        <!-- ⚠️ IMPORTANT : on met des <a> pour que ça marche sans JS -->
+        <a href="login.html" class="btn btn-ghost nav-public-only">Se connecter</a>
+        <a href="register.html" class="btn btn-primary nav-public-only">Tester gratuitement</a>
+      </div>
     </div>
-  </div>
-</header>
-
+  </header>
 
   <main>
     <!-- HERO -->
@@ -57,134 +44,137 @@
       <div class="container hero-grid">
         <div class="hero-content">
           <h1>
-            La traduction contextuelle professionnelle,<br />
-            comme si vous l’aviez écrite vous-même.
+            Camille, votre agent IA<br />
+            pour rédiger et interpréter vos messages.
           </h1>
 
           <p class="hero-subtitle">
-            Je m’appelle Camille. Je vous aide à adapter vos messages en plusieurs langues :
-            vocabulaire natif, tournures usuelles, ton professionnel mais vivant.
-            Vous écrivez pour vos clients, je m’occupe du reste.
+            Vous écrivez (ou vous copiez-collez) un message. Camille le reformule, le traduit ou l’explique
+            dans un français clair, avec un ton professionnel et naturel — sans blabla inutile.
           </p>
 
           <div class="hero-actions">
-            <a href="#" class="btn btn-primary">Essayer gratuitement</a>
-            <a href="#pourquoi" class="btn btn-secondary">
-              Découvrir ce que je fais pour vous
-            </a>
+            <a href="register.html" class="btn btn-primary">Tester sur un échantillon</a>
+            <a href="#comment" class="btn btn-secondary">Voir comment ça marche</a>
           </div>
 
           <p class="hero-meta">
-            +15 langues premium · Mode accompagné ou expert · Crédits adaptés à chaque usage
+            Rédaction + Interprétation · 3 packs simples · Pas d’abonnement · Paiement sécurisé
           </p>
         </div>
 
         <aside class="camille-card">
           <div class="camille-photo-wrapper">
-            <img src="assets/img/camille.png" alt="Camille, votre assistante multilingue" class="camille-photo" />
+            <img src="assets/img/camille.png" alt="Camille, votre agent IA" class="camille-photo" />
           </div>
           <div class="camille-card-body">
             <p class="camille-name">Camille</p>
-            <p class="camille-role">Votre assistante multilingue</p>
+            <p class="camille-role">Agent IA – Rédaction & interprétation</p>
             <p class="camille-quote">
-              « Je veille à ce que vos messages sonnent justes, dans la langue et la culture
-              de vos destinataires. »
+              « Je vous aide à produire des messages qui sonnent justes, et à comprendre ceux que vous recevez. »
             </p>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- POURQUOI -->
-<section id="pourquoi" class="section">
-  <div class="container">
-    <p class="section-kicker">Pourquoi me confier vos textes&nbsp;?</p>
-    <h2 class="section-title">
-      Je fais parler vos messages comme si vous les aviez écrits vous-même.
-    </h2>
+    <!-- COMMENT ÇA MARCHE -->
+    <section id="comment" class="section">
+      <div class="container">
+        <p class="section-kicker">Simple, rapide, exploitable</p>
+        <h2 class="section-title">Deux usages. Un seul outil.</h2>
 
-    <div class="grid grid-3">
-      <article class="card feature-card">
-        <h3>Des textes au plus près du réel</h3>
-        <p>
-          Je tiens compte de votre contexte métier, de votre relation avec le destinataire
-          et de l’objectif réel du message. Résultat&nbsp;: des formulations naturelles,
-          ni trop scolaires, ni trop familières.
-        </p>
-      </article>
+        <div class="grid grid-2">
+          <article class="card feature-card">
+            <h3>1) Rédaction assistée</h3>
+            <p>
+              Emails clients, recouvrement, relances, propositions commerciales, confirmations…
+              Camille reformule ou traduit avec un ton pro (ferme si besoin, jamais agressif).
+            </p>
+            <p>
+              <a class="btn btn-secondary" href="generate.html">Aller à la rédaction</a>
+            </p>
+          </article>
 
-      <article class="card feature-card">
-        <h3>Langues Premium &amp; Standard</h3>
-        <p>
-          Certaines langues bénéficient d’un niveau Premium (Groupes A, B, C) avec un rendu
-          quasi natif, idéal pour les messages à fort enjeu. Les autres langues, y compris
-          celles en version bêta, offrent un excellent rapport précision / coût.
-        </p>
-      </article>
+          <article class="card feature-card">
+            <h3>2) Interprétation</h3>
+            <p>
+              Vous recevez un email dans une autre langue ou un message ambigu ?
+              Camille résume, clarifie, explique le ton et les points sensibles.
+            </p>
+            <p>
+              <a class="btn btn-secondary" href="interpret.html">Aller à l’interprétation</a>
+            </p>
+          </article>
+        </div>
 
-      <article class="card feature-card">
-        <h3>Un ton professionnel, jamais rigide</h3>
-        <p>
-          Vous parlez à des humains, pas à des robots. Je privilégie un ton clair, courtois
-          et accessible&nbsp;: l’exigence d’une soirée chez l’ambassadeur, avec la convivialité
-          d’une fête de village.
-        </p>
-      </article>
-    </div>
-  </div>
-</section>
+        <div class="card info-card" style="margin-top:16px;">
+          <h3>Tester sur un échantillon</h3>
+          <p>
+            Créez un compte, testez sur quelques exemples réels, puis choisissez un pack si ça vous convient.
+            Pas d’abonnement : vous payez uniquement lorsque vous rechargez vos crédits.
+          </p>
+          <p>
+            <a href="register.html" class="btn btn-primary">Tester gratuitement</a>
+            <a href="tarifs.html" class="btn btn-ghost">Voir les packs</a>
+          </p>
+        </div>
+      </div>
+    </section>
 
-    <!-- USAGES CONCRETS -->
+    <!-- POUR QUI -->
     <section class="section section-alt">
       <div class="container">
-        <p class="section-kicker">
-          Des usages concrets, bien au-delà de la simple traduction
-        </p>
-        <h2 class="section-title">
-          Je vous accompagne partout où les mots engagent votre relation client.
-        </h2>
+        <p class="section-kicker">Quand les mots engagent</p>
+        <h2 class="section-title">Pensé pour le quotidien professionnel.</h2>
 
         <div class="cards-grid cards-grid-4">
           <article class="card">
-            <h3>Recouvrement &amp; finance</h3>
-            <p>
-              Relances de factures, mises en demeure, négociations de délais, messages de suivi&nbsp;:
-              des formulations fermes mais respectueuses, adaptées aux pratiques de chaque pays.
-            </p>
+            <h3>Recouvrement & finance</h3>
+            <p>Relances, mises en demeure, négociations : un ton ferme et propre, adapté au pays.</p>
           </article>
-
           <article class="card">
-            <h3>Relations commerciales</h3>
-            <p>
-              Propositions, relances de devis, réponses à objections, annonces de hausse de tarifs&nbsp;:
-              je vous aide à rester ferme sur le fond, tout en restant élégant sur la forme.
-            </p>
+            <h3>Commercial</h3>
+            <p>Relances de devis, objections, annonces de hausse : clair, pro, sans rigidité.</p>
           </article>
-
           <article class="card">
-            <h3>Support &amp; administratif</h3>
-            <p>
-              Messages d’information, confirmations, demandes de pièces, rappels contractuels
-              ou communications internes&nbsp;: un style clair, respectueux et professionnel.
-            </p>
+            <h3>Support & administratif</h3>
+            <p>Demandes de pièces, confirmations, communications internes : précis et compréhensible.</p>
           </article>
-
           <article class="card">
-            <h3>Contrats light &amp; documents sensibles</h3>
-            <p>
-              Clauses simples, accords de principe, avenants, résumés de contrats&nbsp;:
-              je vous aide à formuler proprement, en gardant à l’esprit que ce n’est pas un conseil juridique.
-            </p>
+            <h3>Documents sensibles</h3>
+            <p>Comprendre un passage, reformuler une clause simple : assistance linguistique, pas du juridique.</p>
           </article>
+        </div>
+      </div>
+    </section>
 
-          <article class="card">
-            <h3>Autres usages</h3>
-            <p>
-              Messages RH, achats, communication interne, comptes rendus, présentations…
-              Dès lors qu’il ne s’agit pas de conseil juridique ou réglementaire, je peux vous aider
-              à clarifier et adapter vos textes.
+    <!-- IA & CADRE LÉGAL -->
+    <section class="section">
+      <div class="container">
+        <p class="section-kicker">IA, sans zone grise</p>
+        <h2 class="section-title">Camille est une aide linguistique, pas un conseil juridique.</h2>
+
+        <div class="grid grid-2">
+          <div>
+            <h3>Ce que fait Camille</h3>
+            <ul class="list-check">
+              <li>Reformuler, traduire, adapter un ton.</li>
+              <li>Résumer et expliquer un message reçu.</li>
+              <li>Mettre en évidence des zones potentiellement sensibles (ton, ambiguïtés).</li>
+            </ul>
+          </div>
+          <div class="card info-card">
+            <h3>Ce que Camille ne fait pas</h3>
+            <ul class="list-check">
+              <li>Remplacer un avocat, un juriste, ou un expert réglementaire.</li>
+              <li>Donner une validation juridique ou une stratégie contentieuse.</li>
+              <li>Garantir une interprétation “légale” d’un texte.</li>
+            </ul>
+            <p style="margin-top:10px;">
+              Vous restez décisionnaire. ContextaLingua est un outil d’assistance.
             </p>
-          </article>
+          </div>
         </div>
       </div>
     </section>
@@ -193,18 +183,14 @@
     <section class="cta">
       <div class="container cta-inner">
         <div class="cta-text">
-          <p class="section-kicker cta-kicker">
-            Prêt à me laisser m’occuper de vos textes&nbsp;?
-          </p>
+          <p class="section-kicker cta-kicker">Prêt à avancer ?</p>
           <h2>
-            Créez votre espace, testez quelques cas d’usage et voyez comment vos messages
-            gagnent en clarté et en impact.
+            Testez Camille sur un échantillon, puis choisissez un pack si la qualité vous convient.
           </h2>
         </div>
         <div class="cta-actions">
-          <a href="#" class="btn btn-primary btn-large">
-            Commencer gratuitement
-          </a>
+          <a href="register.html" class="btn btn-primary btn-large">Tester gratuitement</a>
+          <a href="tarifs.html" class="btn btn-secondary btn-large">Voir les packs</a>
         </div>
       </div>
     </section>
@@ -222,8 +208,8 @@
       </nav>
     </div>
   </footer>
-      <!-- Scripts communs -->
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-  </body>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
 </html>
