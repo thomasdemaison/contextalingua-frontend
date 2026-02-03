@@ -31,7 +31,6 @@
         <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
         <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-        <!-- ⚠️ IMPORTANT : on met des <a> pour que ça marche sans JS -->
         <a href="login.html" class="btn btn-ghost nav-public-only">Se connecter</a>
         <a href="register.html" class="btn btn-primary nav-public-only">Tester gratuitement</a>
       </div>
@@ -50,16 +49,16 @@
 
           <p class="hero-subtitle">
             Vous écrivez (ou vous copiez-collez) un message. Camille le reformule, le traduit ou l’explique
-            dans un français clair, avec un ton professionnel et naturel — sans blabla inutile.
+            dans un français clair, avec un ton professionnel et naturel.
           </p>
 
           <div class="hero-actions">
-            <a href="register.html" class="btn btn-primary">Tester sur un échantillon</a>
+            <a href="register.html" class="btn btn-primary">Tester gratuitement</a>
             <a href="#comment" class="btn btn-secondary">Voir comment ça marche</a>
           </div>
 
           <p class="hero-meta">
-            Rédaction + Interprétation · 3 packs simples · Pas d’abonnement · Paiement sécurisé
+            Rédaction + Interprétation · 3 packs · Pas d’abonnement · Paiement sécurisé
           </p>
         </div>
 
@@ -92,7 +91,8 @@
               Camille reformule ou traduit avec un ton pro (ferme si besoin, jamais agressif).
             </p>
             <p>
-              <a class="btn btn-secondary" href="generate.html">Aller à la rédaction</a>
+              <a class="btn btn-secondary nav-auth-only" href="generate.html">Aller à la rédaction</a>
+              <a class="btn btn-secondary nav-public-only" href="register.html">Tester la rédaction</a>
             </p>
           </article>
 
@@ -103,16 +103,17 @@
               Camille résume, clarifie, explique le ton et les points sensibles.
             </p>
             <p>
-              <a class="btn btn-secondary" href="interpret.html">Aller à l’interprétation</a>
+              <a class="btn btn-secondary nav-auth-only" href="interpret.html">Aller à l’interprétation</a>
+              <a class="btn btn-secondary nav-public-only" href="register.html">Tester l’interprétation</a>
             </p>
           </article>
         </div>
 
         <div class="card info-card" style="margin-top:16px;">
-          <h3>Tester sur un échantillon</h3>
+          <h3>Tester avant de payer</h3>
           <p>
-            Créez un compte, testez sur quelques exemples réels, puis choisissez un pack si ça vous convient.
-            Pas d’abonnement : vous payez uniquement lorsque vous rechargez vos crédits.
+            Créez un compte et essayez sur quelques exemples. Si la qualité vous convient,
+            choisissez un pack : Découverte, Pro ou Équipe.
           </p>
           <p>
             <a href="register.html" class="btn btn-primary">Tester gratuitement</a>
@@ -135,7 +136,7 @@
           </article>
           <article class="card">
             <h3>Commercial</h3>
-            <p>Relances de devis, objections, annonces de hausse : clair, pro, sans rigidité.</p>
+            <p>Relances de devis, objections, annonces : clair, pro, sans rigidité.</p>
           </article>
           <article class="card">
             <h3>Support & administratif</h3>
@@ -143,7 +144,7 @@
           </article>
           <article class="card">
             <h3>Documents sensibles</h3>
-            <p>Comprendre un passage, reformuler une clause simple : assistance linguistique, pas du juridique.</p>
+            <p>Comprendre un passage, reformuler une clause simple : assistance linguistique.</p>
           </article>
         </div>
       </div>
@@ -153,26 +154,22 @@
     <section class="section">
       <div class="container">
         <p class="section-kicker">IA, sans zone grise</p>
-        <h2 class="section-title">Camille est une aide linguistique, pas un conseil juridique.</h2>
+        <h2 class="section-title">Camille aide à comprendre et rédiger. Elle ne remplace pas un juriste.</h2>
 
         <div class="grid grid-2">
-          <div>
+          <div class="card info-card">
             <h3>Ce que fait Camille</h3>
             <ul class="list-check">
               <li>Reformuler, traduire, adapter un ton.</li>
               <li>Résumer et expliquer un message reçu.</li>
-              <li>Mettre en évidence des zones potentiellement sensibles (ton, ambiguïtés).</li>
+              <li>Signaler les formulations ambiguës ou potentiellement sensibles.</li>
             </ul>
           </div>
           <div class="card info-card">
-            <h3>Ce que Camille ne fait pas</h3>
-            <ul class="list-check">
-              <li>Remplacer un avocat, un juriste, ou un expert réglementaire.</li>
-              <li>Donner une validation juridique ou une stratégie contentieuse.</li>
-              <li>Garantir une interprétation “légale” d’un texte.</li>
-            </ul>
-            <p style="margin-top:10px;">
-              Vous restez décisionnaire. ContextaLingua est un outil d’assistance.
+            <h3>Cadre d’usage</h3>
+            <p>
+              ContextaLingua est un outil d’assistance linguistique. En cas d’enjeu légal, contractuel
+              ou réglementaire, faites valider par un professionnel.
             </p>
           </div>
         </div>
@@ -184,9 +181,7 @@
       <div class="container cta-inner">
         <div class="cta-text">
           <p class="section-kicker cta-kicker">Prêt à avancer ?</p>
-          <h2>
-            Testez Camille sur un échantillon, puis choisissez un pack si la qualité vous convient.
-          </h2>
+          <h2>Testez Camille, puis choisissez un pack si la qualité vous convient.</h2>
         </div>
         <div class="cta-actions">
           <a href="register.html" class="btn btn-primary btn-large">Tester gratuitement</a>
