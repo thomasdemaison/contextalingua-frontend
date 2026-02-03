@@ -1,223 +1,229 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>FAQ – ContextaLingua</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>FAQ – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="page page-faq">
+
 <header class="site-header">
   <div class="container header-inner">
-    <!-- Logo -->
     <a href="index.html" class="header-logo">
       <span class="contexta">Contexta</span>
       <span class="lingua">Lingua</span>
     </a>
 
-    <!-- Navigation principale -->
     <nav class="main-nav">
-      <!-- Menu PUBLIC : visible quand on n’est PAS connecté -->
+      <!-- PUBLIC -->
       <a href="produit.html" class="nav-link nav-public-only">Produit</a>
       <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
       <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-      <!-- Menu UTILISATEUR : visible UNIQUEMENT quand on est connecté -->
-      <a href="index.html"      class="nav-link nav-auth-only">Accueil</a>
-      <a href="dashboard.html"  class="nav-link nav-auth-only">Tableau de bord</a>
-      <a href="generate.html"   class="nav-link nav-auth-only">Rédaction</a>
-      <a href="interpret.html"  class="nav-link nav-auth-only">Interprétation</a>
-      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+      <!-- CONNECTÉ -->
+      <a href="index.html"        class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"    class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"     class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"    class="nav-link nav-auth-only">Interprétation</a>
+      <a href="accompanied.html"  class="nav-link nav-auth-only">Mode accompagné</a>
     </nav>
 
-    <!-- Zone de droite -->
     <div class="header-actions">
-      <!-- Email + déconnexion : visibles quand connecté -->
       <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-      <button id="btnLogout" class="btn btn-ghost nav-auth-only">
-        Déconnexion
-      </button>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-      <!-- Actions publiques : visibles quand NON connecté -->
-      <button class="btn btn-ghost nav-public-only">
-        Se connecter
-      </button>
-      <button class="btn btn-primary nav-public-only">
-        Commencer gratuitement
-      </button>
+      <!-- PUBLIC : liens -->
+      <a href="login.html" class="btn btn-ghost nav-public-only">Se connecter</a>
+      <a href="register.html" class="btn btn-primary nav-public-only">Tester gratuitement</a>
     </div>
   </div>
 </header>
 
-
-
 <main>
-    <section class="hero hero-inner">
-        <div class="container hero-grid hero-grid-simple">
-            <div class="hero-content">
-                <p class="eyebrow">FAQ</p>
-                <h1>Les questions que l’on me pose le plus souvent.</h1>
-                <p class="hero-subtitle">
-                    Si vous ne trouvez pas la réponse à votre question, écrivez-moi via le formulaire de
-                    contact. Je préfère clarifier les choses avant que vous ne chargiez vos crédits.
-                </p>
-            </div>
-        </div>
-    </section>
+  <section class="hero hero-inner">
+    <div class="container hero-grid hero-grid-simple">
+      <div class="hero-content">
+        <p class="eyebrow">FAQ</p>
+        <h1>Les questions les plus fréquentes.</h1>
+        <p class="hero-subtitle">
+          L’objectif : vous aider à comprendre comment fonctionne Camille (agent IA),
+          et comment utiliser vos crédits sans surprise.
+        </p>
+        <p style="margin-top:12px;">
+          <a href="register.html" class="btn btn-primary">Tester sur un échantillon</a>
+          <a href="tarifs.html" class="btn btn-secondary">Voir les 3 packs</a>
+        </p>
+      </div>
+    </div>
+  </section>
 
-    <section class="section">
-        <div class="container">
-            <div class="faq-list">
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Comment sont calculés les crédits consommés&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Un texte généré dans une langue Standard consomme 1 crédit. Un texte généré dans
-                            une langue Premium consomme 2 crédits. Les langues en version bêta consomment 1
-                            crédit, avec un marquage clair dans l’interface.
-                        </p>
-                    </div>
-                </article>
+  <section class="section">
+    <div class="container">
+      <div class="faq-list">
 
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Puis-je mélanger mode accompagné et mode expert avec le même compte&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Oui. Les deux modes sont disponibles en permanence. Vous pouvez utiliser le mode
-                            accompagné pour les messages sensibles, et le mode expert pour les textes plus
-                            routiniers. Les crédits sont partagés entre les deux.
-                        </p>
-                    </div>
-                </article>
+        <article class="faq-item">
+          <button class="faq-question">À quoi sert ContextaLingua ?</button>
+          <div class="faq-answer">
+            <p>
+              ContextaLingua sert à <strong>rédiger</strong> des messages prêts à envoyer
+              dans plusieurs langues, et à <strong>interpréter</strong> des messages reçus
+              (intention, ton, résumé, points sensibles).
+            </p>
+            <p>
+              Camille est un <strong>agent IA</strong> spécialisé dans l’écriture et la compréhension
+              contextuelle des échanges professionnels.
+            </p>
+          </div>
+        </article>
 
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Que se passe-t-il si un texte ne me convient pas&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Vous pouvez soumettre une demande de révision en joignant le contexte saisi,
-                            le texte généré et une courte explication de ce qui pose problème. Si l’analyse
-                            confirme que le rendu est insuffisant, les crédits correspondants sont recrédités.
-                        </p>
-                    </div>
-                </article>
+        <article class="faq-item">
+          <button class="faq-question">Puis-je tester avant d’acheter ?</button>
+          <div class="faq-answer">
+            <p>
+              Oui. Vous pouvez tester sur un <strong>échantillon</strong> après création de compte.
+              Ensuite seulement, vous chargez un pack si la qualité vous convient.
+            </p>
+          </div>
+        </article>
 
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Y a-t-il un engagement de durée&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Non. Les packs de crédits sont utilisables librement et les abonnements mensuels
-                            peuvent être arrêtés à tout moment avant la date de renouvellement.
-                        </p>
-                    </div>
-                </article>
+        <article class="faq-item">
+          <button class="faq-question">Comment sont consommés les crédits ?</button>
+          <div class="faq-answer">
+            <p>
+              Une génération consomme des crédits. La consommation dépend principalement de la langue
+              et du volume de texte.
+            </p>
+            <ul class="list-check">
+              <li>Standard : en général <strong>1 crédit</strong> pour un message “classique”.</li>
+              <li>Premium : en général <strong>2 crédits</strong> pour un message “classique”.</li>
+              <li>Texte long : vous pouvez le découper en blocs pour maîtriser la consommation.</li>
+            </ul>
+          </div>
+        </article>
 
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Puis-je inviter plusieurs collaborateurs sur le même compte&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Oui, selon la formule choisie. Les packs peuvent être utilisés par une ou plusieurs
-                            personnes, et les abonnements à partir de l’offre Équipe prévoient plusieurs
-                            utilisateurs avec un suivi commun des crédits.
-                        </p>
-                    </div>
-                </article>
+        <article class="faq-item">
+          <button class="faq-question">Interpréter un email reçu coûte-t-il plus cher ?</button>
+          <div class="faq-answer">
+            <p>
+              Non. L’<strong>interprétation</strong> est facturée comme une génération classique :
+              vous utilisez vos crédits, sans supplément.
+            </p>
+            <p class="pricing-note">
+              Astuce : pour un document long, collez le texte par blocs (ex : 1 à 2 pages à la fois)
+              pour garder le contrôle.
+            </p>
+          </div>
+        </article>
 
-                <article class="faq-item">
-                    <button class="faq-question">
-                        Comment sont gérées les données que je saisis&nbsp;?
-                    </button>
-                    <div class="faq-answer">
-                        <p>
-                            Les textes que vous saisissez sont utilisés uniquement pour générer vos messages
-                            et pour améliorer le service de façon agrégée. Les données sensibles peuvent être
-                            anonymisées et des bonnes pratiques vous sont rappelées dans le produit.
-                        </p>
-                    </div>
-                </article>
+        <article class="faq-item">
+          <button class="faq-question">Puis-je mélanger mode accompagné et mode expert ?</button>
+          <div class="faq-answer">
+            <p>
+              Oui. Les deux modes sont disponibles :
+            </p>
+            <ul class="list-check">
+              <li><strong>Mode accompagné</strong> : Camille vous guide avec quelques questions.</li>
+              <li><strong>Mode expert</strong> : vous allez droit au but avec une saisie structurée.</li>
+            </ul>
+            <p>Les crédits sont partagés entre les deux.</p>
+          </div>
+        </article>
 
-<article class="faq-item">
-  <button class="faq-question">
-    Combien de crédits consomme l’analyse d’un document ou d’un email reçu&nbsp;?
-  </button>
-  <div class="faq-answer">
-    <p>
-      L’analyse d’un texte reçu est comptée comme une génération classique&nbsp;:
-      vous utilisez vos crédits exactement comme pour la rédaction.
-    </p>
-    <p>
-      À titre indicatif&nbsp;:
-    </p>
-    <ul class="pricing-list">
-      <li>
-        Un email ou un message court (jusqu’à ~800&nbsp;mots) correspond
-        en général à 1&nbsp;crédit en langue Standard ou 2&nbsp;crédits en langue Premium.
-      </li>
-      <li>
-        Un document plus long (contrat, rapport, compte-rendu…) peut nécessiter
-        plusieurs générations. Vous pouvez découper le texte en blocs
-        pour mieux maîtriser votre consommation.
-      </li>
-    </ul>
-    <p class="pricing-note">
-      Vous gardez ainsi une vision claire du coût&nbsp;: les mêmes packs de crédits
-      couvrent la rédaction, la traduction contextuelle et la compréhension de vos messages.
-    </p>
-  </div>
-</article>
+        <article class="faq-item">
+          <button class="faq-question">Et si le résultat ne me convient pas ?</button>
+          <div class="faq-answer">
+            <p>
+              Dans la majorité des cas, un ajustement de contexte ou de ton suffit.
+              Vous pouvez relancer une génération en précisant :
+              <strong>ce qui ne va pas</strong> (trop dur, trop mou, trop long, pas assez clair…).
+            </p>
+          </div>
+        </article>
 
-                
-            </div>
-        </div>
-    </section>
+        <article class="faq-item">
+          <button class="faq-question">Y a-t-il un abonnement ou un engagement ?</button>
+          <div class="faq-answer">
+            <p>
+              Non. Pour le moment, ContextaLingua fonctionne uniquement avec
+              <strong>3 packs de crédits</strong>. Pas d’abonnement.
+            </p>
+          </div>
+        </article>
 
-    <section class="cta-band">
-        <div class="container cta-band-inner">
-            <div>
-                <p class="eyebrow light">Encore une question&nbsp;?</p>
-                <h2>Expliquez-moi votre contexte, je vous dirai si je peux vous aider.</h2>
-                <p class="cta-band-text">
-                    Un rapide échange permet souvent de clarifier vos besoins et de choisir la bonne formule.
-                </p>
-            </div>
-            <a href="contact.html" class="btn btn-primary btn-large">Écrire à Camille</a>
-        </div>
-    </section>
+        <article class="faq-item">
+          <button class="faq-question">Camille peut-elle faire du juridique / du conseil légal ?</button>
+          <div class="faq-answer">
+            <p>
+              Non. Camille est un agent IA d’assistance linguistique :
+              elle peut reformuler, résumer, expliquer, et signaler des zones potentiellement sensibles,
+              mais elle ne remplace pas un avocat ou un juriste.
+            </p>
+            <p class="pricing-note">
+              Vous restez décisionnaire. En cas d’enjeu juridique, faites valider par un professionnel.
+            </p>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <button class="faq-question">Comment sont gérées les données que je saisis ?</button>
+          <div class="faq-answer">
+            <p>
+              Bonne pratique : évitez de coller des données inutiles (n° de carte, infos hautement sensibles).
+              Si vous devez traiter un message sensible, vous pouvez anonymiser noms, emails, références.
+            </p>
+            <p>
+              ContextaLingua est conçu pour fournir une réponse utile à partir de votre texte, sans exiger
+              d’informations superflues.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-band-inner">
+      <div>
+        <p class="eyebrow light">Besoin d’un avis rapide ?</p>
+        <h2>Testez sur un échantillon, puis choisissez un pack si la qualité vous convient.</h2>
+        <p class="cta-band-text">
+          C’est la voie la plus simple : vous voyez tout de suite si Camille correspond à vos usages.
+        </p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="register.html" class="btn btn-primary btn-large">Tester gratuitement</a>
+        <a href="tarifs.html" class="btn btn-secondary btn-large">Voir les packs</a>
+        <a href="contact.html" class="btn btn-ghost btn-large">Contacter</a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
-    <div class="container footer-inner">
-        <p>© 2025 ContextaLingua — Tous droits réservés.</p>
-        <nav class="footer-nav">
-            <a href="produit.html">Produit</a>
-            <a href="tarifs.html">Tarifs</a>
-            <a href="faq.html">FAQ</a>
-            <a href="contact.html">Contact</a>
-        </nav>
-    </div>
+  <div class="container footer-inner">
+    <p>© 2025 ContextaLingua — Tous droits réservés.</p>
+    <nav class="footer-nav">
+      <a href="produit.html">Produit</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
 </footer>
 
 <script>
-    // petit accordéon simple
-    document.querySelectorAll('.faq-question').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.classList.toggle('open');
-            const answer = btn.nextElementSibling;
-            answer.style.maxHeight = answer.style.maxHeight ? null : answer.scrollHeight + 'px';
-        });
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('open');
+      const answer = btn.nextElementSibling;
+      answer.style.maxHeight = answer.style.maxHeight ? null : answer.scrollHeight + 'px';
     });
+  });
 </script>
-    <!-- Scripts communs -->
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-  </body>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
 </html>
