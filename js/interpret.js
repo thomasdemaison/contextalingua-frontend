@@ -1,7 +1,6 @@
 // js/interpret.js
-// Page "Interprétation"
-// Endpoint backend : POST /api/ai/interpret
-// Payload attendu (legacy) : { language, languageName, depth, textToInterpret, context }
+// POST /api/ai/interpret
+// Payload legacy : { language, languageName, depth, textToInterpret, context }
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // header public/auth + logout
   try {
     if (typeof setupHeaderNavigation === "function") setupHeaderNavigation();
   } catch (e) {
@@ -20,22 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initInterpretLanguagePicker();
   setupInterpretPage();
 });
-
-/* -------------------- Rôles (debug) -------------------- */
-
-function getUserSafe() {
-  try {
-    return typeof getCurrentUser === "function" ? getCurrentUser() : null;
-  } catch {
-    return null;
-  }
-}
-function isSuperAdmin() {
-  const u = getUserSafe();
-  return !!(u && u.role === "superadmin");
-}
-
-/* -------------------- Langues -------------------- */
 
 const LANGUAGES = [
   { code: "fr", name: "Français", flag: "🇫🇷" },
@@ -91,15 +73,11 @@ function findLanguageByName(input) {
   );
 }
 
-/* -------------------- Picker UI -------------------- */
-
 function setInterpretSelectedLanguage(lang) {
-  const codeEl = document.getElementById("intLanguageCode");
-  const nameEl = document.getElementById("intLanguageName");
-  const labelEl = document.getElementById("intLanguageSelectedLabel");
+  document.getElementById("intLanguageCode").value = lang.code;
+  document.getElementById("intLanguageName").value = lang.name;
 
-  if (codeEl) codeEl.value = lang.code;
-  if (nameEl) nameEl.value = lang.name;
+  const labelEl = document.getElementById("intLanguageSelectedLabel");
   if (labelEl) labelEl.textContent = `${lang.flag} ${lang.name}`;
 
   document.querySelectorAll(".int-lang-pill").forEach((btn) => {
@@ -167,46 +145,6 @@ function initInterpretLanguagePicker() {
   }
 }
 
-/* -------------------- Debug UI (superadmin only) -------------------- */
-
-function ensureInterpretDebugUI() {
-  if (!isSuperAdmin()) return null;
-
-  let wrap = document.getElementById("intDebugWrap");
-  if (wrap) return wrap;
-
-  const outEl = document.getElementById("intOutput");
-  if (!outEl || !outEl.parentElement) return null;
-
-  wrap = document.createElement("div");
-  wrap.id = "intDebugWrap";
-  wrap.style.marginTop = "14px";
-
-  const title = document.createElement("h4");
-  title.textContent = "Debug – Payload envoyé (copiable)";
-  title.style.margin = "10px 0 6px";
-  title.style.color = "var(--text-strong)";
-
-  const pre = document.createElement("pre");
-  pre.id = "intDebugPayload";
-  pre.style.whiteSpace = "pre-wrap";
-  pre.style.fontSize = "0.85rem";
-  pre.style.color = "var(--text-muted)";
-  pre.style.background = "#020617";
-  pre.style.borderRadius = "12px";
-  pre.style.padding = "12px";
-  pre.style.border = "1px solid var(--border-subtle)";
-  pre.style.minHeight = "60px";
-
-  wrap.appendChild(title);
-  wrap.appendChild(pre);
-
-  outEl.parentElement.appendChild(wrap);
-  return wrap;
-}
-
-/* -------------------- Main -------------------- */
-
 function setupInterpretPage() {
   const submitBtn = document.getElementById("intSubmit");
   const errorEl = document.getElementById("intError");
@@ -220,8 +158,8 @@ function setupInterpretPage() {
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
 
-    const langCode = (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
-    const langName = (document.getElementById("intLanguageName")?.value || "Français").trim() || "Français";
+    const language = (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
+    const languageName = (document.getElementById("intLanguageName")?.value || "Français").trim() || "Français";
     const depth = (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
 
     const textToInterpret = (document.getElementById("intText")?.value || "").trim();
@@ -236,29 +174,15 @@ function setupInterpretPage() {
     submitBtn.textContent = "Camille analyse…";
 
     try {
-      // ✅ Payload attendu par ton backend (probable) => FIN du 400
-      const payload = {
-        language: langCode,
-        languageName: langName,
-        depth,
-        textToInterpret,
-        context,
-      };
-
-      const wrap = ensureInterpretDebugUI();
-      if (wrap) {
-        const pre = document.getElementById("intDebugPayload");
-        if (pre) pre.textContent = JSON.stringify(payload, null, 2);
-      }
-
+      const payload = { language, languageName, depth, textToInterpret, context };
       const data = await apiRequest("/ai/interpret", "POST", payload);
 
-      // parsing souple
       const out = data?.result?.text ?? data?.result ?? data?.text ?? "";
       if (!out) throw new Error("Réponse inattendue du moteur d'interprétation.");
 
-      if (resultEl) resultEl.textContent = out;
+      resultEl.textContent = out;
     } catch (err) {
+      console.error("[interpret.js] interpret failed:", err);
       if (errorEl) errorEl.textContent = err.message || "Une erreur est survenue lors de l’analyse.";
     } finally {
       submitBtn.disabled = false;
