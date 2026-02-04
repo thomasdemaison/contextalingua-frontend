@@ -5,17 +5,41 @@
   <title>Rédaction – ContextaLingua</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="assets/css/style.css" />
- <div class="header-actions">
-  <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-  <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
-
-  <a href="login.html" class="btn btn-ghost nav-public-only js-go-login">Se connecter</a>
-  <a href="register.html" class="btn btn-primary nav-public-only js-go-register">Tester gratuitement</a>
-</div>
 </head>
 
 <body class="page">
-  <!-- header habituel ici -->
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="header-logo">
+        <span class="contexta">Contexta</span>
+        <span class="lingua">Lingua</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+        <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+        <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
+
+        <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+        <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+        <a href="generate.html"    class="nav-link nav-auth-only active">Rédaction</a>
+        <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
+        <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-ghost nav-auth-only">Dashboard</a>
+        <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+        <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
+
+        <a href="login.html" class="btn btn-ghost nav-public-only js-go-login">Se connecter</a>
+        <a href="register.html" class="btn btn-primary nav-public-only js-go-register">Tester gratuitement</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
   <main>
     <section class="hero">
       <div class="container hero-inner hero-grid hero-grid-simple">
@@ -45,6 +69,7 @@
                 <small class="lang-picker-meta">Tape un début de langue puis sélectionne.</small>
               </div>
 
+              <!-- Format discret -->
               <input id="genFormat" type="hidden" value="email" />
 
               <div class="form-field">
@@ -105,8 +130,17 @@ Texte de départ : (optionnel)…"></textarea>
     </section>
   </main>
 
-  <!-- footer habituel ici -->
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© ContextaLingua</span>
+      <nav class="footer-nav">
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
 
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/languages.js"></script>
