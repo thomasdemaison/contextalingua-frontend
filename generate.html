@@ -1,91 +1,109 @@
-<div class="grid grid-2" style="gap:12px; align-items:start;">
-  <!-- COLONNE GAUCHE -->
-  <div class="card">
-    <h2 style="margin-bottom:6px;">Camille — Rédaction</h2>
-    <p style="color:var(--text-muted); margin-bottom:14px;">
-      Une langue + une demande claire. Camille s’occupe du reste.
-    </p>
+<!DOCTYPE html>
+<html lang="fr" class="page">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rédaction – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
 
-    <form id="generateForm" autocomplete="off">
-      <!-- Langue cible (autocomplete) -->
-      <div class="form-field">
-        <span>Langue cible</span>
+<body class="page">
+  <!-- header habituel ici -->
 
-        <!-- input + dropdown (on garde ton moteur CL_LANG, mais on supprime le gros panneau) -->
-        <div style="position:relative;">
-          <input
-            id="genLanguageLabel"
-            type="text"
-            placeholder="Ex : italien, allemand, arabe…"
-            autocomplete="off"
-          />
-          <input id="genLanguageCode" type="hidden" value="fr" />
+  <main>
+    <section class="hero">
+      <div class="container hero-inner hero-grid hero-grid-simple">
 
-          <!-- suggestions -->
-          <div id="genLangSuggest"
-               style="display:none; position:absolute; z-index:20; left:0; right:0; top:100%;
+        <div class="grid grid-2" style="gap:12px; align-items:start; width:100%;">
+          <!-- COLONNE GAUCHE -->
+          <div class="card">
+            <h2 style="margin-bottom:6px;">Camille — Rédaction</h2>
+            <p style="color:var(--text-muted); margin-bottom:14px;">
+              Une langue + une demande claire. Camille s’occupe du reste.
+            </p>
+
+            <form id="generateForm" autocomplete="off">
+              <div class="form-field">
+                <span>Langue cible</span>
+                <div style="position:relative;">
+                  <input id="genLanguageLabel" type="text" placeholder="Ex : italien, allemand, arabe…" autocomplete="off" />
+                  <input id="genLanguageCode" type="hidden" value="fr" />
+
+                  <div id="genLangSuggest"
+                    style="display:none; position:absolute; z-index:20; left:0; right:0; top:100%;
                       background:rgba(2,6,23,.98); border:1px solid var(--border-subtle);
                       border-radius:12px; padding:6px; margin-top:6px; max-height:240px; overflow:auto;">
+                  </div>
+                </div>
+
+                <small class="lang-picker-meta">Tape un début de langue puis sélectionne.</small>
+              </div>
+
+              <input id="genFormat" type="hidden" value="email" />
+
+              <div class="form-field">
+                <span>Votre demande</span>
+                <textarea id="genRequest" rows="10"
+                  placeholder="Ex :
+Objectif : présenter nos bandes refendues
+Ton : professionnel & enthousiaste
+Destinataire : CEO
+Contexte : qualités, épaisseurs, envoyer un catalogue
+Texte de départ : (optionnel)…"></textarea>
+              </div>
+
+              <p id="genError" style="color:var(--danger); font-size:.9rem; min-height:1.2em;"></p>
+
+              <button id="genSubmit" type="submit" class="btn btn-primary btn-full">Générer</button>
+            </form>
+          </div>
+
+          <!-- COLONNE DROITE -->
+          <aside class="card info-card" style="padding:12px;">
+            <h3 style="margin-top:0;">Pour un résultat premium</h3>
+            <ul class="list-check" style="margin-bottom:0;">
+              <li><strong>Objectif</strong> : 1 phrase (relancer / présenter / négocier).</li>
+              <li><strong>Destinataire</strong> : rôle + relation (client froid / partenaire / débiteur…).</li>
+              <li><strong>Ton</strong> : pro, ferme mais poli, chaleureux…</li>
+              <li><strong>Contexte</strong> : 3 points max (contraintes, infos clés, à éviter).</li>
+              <li><strong>Texte de départ</strong> : colle-le si tu veux “améliorer”.</li>
+            </ul>
+          </aside>
+        </div>
+
+        <!-- Résultats -->
+        <div class="grid grid-2" style="gap:12px; margin-top:12px; width:100%;">
+          <div class="card" style="padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 style="margin:0;">Texte final</h3>
+              <button type="button" class="btn btn-ghost" id="btnCopyFinal">Copier</button>
+            </div>
+            <pre id="genOutput" style="white-space:pre-wrap; margin-top:10px; background:#020617;
+              border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
+          </div>
+
+          <div class="card" style="padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 style="margin:0;">Traduction FR (contrôle)</h3>
+              <button type="button" class="btn btn-ghost" id="btnCopyFR">Copier</button>
+            </div>
+            <pre id="genOutputFR" style="white-space:pre-wrap; margin-top:10px; background:#020617;
+              border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
+            <p style="margin-top:8px; color:var(--text-muted); font-size:.9rem;">
+              Pour vérifier exactement ce que vous envoyez.
+            </p>
           </div>
         </div>
 
-        <small class="lang-picker-meta">
-          Tape un début de langue puis sélectionne.
-        </small>
       </div>
+    </section>
+  </main>
 
-      <!-- Format discret (optionnel) -->
-      <input id="genFormat" type="hidden" value="email" />
+  <!-- footer habituel ici -->
 
-      <!-- Demande unique -->
-      <div class="form-field">
-        <span>Votre demande</span>
-        <textarea
-          id="genRequest"
-          rows="10"
-          placeholder="Ex : Objectif : présenter nos bandes refendues. Ton : professionnel & enthousiaste. Destinataire : CEO. Contexte : qualités, épaisseurs, envoyer un catalogue. Texte de départ : (optionnel)…"
-        ></textarea>
-      </div>
-
-      <p id="genError" style="color:var(--danger); font-size:.9rem; min-height:1.2em;"></p>
-
-      <button id="genSubmit" type="submit" class="btn btn-primary btn-full">Générer</button>
-    </form>
-  </div>
-
-  <!-- COLONNE DROITE : CONSEILS -->
-  <aside class="card info-card" style="padding:12px;">
-    <h3 style="margin-top:0;">Pour un résultat premium</h3>
-    <ul class="list-check" style="margin-bottom:0;">
-      <li><strong>Objectif</strong> : 1 phrase (ex : relancer / présenter / négocier).</li>
-      <li><strong>Destinataire</strong> : rôle + relation (client froid / partenaire / débiteur…).</li>
-      <li><strong>Ton</strong> : pro, ferme mais poli, chaleureux, etc.</li>
-      <li><strong>Contexte</strong> : 3 points max (contraintes, infos clés, à éviter).</li>
-      <li><strong>Texte de départ</strong> : colle-le si tu veux “améliorer” plutôt que créer.</li>
-    </ul>
-  </aside>
-</div>
-
-<!-- Résultats -->
-<div class="grid grid-2" style="gap:12px; margin-top:12px;">
-  <div class="card" style="padding:12px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <h3 style="margin:0;">Texte final</h3>
-      <button type="button" class="btn btn-ghost" id="btnCopyFinal">Copier</button>
-    </div>
-    <pre id="genOutput" style="white-space:pre-wrap; margin-top:10px; background:#020617;
-      border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
-  </div>
-
-  <div class="card" style="padding:12px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-      <h3 style="margin:0;">Traduction FR (contrôle)</h3>
-      <button type="button" class="btn btn-ghost" id="btnCopyFR">Copier</button>
-    </div>
-    <pre id="genOutputFR" style="white-space:pre-wrap; margin-top:10px; background:#020617;
-      border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
-    <p style="margin-top:8px; color:var(--text-muted); font-size:.9rem;">
-      Pour vérifier exactement ce que vous envoyez.
-    </p>
-  </div>
-</div>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/languages.js"></script>
+  <script src="js/generate.js"></script>
+</body>
+</html>
