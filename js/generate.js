@@ -1,7 +1,7 @@
-// js/generate.js (MINIMAL + SECURE)
-// - POST /api/ai/generate avec { input, meta }
-// - Traduction FR via /api/ai/interpret (payload legacy)
-// - Autocomplete langues via window.CL_LANG (languages.js)
+// js/generate.js (MINIMAL + SECURE + FR CONTROL FIXED)
+// - Génération: POST /api/ai/generate
+// - Contrôle FR: POST /api/ai/interpret (payload legacy)
+// - UX minimaliste + autocomplete langues via languages.js (window.CL_LANG)
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // Header (menus public/auth + logout)
   try {
     if (typeof setupHeaderNavigation === "function") setupHeaderNavigation();
   } catch (e) {
@@ -45,24 +46,63 @@ function parseRequest(text) {
   const out = { tone: "", objective: "", recipient: "", context: "", draft: "" };
   if (!t) return out;
 
-  const lines = t.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = t
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   const pick = (prefixes) => {
-    const idx = lines.findIndex((l) => prefixes.some((p) => l.toLowerCase().startsWith(p)));
+    const idx = lines.findIndex((l) =>
+      prefixes.some((p) => l.toLowerCase().startsWith(p))
+    );
     if (idx === -1) return "";
     return lines[idx].split(":").slice(1).join(":").trim();
   };
 
-  out.tone      = pick(["ton:", "tone:"]);
+  out.tone = pick(["ton:", "tone:"]);
   out.objective = pick(["objectif:", "objective:"]);
   out.recipient = pick(["destinataire:", "a qui:", "à qui:", "recipient:"]);
-  out.context   = pick(["contexte:", "context:"]);
-  out.draft     = pick(["texte:", "texte de depart:", "texte de départ:", "draft:"]);
+  out.context = pick(["contexte:", "context:"]);
+  out.draft = pick(["texte:", "texte de depart:", "texte de départ:", "draft:"]);
 
-  const anyStructured = out.tone || out.objective || out.recipient || out.context || out.draft;
+  // Fallback : si rien de structuré, on met tout dans context
+  const anyStructured =
+    out.tone || out.objective || out.recipient || out.context || out.draft;
   if (!anyStructured) out.context = t;
 
   return out;
+}
+
+/* -------------------- Robust extraction helpers -------------------- */
+
+function extractTextFromApiResponse(data) {
+  // Essaie de récupérer un "texte" quelque soit le format de retour
+  // (évite [object Object])
+  const candidate =
+    data?.result?.text ??
+    data?.result ??
+    data?.text ??
+    data?.data?.text ??
+    data?.output ??
+    data?.message ??
+    data;
+
+  if (typeof candidate === "string") return candidate;
+
+  if (candidate && typeof candidate === "object") {
+    if (typeof candidate.text === "string") return candidate.text;
+    if (typeof candidate.translation === "string") return candidate.translation;
+    if (typeof candidate.content === "string") return candidate.content;
+
+    // cas: { result: { text: ... } } déjà couvert, mais on garde un fallback propre
+    try {
+      return JSON.stringify(candidate, null, 2);
+    } catch {
+      return "";
+    }
+  }
+
+  return "";
 }
 
 async function runGenerate() {
@@ -77,16 +117,21 @@ async function runGenerate() {
 
   const requestText = (document.getElementById("genRequest")?.value || "").trim();
   if (!requestText) {
-    if (errorEl) errorEl.textContent = "Écris au moins une demande (objectif/ton/contexte).";
+    if (errorEl)
+      errorEl.textContent = "Écris au moins une demande (objectif/ton/contexte).";
     return;
   }
 
   const parsed = parseRequest(requestText);
 
-  const langCode  = (document.getElementById("genLanguageCode")?.value || "fr").trim() || "fr";
-  const langLabel = (document.getElementById("genLanguageLabel")?.value || "Français").trim() || "Français";
-  const format    = (document.getElementById("genFormat")?.value || "email").trim() || "email";
-  const userLang  = getUserLanguageFallback();
+  const langCode =
+    (document.getElementById("genLanguageCode")?.value || "fr").trim() || "fr";
+  const langLabel =
+    (document.getElementById("genLanguageLabel")?.value || "Français").trim() ||
+    "Français";
+  const format =
+    (document.getElementById("genFormat")?.value || "email").trim() || "email";
+  const userLang = getUserLanguageFallback();
 
   const payload = {
     input: {
@@ -113,62 +158,38 @@ async function runGenerate() {
   try {
     // 1) Génération
     const data = await apiRequest("/ai/generate", "POST", payload);
-    const text = data?.result?.text ?? data?.result ?? data?.text ?? "";
-    if (!text) throw new Error("Réponse inattendue du moteur de génération.");
-    if (outEl) outEl.textContent = text;
+    const generatedText = extractTextFromApiResponse(data);
 
-    // 2) Traduction FR de contrôle (payload legacy)
+    if (!generatedText) throw new Error("Réponse inattendue du moteur de génération.");
+
+    if (outEl) outEl.textContent = generatedText;
+
+    // 2) Contrôle FR (ne bloque jamais)
     if (outFrEl) outFrEl.textContent = "Traduction FR en cours…";
 
     try {
-      const frData = await apiRequest("/ai/interpret", "POST", {
-        
+      const interpretPayload = {
         language: "fr",
         languageName: "Français",
         depth: "quick",
-        textToInterpret: text,
+        textToInterpret: generatedText,
         context: "",
-        
+      };
 
-      });
-console.log("[generate.js] interpret FR raw response:", frData);
+      const frData = await apiRequest("/ai/interpret", "POST", interpretPayload);
+      console.log("[generate.js] interpret FR raw response:", frData);
 
-      
-      const frCandidate =
-  frData?.result?.text ??
-  frData?.result ??
-  frData?.text ??
-  frData?.data?.text ??
-  frData?.output ??
-  frData?.message ??
-  frData;
+      const frText = extractTextFromApiResponse(frData);
 
-let frText = "";
-
-// si c'est déjà une string
-if (typeof frCandidate === "string") {
-  frText = frCandidate;
-}
-// si c'est un objet (ton cas -> [object Object])
-else if (frCandidate && typeof frCandidate === "object") {
-  // cas fréquent: { text: "..." }
-  if (typeof frCandidate.text === "string") frText = frCandidate.text;
-  else if (typeof frCandidate.translation === "string") frText = frCandidate.translation;
-  else if (typeof frCandidate.content === "string") frText = frCandidate.content;
-  else {
-    // fallback lisible : stringify
-    frText = JSON.stringify(frCandidate, null, 2);
-  }
-}
-
-if (outFrEl) outFrEl.textContent = frText || "(Contrôle FR indisponible pour le moment)";
-
+      if (outFrEl) {
+        outFrEl.textContent = frText || "(Contrôle FR indisponible pour le moment)";
+      }
     } catch (e) {
-      console.error("[generate.js] FR interpret failed:", e);
+      console.warn("[generate.js] FR control failed:", e);
       if (outFrEl) outFrEl.textContent = "(Contrôle FR indisponible pour le moment)";
     }
   } catch (err) {
-    console.error("[generate.js] generate failed:", err);
+    console.error("[generate.js] generate error:", err);
     if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
   } finally {
     if (btn) {
@@ -178,20 +199,25 @@ if (outFrEl) outFrEl.textContent = frText || "(Contrôle FR indisponible pour le
   }
 }
 
-/* ---- Autocomplete langues ---- */
+/* -------------------- Autocomplete langues (languages.js / window.CL_LANG) -------------------- */
+
 function initLanguageAutocompleteGenerate() {
   const labelInput = document.getElementById("genLanguageLabel");
-  const codeInput  = document.getElementById("genLanguageCode");
+  const codeInput = document.getElementById("genLanguageCode");
   const suggestBox = document.getElementById("genLangSuggest");
 
   if (!labelInput || !codeInput || !suggestBox) return;
-  if (!window.CL_LANG) {
-    console.warn("[generate.js] window.CL_LANG absent → languages.js pas chargé ?");
+
+  if (!window.CL_LANG || typeof window.CL_LANG.searchLanguages !== "function") {
+    console.warn("[generate.js] window.CL_LANG absent → autocomplete désactivé");
     return;
   }
 
-  // default
-  const def = window.CL_LANG.getLanguageByCode(codeInput.value) || window.CL_LANG.getLanguages()[0];
+  // Default
+  const def =
+    window.CL_LANG.getLanguageByCode(codeInput.value) ||
+    window.CL_LANG.getLanguages()[0];
+
   if (def) {
     labelInput.value = def.name;
     codeInput.value = def.code;
@@ -203,12 +229,13 @@ function initLanguageAutocompleteGenerate() {
   }
 
   function render(query) {
-    const results = window.CL_LANG.searchLanguages((query || "").trim()).slice(0, 12);
+    const q = (query || "").trim();
+    const results = window.CL_LANG.searchLanguages(q).slice(0, 12);
+
     suggestBox.innerHTML = "";
 
     if (!results.length) {
-      suggestBox.innerHTML =
-        `<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun résultat.</div>`;
+      suggestBox.innerHTML = `<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun résultat.</div>`;
       suggestBox.style.display = "block";
       return;
     }
@@ -219,6 +246,7 @@ function initLanguageAutocompleteGenerate() {
       row.className = "btn btn-ghost";
       row.style.display = "flex";
       row.style.justifyContent = "space-between";
+      row.style.alignItems = "center";
       row.style.width = "100%";
       row.style.textAlign = "left";
       row.style.padding = "8px";
@@ -245,11 +273,39 @@ function initLanguageAutocompleteGenerate() {
   });
 }
 
+/* -------------------- Copy buttons -------------------- */
+
 function setupCopyButtons() {
-  document.getElementById("btnCopyFinal")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(document.getElementById("genOutput")?.textContent || "");
-  });
-  document.getElementById("btnCopyFR")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(document.getElementById("genOutputFR")?.textContent || "");
-  });
+  const btnFinal = document.getElementById("btnCopyFinal");
+  const btnFr = document.getElementById("btnCopyFR");
+
+  if (btnFinal) {
+    btnFinal.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(
+          document.getElementById("genOutput")?.textContent || ""
+        );
+        btnFinal.textContent = "Copié ✓";
+        setTimeout(() => (btnFinal.textContent = "Copier"), 1200);
+      } catch {
+        btnFinal.textContent = "Copie impossible";
+        setTimeout(() => (btnFinal.textContent = "Copier"), 1200);
+      }
+    });
+  }
+
+  if (btnFr) {
+    btnFr.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(
+          document.getElementById("genOutputFR")?.textContent || ""
+        );
+        btnFr.textContent = "Copié ✓";
+        setTimeout(() => (btnFr.textContent = "Copier"), 1200);
+      } catch {
+        btnFr.textContent = "Copie impossible";
+        setTimeout(() => (btnFr.textContent = "Copier"), 1200);
+      }
+    });
+  }
 }
