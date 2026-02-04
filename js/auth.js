@@ -1,26 +1,18 @@
 // js/auth.js
-// Gestion de l'authentification + header (espace public / espace utilisateur)
+// Auth + header public/auth + login/register
 
 console.log("[auth.js] loaded");
 
-// ---------- Helpers de stockage ----------
-
+// ---------- Storage helpers ----------
 function saveAuth(token, user) {
   if (token) localStorage.setItem("token", token);
-  if (user) {
-    try {
-      localStorage.setItem("user", JSON.stringify(user));
-    } catch {
-      // ignore
-    }
-  }
+  if (user) localStorage.setItem("user", JSON.stringify(user));
 }
 
 function getCurrentUser() {
-  const raw = localStorage.getItem("user");
-  if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
@@ -35,53 +27,33 @@ function isAuthenticated() {
   return !!localStorage.getItem("token");
 }
 
-function normalizeText(str) {
-  return (str || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-
-// ---------- Initialisation globale ----------
-
+// ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
-  try {
-    setupHeaderNavigation();
-  } catch (e) {
-    console.error("Erreur setupHeaderNavigation :", e);
-  }
-
-  try {
-    setupLoginForm();
-  } catch (e) {
-    console.error("Erreur setupLoginForm :", e);
-  }
-
-  try {
-    setupRegisterForm();
-  } catch (e) {
-    console.error("Erreur setupRegisterForm :", e);
-  }
+  setupHeaderNavigation();
+  setupLoginForm();
+  setupRegisterForm();
 });
 
-// ---------- Header : affichage espace public / espace utilisateur ----------
-
+// ---------- Header ----------
 function setupHeaderNavigation() {
   const user = getCurrentUser();
   const hasToken = isAuthenticated();
 
-  const publicEls = document.querySelectorAll(".nav-public-only");
-  const authEls = document.querySelectorAll(".nav-auth-only");
+  // Toggle menus
+  document.querySelectorAll(".nav-public-only").forEach((el) => {
+    el.style.display = hasToken ? "none" : "";
+  });
+  document.querySelectorAll(".nav-auth-only").forEach((el) => {
+    el.style.display = hasToken ? "" : "none";
+  });
 
-  publicEls.forEach((el) => (el.style.display = hasToken ? "none" : ""));
-  authEls.forEach((el) => (el.style.display = hasToken ? "" : "none"));
-
+  // Email
   const headerEmail = document.getElementById("headerUserEmail");
   if (headerEmail) {
-    headerEmail.textContent = hasToken && user && user.email ? user.email : "";
+    headerEmail.textContent = hasToken && user?.email ? user.email : "";
   }
 
+  // Logout
   const logoutBtn = document.getElementById("btnLogout");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
@@ -91,79 +63,32 @@ function setupHeaderNavigation() {
     });
   }
 
-  // IMPORTANT : ne PAS intercepter les boutons submit des formulaires
-  const clickable = Array.from(document.querySelectorAll("a, button"));
-
-  clickable.forEach((el) => {
-    const txt = normalizeText(el.textContent || "");
-    if (!txt) return;
-
-    if (el.id === "btnLogout") return;
-
-    // Ignore les boutons de formulaire (login/register etc.)
-    if (el.tagName === "BUTTON" && (el.type === "submit" || el.closest("form"))) {
-      return;
-    }
-
-    // Se connecter
-    if (txt.includes("se connecter")) {
-      el.addEventListener("click", (e) => {
+  // Optional: header buttons (public)
+  // Works only if you add these classes in HTML:
+  //  - .js-go-login  (link to login.html)
+  //  - .js-go-register (link to register.html)
+  document.querySelectorAll(".js-go-login").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (hasToken) {
         e.preventDefault();
-        if (hasToken) window.location.href = "dashboard.html";
-        else if (!location.pathname.endsWith("/login.html")) window.location.href = "login.html";
-      });
-      return;
-    }
+        window.location.href = "dashboard.html";
+      }
+      // sinon, laisse le href aller sur login.html
+    });
+  });
 
-    // Commencer / Essayer gratuitement
-    if (txt.includes("commencer gratuitement") || txt.includes("essayer gratuitement") || txt.includes("tester gratuitement")) {
-      el.addEventListener("click", (e) => {
+  document.querySelectorAll(".js-go-register").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (hasToken) {
         e.preventDefault();
-        window.location.href = hasToken ? "dashboard.html" : "register.html";
-      });
-      return;
-    }
-
-    // Tableau de bord
-    if (txt.includes("tableau de bord")) {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.location.href = hasToken ? "dashboard.html" : "login.html";
-      });
-      return;
-    }
-
-    // Rédaction
-    if (txt.includes("redaction")) {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.location.href = hasToken ? "generate.html" : "login.html";
-      });
-      return;
-    }
-
-    // Interprétation
-    if (txt.includes("interpretation")) {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.location.href = hasToken ? "interpret.html" : "login.html";
-      });
-      return;
-    }
-
-    // Mode accompagné
-    if (txt.includes("mode accompagne") || txt === "accompagne" || txt.includes("accompagne")) {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.location.href = hasToken ? "accompanied.html" : "login.html";
-      });
-      return;
-    }
+        window.location.href = "dashboard.html";
+      }
+      // sinon, laisse le href aller sur register.html
+    });
   });
 }
 
 // ---------- Login ----------
-
 function setupLoginForm() {
   const form = document.getElementById("loginForm");
   if (!form) return;
@@ -176,8 +101,8 @@ function setupLoginForm() {
     e.preventDefault();
     if (errorEl) errorEl.textContent = "";
 
-    const email = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value : "";
+    const email = emailInput?.value?.trim() || "";
+    const password = passwordInput?.value || "";
 
     if (!email || !password) {
       if (errorEl) errorEl.textContent = "Email et mot de passe requis.";
@@ -186,14 +111,16 @@ function setupLoginForm() {
 
     try {
       const data = await apiRequest("/auth/login", "POST", { email, password });
-      if (!data || !data.token || !data.user) {
+
+      if (!data?.token || !data?.user) {
         if (errorEl) errorEl.textContent = "Réponse inattendue du serveur.";
         return;
       }
+
       saveAuth(data.token, data.user);
       window.location.href = "dashboard.html";
     } catch (err) {
-      console.error("[auth.js] Erreur login :", err);
+      console.error("[auth.js] login error:", err);
       if (!errorEl) return;
       if (err.status === 401) errorEl.textContent = "Identifiants invalides.";
       else if (err.message === "Failed to fetch") errorEl.textContent = "Impossible de contacter le serveur.";
@@ -203,23 +130,22 @@ function setupLoginForm() {
 }
 
 // ---------- Register ----------
-
 function setupRegisterForm() {
   const form = document.getElementById("registerForm");
   if (!form) return;
 
   const emailInput = document.getElementById("registerEmail");
   const passwordInput = document.getElementById("registerPassword");
-  const languageSelect = document.getElementById("registerLanguage");
+  const languageInput = document.getElementById("registerLanguage");
   const errorEl = document.getElementById("registerError");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (errorEl) errorEl.textContent = "";
 
-    const email = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value : "";
-    const defaultLanguage = languageSelect ? languageSelect.value : "fr";
+    const email = emailInput?.value?.trim() || "";
+    const password = passwordInput?.value || "";
+    const defaultLanguage = languageInput?.value || "fr";
 
     if (!email || !password) {
       if (errorEl) errorEl.textContent = "Email et mot de passe requis.";
@@ -227,15 +153,21 @@ function setupRegisterForm() {
     }
 
     try {
-      const data = await apiRequest("/auth/register", "POST", { email, password, defaultLanguage });
-      if (!data || !data.token || !data.user) {
+      const data = await apiRequest("/auth/register", "POST", {
+        email,
+        password,
+        defaultLanguage,
+      });
+
+      if (!data?.token || !data?.user) {
         if (errorEl) errorEl.textContent = "Réponse inattendue du serveur.";
         return;
       }
+
       saveAuth(data.token, data.user);
       window.location.href = "dashboard.html";
     } catch (err) {
-      console.error("[auth.js] Erreur register :", err);
+      console.error("[auth.js] register error:", err);
       if (errorEl) errorEl.textContent = err.message || "Erreur lors de la création du compte.";
     }
   });
