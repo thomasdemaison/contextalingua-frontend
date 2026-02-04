@@ -1,172 +1,91 @@
-<!DOCTYPE html>
-<html lang="fr" class="page">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Rédaction – ContextaLingua</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="index.html" class="header-logo">
-          <span class="contexta">Contexta</span>
-          <span class="lingua">Lingua</span>
-        </a>
+<div class="grid grid-2" style="gap:12px; align-items:start;">
+  <!-- COLONNE GAUCHE -->
+  <div class="card">
+    <h2 style="margin-bottom:6px;">Camille — Rédaction</h2>
+    <p style="color:var(--text-muted); margin-bottom:14px;">
+      Une langue + une demande claire. Camille s’occupe du reste.
+    </p>
 
-        <nav class="main-nav">
-          <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-          <a href="tarifs.html" class="nav-link nav-public-only">Tarifs</a>
-          <a href="faq.html" class="nav-link nav-public-only">FAQ</a>
+    <form id="generateForm" autocomplete="off">
+      <!-- Langue cible (autocomplete) -->
+      <div class="form-field">
+        <span>Langue cible</span>
 
-          <a href="index.html" class="nav-link nav-auth-only">Accueil</a>
-          <a href="dashboard.html" class="nav-link nav-auth-only">Tableau de bord</a>
-          <a href="generate.html" class="nav-link nav-auth-only active">Rédaction</a>
-          <a href="interpret.html" class="nav-link nav-auth-only">Interprétation</a>
-          <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
-        </nav>
+        <!-- input + dropdown (on garde ton moteur CL_LANG, mais on supprime le gros panneau) -->
+        <div style="position:relative;">
+          <input
+            id="genLanguageLabel"
+            type="text"
+            placeholder="Ex : italien, allemand, arabe…"
+            autocomplete="off"
+          />
+          <input id="genLanguageCode" type="hidden" value="fr" />
 
-        <div class="header-actions">
-          <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-          <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
-
-          <button class="btn btn-ghost nav-public-only">Se connecter</button>
-          <button class="btn btn-primary nav-public-only">Commencer gratuitement</button>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="container hero-grid hero-grid-simple">
-          <div class="card">
-            <h2 style="margin-bottom: 8px; color: var(--text-strong);">
-              Camille — Mode rédaction
-            </h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
-              Donnez le contexte, l’objectif et éventuellement un texte brut. Camille rédige selon le format choisi.
-            </p>
-
-            <form id="generateForm" autocomplete="off">
-              <div class="form-field">
-                <span>Format du message</span>
-                <select id="genFormat">
-                  <option value="email">Email</option>
-                  <option value="courrier">Courrier formel</option>
-                  <option value="telephone">Script téléphonique</option>
-                </select>
-              </div>
-
-              <div class="form-field">
-                <span>Langue cible</span>
-
-                <!-- Picker -->
-                <div class="lang-picker" id="genLangPicker">
-                  <div class="lang-picker-input">
-                    <input
-                      id="genLanguageLabel"
-                      type="text"
-                      placeholder="Rechercher une langue (ex : allemand, chinois, arabe...)"
-                      autocomplete="off"
-                    />
-                    <!-- code interne, invisible -->
-                    <input id="genLanguageCode" type="hidden" value="fr" />
-                    <button id="genLangOpenBtn" type="button" class="btn btn-secondary">Choisir</button>
-                  </div>
-
-                  <div class="lang-picker-panel" id="genLangPanel">
-                    <div class="form-field" style="margin-bottom: 10px;">
-                      <span>Recherche</span>
-                      <input id="genLangSearch" type="text" placeholder="Tapez pour filtrer..." autocomplete="off" />
-                    </div>
-
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                      <span class="eyebrow light" style="margin:0;">Favoris</span>
-                      <span class="lang-picker-meta">Cliquez ☆ pour épingler</span>
-                    </div>
-                    <div id="genLangFavList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
-
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                      <span class="eyebrow light" style="margin:0;">Toutes les langues</span>
-                      <span class="lang-picker-meta">Sélection = 1 clic</span>
-                    </div>
-                    <div id="genLangAllList" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-field">
-                <span>Ton souhaité</span>
-                <input type="text" id="genTone" placeholder="Ex : professionnel, chaleureux, ferme mais poli…" />
-              </div>
-
-              <div class="form-field">
-                <span>Objectif du message</span>
-                <textarea
-                  id="genObjective"
-                  rows="3"
-                  placeholder="Ex : relancer un client en retard, confirmer un RDV, recadrer sans conflit…"
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>À qui écrivez-vous ?</span>
-                <textarea
-                  id="genRecipient"
-                  rows="2"
-                  placeholder="Ex : dirigeant de PME, client fidèle mais en retard, fournisseur…"
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>Texte de départ (optionnel)</span>
-                <textarea
-                  id="genDraft"
-                  rows="6"
-                  placeholder="Collez ici un texte à améliorer ou laissez vide pour une création complète."
-                ></textarea>
-              </div>
-
-              <div class="form-field">
-                <span>Contexte supplémentaire (optionnel)</span>
-                <textarea
-                  id="genContext"
-                  rows="3"
-                  placeholder="Historique, contraintes, éléments à éviter, détails de la situation…"
-                ></textarea>
-              </div>
-
-              <p
-                id="genError"
-                style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"
-              ></p>
-
-              <button id="genSubmit" type="submit" class="btn btn-primary">Lancer la rédaction</button>
-            </form>
-
-            <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">Proposition de Camille</h3>
-            <pre
-              id="genOutput"
-              style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617; border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"
-            ></pre>
-
-            <!-- Debug (superadmin only) injecté par JS -->
+          <!-- suggestions -->
+          <div id="genLangSuggest"
+               style="display:none; position:absolute; z-index:20; left:0; right:0; top:100%;
+                      background:rgba(2,6,23,.98); border:1px solid var(--border-subtle);
+                      border-radius:12px; padding:6px; margin-top:6px; max-height:240px; overflow:auto;">
           </div>
         </div>
-      </section>
-    </main>
 
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <span>© ContextaLingua</span>
-        <nav class="footer-nav">
-          <a href="contact.html">Contact</a>
-        </nav>
+        <small class="lang-picker-meta">
+          Tape un début de langue puis sélectionne.
+        </small>
       </div>
-    </footer>
 
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/languages.js"></script>
-    <script src="js/generate.js"></script>
-  </body>
-</html>
+      <!-- Format discret (optionnel) -->
+      <input id="genFormat" type="hidden" value="email" />
+
+      <!-- Demande unique -->
+      <div class="form-field">
+        <span>Votre demande</span>
+        <textarea
+          id="genRequest"
+          rows="10"
+          placeholder="Ex : Objectif : présenter nos bandes refendues. Ton : professionnel & enthousiaste. Destinataire : CEO. Contexte : qualités, épaisseurs, envoyer un catalogue. Texte de départ : (optionnel)…"
+        ></textarea>
+      </div>
+
+      <p id="genError" style="color:var(--danger); font-size:.9rem; min-height:1.2em;"></p>
+
+      <button id="genSubmit" type="submit" class="btn btn-primary btn-full">Générer</button>
+    </form>
+  </div>
+
+  <!-- COLONNE DROITE : CONSEILS -->
+  <aside class="card info-card" style="padding:12px;">
+    <h3 style="margin-top:0;">Pour un résultat premium</h3>
+    <ul class="list-check" style="margin-bottom:0;">
+      <li><strong>Objectif</strong> : 1 phrase (ex : relancer / présenter / négocier).</li>
+      <li><strong>Destinataire</strong> : rôle + relation (client froid / partenaire / débiteur…).</li>
+      <li><strong>Ton</strong> : pro, ferme mais poli, chaleureux, etc.</li>
+      <li><strong>Contexte</strong> : 3 points max (contraintes, infos clés, à éviter).</li>
+      <li><strong>Texte de départ</strong> : colle-le si tu veux “améliorer” plutôt que créer.</li>
+    </ul>
+  </aside>
+</div>
+
+<!-- Résultats -->
+<div class="grid grid-2" style="gap:12px; margin-top:12px;">
+  <div class="card" style="padding:12px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <h3 style="margin:0;">Texte final</h3>
+      <button type="button" class="btn btn-ghost" id="btnCopyFinal">Copier</button>
+    </div>
+    <pre id="genOutput" style="white-space:pre-wrap; margin-top:10px; background:#020617;
+      border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
+  </div>
+
+  <div class="card" style="padding:12px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <h3 style="margin:0;">Traduction FR (contrôle)</h3>
+      <button type="button" class="btn btn-ghost" id="btnCopyFR">Copier</button>
+    </div>
+    <pre id="genOutputFR" style="white-space:pre-wrap; margin-top:10px; background:#020617;
+      border-radius:12px; padding:12px; border:1px solid var(--border-subtle); min-height:140px;"></pre>
+    <p style="margin-top:8px; color:var(--text-muted); font-size:.9rem;">
+      Pour vérifier exactement ce que vous envoyez.
+    </p>
+  </div>
+</div>
