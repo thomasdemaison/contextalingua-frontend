@@ -1,9 +1,7 @@
-// js/interpret.js (SECURE)
+// js/interpret.js
 // Page "Interprétation"
 // Endpoint backend : POST /api/ai/interpret
-// - Pas de prompt côté front
-// - Le front envoie uniquement { input, meta }
-// - Debug superadmin only : payload (OK)
+// Payload attendu (legacy) : { language, languageName, depth, textToInterpret, context }
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -12,26 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // header public/auth + logout
   try {
-    // Affichage header public/auth + logout
     if (typeof setupHeaderNavigation === "function") setupHeaderNavigation();
-  } catch {}
+  } catch (e) {
+    console.error("[interpret.js] setupHeaderNavigation error:", e);
+  }
 
   initInterpretLanguagePicker();
   setupInterpretPage();
 });
 
-/* -------------------- Helpers (langue UI) -------------------- */
-
-function getUserLanguageFallback() {
-  const nav = (navigator.language || "fr").toLowerCase();
-  if (nav.startsWith("fr")) return "fr";
-  if (nav.startsWith("en")) return "en";
-  if (nav.startsWith("es")) return "es";
-  return "fr";
-}
-
-/* -------------------- Rôles -------------------- */
+/* -------------------- Rôles (debug) -------------------- */
 
 function getUserSafe() {
   try {
@@ -40,7 +30,6 @@ function getUserSafe() {
     return null;
   }
 }
-
 function isSuperAdmin() {
   const u = getUserSafe();
   return !!(u && u.role === "superadmin");
@@ -119,9 +108,7 @@ function setInterpretSelectedLanguage(lang) {
     btn.style.borderColor = "rgba(148, 163, 184, 0.35)";
   });
 
-  const activeBtn = document.querySelector(
-    `.int-lang-pill[data-code="${lang.code}"]`
-  );
+  const activeBtn = document.querySelector(`.int-lang-pill[data-code="${lang.code}"]`);
   if (activeBtn) {
     activeBtn.classList.remove("btn-secondary");
     activeBtn.classList.add("btn-primary");
@@ -134,9 +121,7 @@ function renderInterpretLanguageGrid(filterText = "") {
   if (!grid) return;
 
   const q = normalize(filterText);
-  const items = q
-    ? LANGUAGES.filter((l) => normalize(l.name).includes(q))
-    : LANGUAGES;
+  const items = q ? LANGUAGES.filter((l) => normalize(l.name).includes(q)) : LANGUAGES;
 
   grid.innerHTML = "";
 
@@ -213,25 +198,8 @@ function ensureInterpretDebugUI() {
   pre.style.border = "1px solid var(--border-subtle)";
   pre.style.minHeight = "60px";
 
-  const btnCopy = document.createElement("button");
-  btnCopy.type = "button";
-  btnCopy.className = "btn btn-secondary";
-  btnCopy.style.marginTop = "8px";
-  btnCopy.textContent = "Copier le payload";
-  btnCopy.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(pre.textContent || "");
-      btnCopy.textContent = "Copié ✓";
-      setTimeout(() => (btnCopy.textContent = "Copier le payload"), 1200);
-    } catch {
-      btnCopy.textContent = "Copie impossible";
-      setTimeout(() => (btnCopy.textContent = "Copier le payload"), 1200);
-    }
-  });
-
   wrap.appendChild(title);
   wrap.appendChild(pre);
-  wrap.appendChild(btnCopy);
 
   outEl.parentElement.appendChild(wrap);
   return wrap;
@@ -252,18 +220,14 @@ function setupInterpretPage() {
     if (errorEl) errorEl.textContent = "";
     if (resultEl) resultEl.textContent = "";
 
-    const targetLangCode =
-      (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
-    const targetLangName =
-      (document.getElementById("intLanguageName")?.value || "Français").trim() ||
-      "Français";
-    const depth =
-      (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
+    const langCode = (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
+    const langName = (document.getElementById("intLanguageName")?.value || "Français").trim() || "Français";
+    const depth = (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
 
-    const text = (document.getElementById("intText")?.value || "").trim();
+    const textToInterpret = (document.getElementById("intText")?.value || "").trim();
     const context = (document.getElementById("intContext")?.value || "").trim();
 
-    if (!text) {
+    if (!textToInterpret) {
       if (errorEl) errorEl.textContent = "Merci de coller le texte à analyser.";
       return;
     }
@@ -272,15 +236,13 @@ function setupInterpretPage() {
     submitBtn.textContent = "Camille analyse…";
 
     try {
-      // ✅ FORMAT SECURE ATTENDU : { input, meta }
+      // ✅ Payload attendu par ton backend (probable) => FIN du 400
       const payload = {
-        input: { text, context },
-        meta: {
-          targetLangCode,
-          targetLangName,
-          userLang: getUserLanguageFallback(),
-          depth, // quick | detailed
-        },
+        language: langCode,
+        languageName: langName,
+        depth,
+        textToInterpret,
+        context,
       };
 
       const wrap = ensureInterpretDebugUI();
@@ -291,15 +253,13 @@ function setupInterpretPage() {
 
       const data = await apiRequest("/ai/interpret", "POST", payload);
 
-      // ✅ parsing souple (compatible avec plusieurs formats backend)
+      // parsing souple
       const out = data?.result?.text ?? data?.result ?? data?.text ?? "";
       if (!out) throw new Error("Réponse inattendue du moteur d'interprétation.");
 
       if (resultEl) resultEl.textContent = out;
     } catch (err) {
-      if (errorEl)
-        errorEl.textContent =
-          err.message || "Une erreur est survenue lors de l’analyse.";
+      if (errorEl) errorEl.textContent = err.message || "Une erreur est survenue lors de l’analyse.";
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Interpréter le message";
