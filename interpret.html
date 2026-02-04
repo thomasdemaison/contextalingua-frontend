@@ -1,147 +1,121 @@
 <!DOCTYPE html>
 <html lang="fr" class="page">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Interprétation – ContextaLingua</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Interprétation – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
 
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="index.html" class="header-logo">
-          <span class="contexta">Contexta</span>
-          <span class="lingua">Lingua</span>
-        </a>
+<body class="page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="header-logo">
+        <span class="contexta">Contexta</span>
+        <span class="lingua">Lingua</span>
+      </a>
 
-        <nav class="main-nav">
-          <a href="produit.html" class="nav-link nav-public-only">Produit</a>
-          <a href="tarifs.html" class="nav-link nav-public-only">Tarifs</a>
-          <a href="faq.html" class="nav-link nav-public-only">FAQ</a>
+      <nav class="main-nav">
+        <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+        <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+        <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-          <a href="index.html" class="nav-link nav-auth-only">Accueil</a>
-          <a href="dashboard.html" class="nav-link nav-auth-only">Tableau de bord</a>
-          <a href="generate.html" class="nav-link nav-auth-only">Rédaction</a>
-          <a href="interpret.html" class="nav-link nav-auth-only active">Interprétation</a>
-          <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
-        </nav>
+        <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+        <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+        <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+        <a href="interpret.html"   class="nav-link nav-auth-only active">Interprétation</a>
+        <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+      </nav>
 
-        <div class="header-actions">
-          <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
-          <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-ghost nav-auth-only">Dashboard</a>
+        <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+        <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-          <button class="btn btn-ghost nav-public-only">Se connecter</button>
-          <button class="btn btn-primary nav-public-only">Commencer gratuitement</button>
-        </div>
+        <a href="login.html" class="btn btn-ghost nav-public-only js-go-login">Se connecter</a>
+        <a href="register.html" class="btn btn-primary nav-public-only js-go-register">Tester gratuitement</a>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main>
-      <section class="hero">
-        <div class="container hero-grid hero-grid-simple">
-          <div class="card">
-            <h2 style="margin-bottom: 8px; color: var(--text-strong);">
-              Camille — Interprétation (traduction contextuelle)
-            </h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
-              Collez un message reçu. Camille détecte automatiquement la langue d’origine et vous répond dans la langue choisie.
+  <main>
+    <section class="hero">
+      <div class="container hero-grid hero-grid-simple">
+        <div class="card">
+          <h2 style="margin-bottom: 8px; color: var(--text-strong);">
+            Camille — Interprétation (traduction contextuelle)
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">
+            Collez un message reçu. Camille vous répond dans la langue choisie.
+          </p>
+
+          <div class="form-field">
+            <span>Langue de la réponse</span>
+
+            <input
+              id="intLanguageSearch"
+              type="text"
+              placeholder="Tapez une langue (ex : Français, Chinois, Arabe…) ou cliquez sur un drapeau"
+              style="margin-bottom:10px;"
+            />
+
+            <input type="hidden" id="intLanguageCode" value="fr" />
+            <input type="hidden" id="intLanguageName" value="Français" />
+
+            <div
+              id="intLanguageGrid"
+              style="display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:10px;"
+            ></div>
+
+            <p style="margin-top:8px;color:var(--text-muted);font-size:0.85rem;">
+              Sélection actuelle : <strong id="intLanguageSelectedLabel">🇫🇷 Français</strong>
             </p>
-
-            <!-- ✅ Langue cible (UX) -->
-            <div class="form-field">
-              <span>Langue de la réponse</span>
-
-              <input
-                id="intLanguageSearch"
-                type="text"
-                placeholder="Tapez une langue (ex : Français, Chinois, Arabe…) ou cliquez sur un drapeau"
-                style="margin-bottom:10px;"
-              />
-
-              <input type="hidden" id="intLanguageCode" value="fr" />
-              <input type="hidden" id="intLanguageName" value="Français" />
-
-              <div
-                id="intLanguageGrid"
-                style="
-                  display:grid;
-                  grid-template-columns: repeat(4, minmax(0, 1fr));
-                  gap:10px;
-                "
-              ></div>
-
-              <p style="margin-top:8px;color:var(--text-muted);font-size:0.85rem;">
-                Sélection actuelle : <strong id="intLanguageSelectedLabel">🇫🇷 Français</strong>
-              </p>
-            </div>
-
-            <!-- ✅ Profondeur : rapide par défaut -->
-            <div class="form-field">
-              <span>Niveau de réponse</span>
-              <select id="intDepth">
-                <option value="quick" selected>Rapide (traduction contextuelle + micro-analyse)</option>
-                <option value="detailed">Approfondi (ton, intention, risques, pistes de réponse)</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <span>Texte à interpréter</span>
-              <textarea
-                id="intText"
-                rows="8"
-                placeholder="Collez le mail, le message ou l’extrait de document à analyser."
-              ></textarea>
-            </div>
-
-            <div class="form-field">
-              <span>Contexte (optionnel)</span>
-              <textarea
-                id="intContext"
-                rows="3"
-                placeholder="Relation avec la personne, situation, historique, enjeux…"
-              ></textarea>
-            </div>
-
-            <p
-              id="intError"
-              style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"
-            ></p>
-
-            <button id="intSubmit" class="btn btn-primary">Interpréter le message</button>
-
-            <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">
-              Réponse de Camille
-            </h3>
-
-            <pre
-              id="intOutput"
-              style="
-                white-space: pre-wrap;
-                font-size: 0.95rem;
-                color: var(--text-main);
-                background:#020617;
-                border-radius: 12px;
-                padding: 12px;
-                border: 1px solid var(--border-subtle);
-                min-height: 80px;
-              "
-            ></pre>
           </div>
+
+          <div class="form-field">
+            <span>Niveau de réponse</span>
+            <select id="intDepth">
+              <option value="quick" selected>Rapide (traduction + micro-analyse)</option>
+              <option value="detailed">Approfondi (ton, intention, risques, pistes de réponse)</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <span>Texte à interpréter</span>
+            <textarea id="intText" rows="8" placeholder="Collez le mail, le message ou l’extrait."></textarea>
+          </div>
+
+          <div class="form-field">
+            <span>Contexte (optionnel)</span>
+            <textarea id="intContext" rows="3" placeholder="Relation, historique, enjeux…"></textarea>
+          </div>
+
+          <p id="intError" style="color: var(--danger); font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px;"></p>
+
+          <button id="intSubmit" class="btn btn-primary">Interpréter le message</button>
+
+          <h3 style="margin-top: 22px; margin-bottom: 6px; color: var(--text-strong);">
+            Réponse de Camille
+          </h3>
+
+          <pre id="intOutput" style="white-space: pre-wrap; font-size: 0.95rem; color: var(--text-main); background:#020617;
+            border-radius: 12px; padding: 12px; border: 1px solid var(--border-subtle); min-height: 80px;"></pre>
         </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <span>© ContextaLingua</span>
-        <nav class="footer-nav">
-          <a href="contact.html">Contact</a>
-        </nav>
       </div>
-    </footer>
+    </section>
+  </main>
 
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/interpret.js"></script>
-  </body>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© ContextaLingua</span>
+      <nav class="footer-nav">
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/interpret.js"></script>
+</body>
 </html>
