@@ -129,9 +129,11 @@ async function runGenerate() {
         textToInterpret: text,
         context: "",
         
-console.log("[generate.js] interpret FR raw response:", frData);
-      });
 
+      });
+console.log("[generate.js] interpret FR raw response:", frData);
+
+      
       const frCandidate =
   frData?.result?.text ??
   frData?.result ??
