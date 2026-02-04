@@ -122,15 +122,45 @@ async function runGenerate() {
 
     try {
       const frData = await apiRequest("/ai/interpret", "POST", {
+        
         language: "fr",
         languageName: "Français",
         depth: "quick",
         textToInterpret: text,
         context: "",
+        
+console.log("[generate.js] interpret FR raw response:", frData);
       });
 
-      const frText = frData?.result?.text ?? frData?.result ?? frData?.text ?? "";
-      if (outFrEl) outFrEl.textContent = frText || "(Contrôle FR indisponible pour le moment)";
+      const frCandidate =
+  frData?.result?.text ??
+  frData?.result ??
+  frData?.text ??
+  frData?.data?.text ??
+  frData?.output ??
+  frData?.message ??
+  frData;
+
+let frText = "";
+
+// si c'est déjà une string
+if (typeof frCandidate === "string") {
+  frText = frCandidate;
+}
+// si c'est un objet (ton cas -> [object Object])
+else if (frCandidate && typeof frCandidate === "object") {
+  // cas fréquent: { text: "..." }
+  if (typeof frCandidate.text === "string") frText = frCandidate.text;
+  else if (typeof frCandidate.translation === "string") frText = frCandidate.translation;
+  else if (typeof frCandidate.content === "string") frText = frCandidate.content;
+  else {
+    // fallback lisible : stringify
+    frText = JSON.stringify(frCandidate, null, 2);
+  }
+}
+
+if (outFrEl) outFrEl.textContent = frText || "(Contrôle FR indisponible pour le moment)";
+
     } catch (e) {
       console.error("[generate.js] FR interpret failed:", e);
       if (outFrEl) outFrEl.textContent = "(Contrôle FR indisponible pour le moment)";
