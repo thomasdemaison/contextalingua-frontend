@@ -111,20 +111,15 @@ async function runGenerate() {
     if (outFrEl) outFrEl.textContent = "Traduction FR en cours…";
     try {
       const frData = await apiRequest("/ai/interpret", "POST", {
-        input: { text },
-        meta: {
-          sourceLangCode: langCode,
-          sourceLangName: langLabel,
-          targetLangCode: "fr",
-          targetLangName: "Français",
-          userLang: "fr",
-          mode: "translate",
-        },
-      });
-      const frText = frData?.result?.text ?? frData?.result ?? frData?.text ?? "";
-      outFrEl.textContent = frText || "(Contrôle FR indisponible)";
-    } catch {
-      if (outFrEl) outFrEl.textContent = "(Contrôle FR indisponible)";
+  language: "fr",
+  languageName: "Français",
+  depth: "quick",
+  textToInterpret: text,
+  context: "",
+});
+const frText = frData?.result?.text ?? frData?.result ?? frData?.text ?? "";
+outFrEl.textContent = frText || "(Contrôle FR indisponible pour le moment)";
+
     }
 
   } catch (err) {
