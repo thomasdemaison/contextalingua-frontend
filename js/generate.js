@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setupHeaderNavigation();
   } catch {}
 
-  initLanguagePickerGenerate();
+  initLanguageAutocompleteGenerate();
+  setupCopyButtons();
   attachGenerateHandlers();
 });
 
@@ -127,107 +128,171 @@ async function runGenerate() {
 
 /* ---------------- Language Picker (Generate) ---------------- */
 
-function initLanguagePickerGenerate() {
-  const picker = document.getElementById("genLangPicker");
-  if (!picker || !window.CL_LANG) return;
-
+function initLanguageAutocompleteGenerate() {
   const labelInput = document.getElementById("genLanguageLabel");
-  const codeInput = document.getElementById("genLanguageCode");
-  const openBtn = document.getElementById("genLangOpenBtn");
-  const panel = document.getElementById("genLangPanel");
-  const search = document.getElementById("genLangSearch");
-  const favList = document.getElementById("genLangFavList");
-  const allList = document.getElementById("genLangAllList");
+  const codeInput  = document.getElementById("genLanguageCode");
+  const suggestBox = document.getElementById("genLangSuggest");
+  if (!labelInput || !codeInput || !suggestBox || !window.CL_LANG) return;
 
   // default
   const def = window.CL_LANG.getLanguageByCode(codeInput.value) || window.CL_LANG.getLanguages()[0];
-  labelInput.value = def ? def.name : "Français";
-  codeInput.value = def ? def.code : "fr";
-
-  function closePanel() {
-    panel.classList.remove("open");
-  }
-  function openPanel() {
-    panel.classList.add("open");
-    search.value = "";
-    render();
-    search.focus();
+  if (def) {
+    labelInput.value = def.name;
+    codeInput.value = def.code;
   }
 
-  openBtn.addEventListener("click", () => {
-    if (panel.classList.contains("open")) closePanel();
-    else openPanel();
-  });
+  function close() { suggestBox.style.display = "none"; suggestBox.innerHTML = ""; }
 
-  document.addEventListener("click", (e) => {
-    if (!panel.classList.contains("open")) return;
-    if (picker.contains(e.target)) return;
-    closePanel();
-  });
+  function render(query) {
+    const q = (query || "").trim();
+    const results = window.CL_LANG.searchLanguages(q).slice(0, 12);
 
-  function setLanguage(lang) {
-    labelInput.value = lang.name;
-    codeInput.value = lang.code;
-    closePanel();
-  }
-
-  function row(lang, isFav) {
-    const el = document.createElement("div");
-    el.className = "lang-picker-row";
-
-    const left = document.createElement("div");
-    left.className = "lang-picker-left";
-
-    const flag = document.createElement("div");
-    flag.className = "lang-picker-flag";
-    flag.textContent = lang.flag || "🏳️";
-
-    const name = document.createElement("div");
-    name.className = "lang-picker-name";
-    name.textContent = lang.name;
-
-    left.appendChild(flag);
-    left.appendChild(name);
-
-    const favBtn = document.createElement("button");
-    favBtn.type = "button";
-    favBtn.className = "lang-picker-fav" + (isFav ? " active" : "");
-    favBtn.textContent = isFav ? "★" : "☆";
-    favBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      window.CL_LANG.toggleFavorite(lang.code);
-      render();
-    });
-
-    el.appendChild(left);
-    el.appendChild(favBtn);
-
-    el.addEventListener("click", () => setLanguage(lang));
-    return el;
-  }
-
-  function render() {
-    const favCodes = window.CL_LANG.getFavorites();
-    const all = window.CL_LANG.searchLanguages(search.value);
-    const fav = favCodes
-      .map((c) => window.CL_LANG.getLanguageByCode(c))
-      .filter(Boolean);
-
-    favList.innerHTML = "";
-    allList.innerHTML = "";
-
-    if (!fav.length) {
-      const empty = document.createElement("div");
-      empty.style.color = "var(--text-muted)";
-      empty.style.fontSize = "0.9rem";
-      empty.textContent = "Aucun favori pour l’instant.";
-      favList.appendChild(empty);
-    } else {
-      fav.forEach((l) => favList.appendChild(row(l, true)));
+    suggestBox.innerHTML = "";
+    if (!results.length) {
+      suggestBox.innerHTML = `<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun résultat.</div>`;
+      suggestBox.style.display = "block";
+      return;
     }
 
-    all.forEach((l) => allList.appendChild(row(l, favCodes.includes(l.code))));
+    results.forEach((lang) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "btn btn-ghost";
+      row.style.display = "flex";
+      row.style.justifyContent = "space-between";
+      row.style.width = "100%";
+      row.style.textAlign = "left";
+      row.style.padding = "8px";
+      row.innerHTML = `<span>${lang.flag || "🏳️"} ${lang.name}</span><span style="opacity:.7;">${lang.code}</span>`;
+
+      row.addEventListener("click", () => {
+        labelInput.value = lang.name;
+        codeInput.value = lang.code;
+        close();
+      });
+
+      suggestBox.appendChild(row);
+    });
+
+    suggestBox.style.display = "block";
   }
 
-  search.addEventListener("input", render);
+  labelInput.addEventListener("input", () => render(labelInput.value));
+  labelInput.addEventListener("focus", () => render(labelInput.value));
+
+  document.addEventListener("click", (e) => {
+    if (e.target === labelInput || suggestBox.contains(e.target)) return;
+    close();
+  });
+}
+function parseRequest(text) {
+  const t = (text || "").trim();
+  const out = { tone: "", objective: "", recipient: "", context: "", draft: "" };
+  if (!t) return out;
+
+  // Si l'utilisateur suit le format "Clé : valeur"
+  const lines = t.split("\n").map(l => l.trim()).filter(Boolean);
+
+  const pick = (prefixes) => {
+    const idx = lines.findIndex(l => prefixes.some(p => l.toLowerCase().startsWith(p)));
+    if (idx === -1) return "";
+    const line = lines[idx];
+    const val = line.split(":").slice(1).join(":").trim();
+    return val;
+  };
+
+  out.tone      = pick(["ton:", "tone:"]);
+  out.objective = pick(["objectif:", "objective:"]);
+  out.recipient = pick(["destinataire:", "a qui:", "à qui:", "recipient:"]);
+  out.context   = pick(["contexte:", "context:"]);
+  out.draft     = pick(["texte:", "texte de depart:", "texte de départ:", "draft:"]);
+
+  // Fallback : si rien n’est structuré → tout en contexte
+  const anyStructured = out.tone || out.objective || out.recipient || out.context || out.draft;
+  if (!anyStructured) {
+    out.context = t;
+  }
+
+  return out;
+}
+async function runGenerate() {
+  const btn = document.getElementById("genSubmit");
+  const errorEl = document.getElementById("genError");
+  const outEl = document.getElementById("genOutput");
+  const outFrEl = document.getElementById("genOutputFR");
+
+  if (errorEl) errorEl.textContent = "";
+  if (outEl) outEl.textContent = "";
+  if (outFrEl) outFrEl.textContent = "";
+
+  const requestText = (document.getElementById("genRequest")?.value || "").trim();
+  const parsed = parseRequest(requestText);
+
+  const langCode = (document.getElementById("genLanguageCode")?.value || "fr").trim() || "fr";
+  const langLabel = (document.getElementById("genLanguageLabel")?.value || "Français").trim() || "Français";
+  const format = (document.getElementById("genFormat")?.value || "email").trim() || "email";
+  const userLang = getUserLanguageFallback();
+
+  const payload = {
+    input: {
+      tone: parsed.tone,
+      objective: parsed.objective,
+      recipient: parsed.recipient,
+      draft: parsed.draft,
+      context: parsed.context,
+    },
+    meta: {
+      format,
+      targetLangName: langLabel,
+      targetLangCode: langCode,
+      userLang,
+    },
+  };
+
+  const originalLabel = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "Camille rédige…"; }
+
+  try {
+    const data = await apiRequest("/ai/generate", "POST", payload);
+    const text = data?.result?.text ?? data?.result ?? data?.text ?? "";
+    if (!text) throw new Error("Réponse inattendue du moteur de génération.");
+
+    if (outEl) outEl.textContent = text;
+
+    // Traduction FR de contrôle (si endpoint dispo)
+    if (outFrEl) outFrEl.textContent = "Traduction FR en cours…";
+
+    try {
+      // ✅ adapte si ton endpoint s'appelle autrement
+      const frData = await apiRequest("/ai/interpret", "POST", {
+        input: { text }, // ou inputText selon ton API
+        meta: {
+          sourceLangCode: langCode,
+          sourceLangName: langLabel,
+          targetLangCode: "fr",
+          targetLangName: "Français",
+          userLang: "fr",
+          mode: "translate", // si tu gères un mode
+        },
+      });
+
+      const frText = frData?.result?.text ?? frData?.result ?? frData?.text ?? "";
+      outFrEl.textContent = frText || "(Traduction indisponible pour le moment)";
+    } catch (e) {
+      // Si endpoint pas prêt, on ne bloque pas l’utilisateur
+      outFrEl.textContent = "(Contrôle FR indisponible pour le moment)";
+    }
+  } catch (err) {
+    if (errorEl) errorEl.textContent = err.message || "Erreur lors de la génération.";
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = originalLabel || "Générer"; }
+  }
+}
+function setupCopyButtons() {
+  document.getElementById("btnCopyFinal")?.addEventListener("click", () => {
+    navigator.clipboard.writeText(document.getElementById("genOutput")?.textContent || "");
+  });
+  document.getElementById("btnCopyFR")?.addEventListener("click", () => {
+    navigator.clipboard.writeText(document.getElementById("genOutputFR")?.textContent || "");
+  });
 }
