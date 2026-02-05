@@ -2,7 +2,7 @@
 // - FR par défaut
 // - Checkbox => choisir une autre langue via autocomplete (CL_LANG) comme generate
 // - Parse anti JSON affiché : extrait translation + detected language + analysis
-// - Lecture rapide : Ton / Intention / Point d’attention
+// - Lecture rapide : Langue d'origine / Ton / Intention / Point d’attention
 // - Option Répondre : /ai/generate + /ai/interpret (FR contrôle)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Defaults UI
   setSelectedLanguageUI("fr", "Français", "🇫🇷");
+  setText("intQuickLang", "(non détectée)");
 });
 
 /* ---------------- Helpers ---------------- */
@@ -374,6 +375,7 @@ async function runInterpret() {
   setText("intTranslation", "");
   setText("intMeta", "");
   setText("intDetectedLangLabel", "—");
+  setText("intQuickLang", "(non détectée)");
   fillQuickFromInsights([]);
 
   const btn = document.getElementById("intSubmit");
@@ -421,10 +423,13 @@ async function runInterpret() {
       chosenTargetLangName: payload.languageName,
     };
 
+    // ✅ Nouvelle bulle : langue d'origine
+    setText("intQuickLang", parsed.detectedLanguage || "(non détectée)");
+
     // 1) Traduction texte (pas JSON)
     setText("intTranslation", parsed.translationText || "(traduction vide)");
 
-    // 2) Langue détectée
+    // 2) Langue détectée (gauche)
     setText("intDetectedLangLabel", parsed.detectedLanguage || "auto");
 
     // 3) Bulles à droite
