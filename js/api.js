@@ -8,18 +8,18 @@
 
 (function () {
   function guessDefaultApiBase() {
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    return "http://localhost:4000/api";
-  }
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      return "http://localhost:4000/api";
+    }
 
-  // Si tu es sur contextalingua.fr, API sur api.contextalingua.fr
-  if (location.hostname.endsWith("contextalingua.fr")) {
+    // Si tu es sur contextalingua.fr, API sur api.contextalingua.fr
+    if (location.hostname.endsWith("contextalingua.fr")) {
+      return "https://api.contextalingua.fr/api";
+    }
+
+    // fallback générique
     return "https://api.contextalingua.fr/api";
   }
-
-  // fallback générique
-  return "https://api.contextalingua.fr/api";
-}
 
   const fromWindow = typeof window !== "undefined" ? window.API_BASE_URL : null;
   const fromStorage = (() => {
