@@ -1,9 +1,13 @@
-// js/interpret.js (MINIMAL + PREMIUM + ROBUSTE)
-// - Traduction FR par défaut
-// - Option checkbox => choisir une autre langue via autocomplete (CL_LANG)
-// - Parsing anti "[object Object]"
-// - Option "Répondre" (dépliable) : génère une réponse + FR contrôle
-//   => utilise /ai/generate + /ai/interpret en fallback si besoin
+// js/interpret.js (SECURE + PREMIUM)
+// - POST /api/ai/interpret : { language, languageName, depth, textToInterpret, context }
+// - Traduction en FR par défaut
+// - Affiche langue détectée
+// - Lecture rapide : parsing tolérant (plus de "(non détecté)" si dispo)
+// - Répondre : génère dans la langue d'origine détectée + FR de contrôle
+
+console.log("[interpret.js] loaded");
+
+let LAST_DETECTED = { code: null, name: null }; // langue d'origine détectée
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -12,457 +16,400 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Header (auth/public + logout)
+  // header (menus + logout)
   try {
     if (typeof setupHeaderNavigation === "function") setupHeaderNavigation();
   } catch (e) {
     console.error("[interpret.js] setupHeaderNavigation error:", e);
   }
 
-  initTargetLangUX();
-  initLanguageAutocompleteInterpret();
+  initInterpretLanguagePicker();
   setupCopyButtons();
-  attachInterpretHandlers();
-  attachReplyHandlers();
+  setupInterpretSubmit();
+  setupReplySubmit();
 });
 
-/* ---------------- Helpers ---------------- */
+/* -------------------- Langues (UI) -------------------- */
 
-function getUserLanguageFallback() {
-  const nav = (navigator.language || "fr").toLowerCase();
-  if (nav.startsWith("fr")) return "fr";
-  if (nav.startsWith("en")) return "en";
-  if (nav.startsWith("es")) return "es";
-  return "fr";
+const LANGUAGES = [
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "en", name: "Anglais", flag: "🇬🇧" },
+  { code: "en-US", name: "Anglais (US)", flag: "🇺🇸" },
+  { code: "es", name: "Espagnol", flag: "🇪🇸" },
+  { code: "de", name: "Allemand", flag: "🇩🇪" },
+  { code: "it", name: "Italien", flag: "🇮🇹" },
+  { code: "pt", name: "Portugais", flag: "🇵🇹" },
+  { code: "pt-BR", name: "Portugais (Brésil)", flag: "🇧🇷" },
+  { code: "nl", name: "Néerlandais", flag: "🇳🇱" },
+  { code: "sv", name: "Suédois", flag: "🇸🇪" },
+  { code: "no", name: "Norvégien", flag: "🇳🇴" },
+  { code: "da", name: "Danois", flag: "🇩🇰" },
+  { code: "fi", name: "Finnois", flag: "🇫🇮" },
+  { code: "pl", name: "Polonais", flag: "🇵🇱" },
+  { code: "cs", name: "Tchèque", flag: "🇨🇿" },
+  { code: "sk", name: "Slovaque", flag: "🇸🇰" },
+  { code: "hu", name: "Hongrois", flag: "🇭🇺" },
+  { code: "ro", name: "Roumain", flag: "🇷🇴" },
+  { code: "bg", name: "Bulgare", flag: "🇧🇬" },
+  { code: "el", name: "Grec", flag: "🇬🇷" },
+  { code: "tr", name: "Turc", flag: "🇹🇷" },
+  { code: "ru", name: "Russe", flag: "🇷🇺" },
+  { code: "uk", name: "Ukrainien", flag: "🇺🇦" },
+  { code: "ar", name: "Arabe", flag: "🇸🇦" },
+  { code: "he", name: "Hébreu", flag: "🇮🇱" },
+  { code: "zh", name: "Chinois", flag: "🇨🇳" },
+  { code: "zh-TW", name: "Chinois (Traditionnel)", flag: "🇹🇼" },
+  { code: "ja", name: "Japonais", flag: "🇯🇵" },
+  { code: "ko", name: "Coréen", flag: "🇰🇷" },
+  { code: "hi", name: "Hindi", flag: "🇮🇳" },
+  { code: "th", name: "Thaï", flag: "🇹🇭" },
+  { code: "vi", name: "Vietnamien", flag: "🇻🇳" },
+  { code: "id", name: "Indonésien", flag: "🇮🇩" },
+];
+
+function normalize(str) {
+  return (str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
 }
 
-function setText(elId, value) {
-  const el = document.getElementById(elId);
+function findLanguageByName(input) {
+  const q = normalize(input);
+  if (!q) return null;
+  return (
+    LANGUAGES.find((l) => normalize(l.name) === q) ||
+    LANGUAGES.find((l) => normalize(l.name).includes(q)) ||
+    null
+  );
+}
+
+function setInterpretSelectedLanguage(lang) {
+  const codeEl = document.getElementById("intLanguageCode");
+  const nameEl = document.getElementById("intLanguageName");
+  const labelEl = document.getElementById("intLanguageSelectedLabel");
+
+  if (codeEl) codeEl.value = lang.code;
+  if (nameEl) nameEl.value = lang.name;
+  if (labelEl) labelEl.textContent = `${lang.flag} ${lang.name}`;
+
+  document.querySelectorAll(".int-lang-pill").forEach((btn) => {
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-secondary");
+    btn.style.borderColor = "rgba(148, 163, 184, 0.35)";
+  });
+
+  const activeBtn = document.querySelector(`.int-lang-pill[data-code="${lang.code}"]`);
+  if (activeBtn) {
+    activeBtn.classList.remove("btn-secondary");
+    activeBtn.classList.add("btn-primary");
+    activeBtn.style.borderColor = "rgba(37, 99, 235, 0.8)";
+  }
+}
+
+function renderInterpretLanguageGrid(filterText = "") {
+  const grid = document.getElementById("intLanguageGrid");
+  if (!grid) return;
+
+  const q = normalize(filterText);
+  const items = q ? LANGUAGES.filter((l) => normalize(l.name).includes(q)) : LANGUAGES;
+
+  grid.innerHTML = "";
+
+  items.slice(0, 40).forEach((lang) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-secondary int-lang-pill";
+    btn.dataset.code = lang.code;
+    btn.style.justifyContent = "flex-start";
+    btn.style.gap = "10px";
+    btn.style.padding = "10px 12px";
+    btn.style.borderRadius = "14px";
+
+    const left = document.createElement("span");
+    left.textContent = lang.flag;
+    left.style.fontSize = "1.05rem";
+
+    const right = document.createElement("span");
+    right.textContent = lang.name;
+    right.style.fontSize = "0.92rem";
+
+    btn.appendChild(left);
+    btn.appendChild(right);
+
+    btn.addEventListener("click", () => setInterpretSelectedLanguage(lang));
+    grid.appendChild(btn);
+  });
+}
+
+function initInterpretLanguagePicker() {
+  const search = document.getElementById("intLanguageSearch");
+  renderInterpretLanguageGrid("");
+
+  const defaultLang = LANGUAGES.find((l) => l.code === "fr") || LANGUAGES[0];
+  setInterpretSelectedLanguage(defaultLang);
+
+  if (search) {
+    search.addEventListener("input", () => {
+      renderInterpretLanguageGrid(search.value);
+      const found = findLanguageByName(search.value);
+      if (found) setInterpretSelectedLanguage(found);
+    });
+  }
+}
+
+/* -------------------- Helpers affichage -------------------- */
+
+function setText(id, value, fallback = "") {
+  const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = value || "";
+  el.textContent = (value ?? "") || fallback;
 }
 
-function safeString(v) {
-  if (v == null) return "";
+function asText(v) {
   if (typeof v === "string") return v;
-  // Cas fréquent: {text:"..."} / {translation:"..."} / objets divers
-  if (typeof v === "object") {
-    if (typeof v.text === "string") return v.text;
-    if (typeof v.translation === "string") return v.translation;
-    if (typeof v.translatedText === "string") return v.translatedText;
-    if (typeof v.output === "string") return v.output;
-    try {
-      return JSON.stringify(v, null, 2);
-    } catch {
-      return String(v);
+  if (v == null) return "";
+  // évite [object Object]
+  try {
+    return JSON.stringify(v, null, 2);
+  } catch {
+    return String(v);
+  }
+}
+
+function pick(obj, paths) {
+  for (const p of paths) {
+    const parts = p.split(".");
+    let cur = obj;
+    let ok = true;
+    for (const part of parts) {
+      if (!cur || typeof cur !== "object" || !(part in cur)) {
+        ok = false;
+        break;
+      }
+      cur = cur[part];
     }
+    if (ok && cur != null) return cur;
   }
-  return String(v);
+  return null;
 }
 
-/**
- * Parse la réponse /ai/interpret (robuste).
- * On essaie de récupérer :
- * - translationText (string)
- * - sourceLangCode / sourceLangName (si présents)
- * - insights (liste de bullets)
- */
-function parseInterpretResponse(data) {
-  const ok = data?.ok;
-  const result = data?.result ?? data;
-
-  // Texte de traduction (plusieurs formats possibles)
-  const translationText =
-    (typeof result?.text === "string" && result.text) ||
-    (typeof result?.translation === "string" && result.translation) ||
-    (typeof result?.translatedText === "string" && result.translatedText) ||
-    (typeof data?.text === "string" && data.text) ||
-    safeString(result?.text ?? result?.translation ?? result?.translatedText ?? "");
-
-  // Langue d'origine si backend la renvoie
-  const sourceLangCode =
-    result?.sourceLangCode ||
-    result?.detectedLangCode ||
-    result?.languageDetected ||
-    result?.source_language ||
-    "";
-  const sourceLangName =
-    result?.sourceLangName ||
-    result?.detectedLangName ||
-    result?.languageDetectedName ||
-    result?.source_language_name ||
-    "";
-
-  // Insights : on essaye plusieurs champs
-  let insights = [];
-  const cand =
-    result?.insights ||
-    result?.analysis ||
-    result?.bullets ||
-    result?.summary ||
-    null;
-
-  // Si le backend renvoie déjà un tableau
-  if (Array.isArray(cand)) {
-    insights = cand.map((x) => safeString(x)).filter(Boolean);
-  } else if (cand && typeof cand === "object") {
-    // Cas objet: { tone:"", intent:"", risks:"" ... }
-    const maybe = [];
-    for (const k of ["intent", "tone", "risks", "risque", "ask", "request", "nextStep", "next_step"]) {
-      if (cand[k]) maybe.push(`${labelize(k)} : ${safeString(cand[k])}`);
-    }
-    // fallback : on prend 3 clés max
-    if (!maybe.length) {
-      const keys = Object.keys(cand).slice(0, 3);
-      keys.forEach((k) => maybe.push(`${labelize(k)} : ${safeString(cand[k])}`));
-    }
-    insights = maybe.filter(Boolean);
-  } else if (typeof cand === "string") {
-    // un bloc texte → on split léger
-    insights = cand
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean)
-      .slice(0, 6);
-  }
-
-  // default si rien
-  if (!insights.length) {
-    insights = [
-      "Ton : (non détecté)",
-      "Intention : (non détectée)",
-      "Point d’attention : (non détecté)",
-    ];
-  }
-
-  return {
-    ok: ok !== false,
-    translationText,
-    sourceLangCode,
-    sourceLangName,
-    insights,
-    creditBalance: data?.creditBalance,
-  };
+function updateDetectedLanguageLabel(code, name) {
+  const pretty = code && name ? `${code} — ${name}` : code ? code : "—";
+  setText("intDetectedLangLabel", pretty, "—");
 }
 
-function labelize(k) {
-  const map = {
-    intent: "Intention",
-    tone: "Ton",
-    risks: "Points d’attention",
-    risque: "Points d’attention",
-    ask: "Demande",
-    request: "Demande",
-    nextStep: "Prochaine étape",
-    next_step: "Prochaine étape",
-  };
-  return map[k] || k;
-}
+/* -------------------- Interpret submit -------------------- */
 
-function renderInsights(items) {
-  const wrap = document.getElementById("intInsights");
-  if (!wrap) return;
+function setupInterpretSubmit() {
+  const btn = document.getElementById("intSubmit");
+  if (!btn) return;
 
-  wrap.innerHTML = "";
-  items.slice(0, 6).forEach((txt) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.style.padding = "10px 12px";
-    div.style.borderRadius = "14px";
-    div.style.border = "1px solid var(--border-subtle)";
-    div.style.background = "rgba(2,6,23,.6)";
-    div.textContent = txt;
-    wrap.appendChild(div);
-  });
-}
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-/* ---------------- UX : langue cible optionnelle ---------------- */
+    setText("intError", "");
+    setText("intTranslation", "");
+    setText("intQuickTone", "(non détecté)");
+    setText("intQuickIntent", "(non détectée)");
+    setText("intQuickRisk", "(non détecté)");
+    updateDetectedLanguageLabel(null, null);
 
-function initTargetLangUX() {
-  const toggle = document.getElementById("intToggleTargetLang");
-  const wrap = document.getElementById("intTargetLangWrap");
-  const label = document.getElementById("intTargetLanguageLabel");
-  const code = document.getElementById("intTargetLanguageCode");
+    const langCode = (document.getElementById("intLanguageCode")?.value || "fr").trim() || "fr";
+    const langName = (document.getElementById("intLanguageName")?.value || "Français").trim() || "Français";
+    const depth = (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
 
-  if (!toggle || !wrap || !label || !code) return;
+    const textToInterpret = (document.getElementById("intText")?.value || "").trim();
+    const context = (document.getElementById("intContext")?.value || "").trim();
 
-  // default = FR
-  label.value = "Français";
-  code.value = "fr";
-
-  toggle.addEventListener("change", () => {
-    wrap.style.display = toggle.checked ? "" : "none";
-    if (!toggle.checked) {
-      label.value = "Français";
-      code.value = "fr";
-    } else {
-      // focus
-      setTimeout(() => label.focus(), 0);
-    }
-  });
-}
-
-/* ---------------- Autocomplete langues (CL_LANG) ---------------- */
-
-function initLanguageAutocompleteInterpret() {
-  const labelInput = document.getElementById("intTargetLanguageLabel");
-  const codeInput = document.getElementById("intTargetLanguageCode");
-  const suggestBox = document.getElementById("intLangSuggest");
-
-  if (!labelInput || !codeInput || !suggestBox || !window.CL_LANG) return;
-
-  const def = window.CL_LANG.getLanguageByCode(codeInput.value) || window.CL_LANG.getLanguages()[0];
-  if (def) {
-    labelInput.value = def.name;
-    codeInput.value = def.code;
-  }
-
-  function close() {
-    suggestBox.style.display = "none";
-    suggestBox.innerHTML = "";
-  }
-
-  function render(query) {
-    const results = window.CL_LANG.searchLanguages((query || "").trim()).slice(0, 12);
-    suggestBox.innerHTML = "";
-
-    if (!results.length) {
-      suggestBox.innerHTML = `<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun résultat.</div>`;
-      suggestBox.style.display = "block";
+    if (!textToInterpret) {
+      setText("intError", "Merci de coller le texte à analyser.");
       return;
     }
 
-    results.forEach((lang) => {
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "btn btn-ghost";
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.width = "100%";
-      row.style.textAlign = "left";
-      row.style.padding = "8px";
-      row.innerHTML = `<span>${lang.flag || "🏳️"} ${lang.name}</span><span style="opacity:.7;">${lang.code}</span>`;
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Camille analyse…";
 
-      row.addEventListener("click", () => {
-        labelInput.value = lang.name;
-        codeInput.value = lang.code;
-        close();
-      });
+    try {
+      const payload = {
+        language: langCode,
+        languageName: langName,
+        depth,
+        textToInterpret,
+        context,
+      };
 
-      suggestBox.appendChild(row);
-    });
+      const data = await apiRequest("/ai/interpret", "POST", payload);
 
-    suggestBox.style.display = "block";
-  }
+      // ✅ parsing souple
+      const result = data?.result ?? data;
 
-  labelInput.addEventListener("input", () => render(labelInput.value));
-  labelInput.addEventListener("focus", () => render(labelInput.value));
+      // 1) Texte traduit / réponse principale
+      const translated =
+        pick(result, ["text", "translation", "translatedText", "output.text", "result.text"]) ||
+        pick(data, ["result.text", "text"]);
+      if (translated) setText("intTranslation", asText(translated));
+      else setText("intTranslation", "(Aucune traduction retournée)");
 
-  document.addEventListener("click", (e) => {
-    if (e.target === labelInput || suggestBox.contains(e.target)) return;
-    close();
-  });
-}
+      // 2) Langue détectée (origine)
+      const detCode =
+        pick(result, [
+          "detectedLanguage.code",
+          "detected.languageCode",
+          "sourceLanguage.code",
+          "sourceLang.code",
+          "meta.sourceLangCode",
+          "meta.detectedLangCode",
+        ]) || null;
 
-/* ---------------- Buttons ---------------- */
+      const detName =
+        pick(result, [
+          "detectedLanguage.name",
+          "detected.languageName",
+          "sourceLanguage.name",
+          "sourceLang.name",
+          "meta.sourceLangName",
+          "meta.detectedLangName",
+        ]) || null;
 
-function setupCopyButtons() {
-  document.getElementById("btnCopyTranslation")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(document.getElementById("intTranslation")?.textContent || "");
-  });
+      LAST_DETECTED = { code: detCode, name: detName };
+      updateDetectedLanguageLabel(detCode, detName);
 
-  document.getElementById("btnCopyReply")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(document.getElementById("intReply")?.textContent || "");
-  });
+      // 3) Lecture rapide (ton / intention / risque)
+      const tone =
+        pick(result, ["quickRead.tone", "quick.tone", "analysis.tone", "summary.tone"]) || null;
+      const intent =
+        pick(result, ["quickRead.intent", "quick.intent", "analysis.intent", "summary.intent"]) || null;
+      const risk =
+        pick(result, ["quickRead.risk", "quickRead.warning", "analysis.risk", "analysis.warning", "summary.warning"]) ||
+        null;
 
-  document.getElementById("btnCopyReplyFR")?.addEventListener("click", () => {
-    navigator.clipboard.writeText(document.getElementById("intReplyFR")?.textContent || "");
-  });
-}
-
-/* ---------------- Interpréter ---------------- */
-
-function attachInterpretHandlers() {
-  const form = document.getElementById("interpretForm");
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    await runInterpret();
-  });
-}
-
-async function runInterpret() {
-  setText("intError", "");
-  setText("intTranslation", "");
-  setText("intMeta", "");
-  renderInsights([]);
-
-  const btn = document.getElementById("intSubmit");
-  const originalLabel = btn ? btn.textContent : "";
-
-  const textToInterpret = (document.getElementById("intText")?.value || "").trim();
-  const context = (document.getElementById("intContext")?.value || "").trim();
-
-  if (!textToInterpret) {
-    setText("intError", "Collez un texte à interpréter.");
-    return;
-  }
-
-  // Par défaut FR, sinon la langue choisie
-  const toggle = document.getElementById("intToggleTargetLang");
-  const targetLangCode = ((document.getElementById("intTargetLanguageCode")?.value || "fr").trim() || "fr");
-  const targetLangName = ((document.getElementById("intTargetLanguageLabel")?.value || "Français").trim() || "Français");
-  const forceTarget = !!(toggle && toggle.checked);
-
-  // Payload legacy attendu par TON backend (celui qui marche déjà dans generate)
-  // IMPORTANT : language = langue de réponse/traduction
-  const payload = {
-    language: forceTarget ? targetLangCode : "fr",
-    languageName: forceTarget ? targetLangName : "Français",
-    depth: "quick",
-    textToInterpret,
-    context,
-    userLang: getUserLanguageFallback(),
-  };
-
-  try {
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "Camille analyse…";
-    }
-
-    const data = await apiRequest("/ai/interpret", "POST", payload);
-
-    const parsed = parseInterpretResponse(data);
-
-    // Stocke des infos pour la partie "Répondre"
-    window.__CL_LAST_INTERPRET__ = {
-      sourceLangCode: parsed.sourceLangCode,
-      sourceLangName: parsed.sourceLangName,
-      originalText: textToInterpret,
-      translationFR: parsed.translationText, // si on traduit en FR (ou autre)
-      chosenTargetLangCode: payload.language,
-      chosenTargetLangName: payload.languageName,
-    };
-
-    setText("intTranslation", parsed.translationText || "(traduction vide)");
-    renderInsights(parsed.insights);
-
-    const metaBits = [];
-    if (parsed.sourceLangCode || parsed.sourceLangName) {
-      metaBits.push(`Langue détectée : ${parsed.sourceLangName || parsed.sourceLangCode}`);
-    } else {
-      metaBits.push(`Langue détectée : auto`);
-    }
-    if (parsed.creditBalance != null) metaBits.push(`Crédits restants : ${parsed.creditBalance}`);
-    setText("intMeta", metaBits.join(" · "));
-  } catch (err) {
-    console.error("[interpret.js] /ai/interpret error:", err);
-    setText("intError", err.message || "Erreur lors de l’interprétation.");
-  } finally {
-    if (btn) {
+      setText("intQuickTone", tone ? asText(tone) : "(non détecté)");
+      setText("intQuickIntent", intent ? asText(intent) : "(non détectée)");
+      setText("intQuickRisk", risk ? asText(risk) : "(non détecté)");
+    } catch (err) {
+      console.error("[interpret.js] interpret error:", err);
+      setText("intError", err.message || "Une erreur est survenue lors de l’analyse.");
+    } finally {
       btn.disabled = false;
       btn.textContent = originalLabel || "Traduire & interpréter";
     }
-  }
-}
-
-/* ---------------- Répondre (optionnel) ---------------- */
-
-function attachReplyHandlers() {
-  const btn = document.getElementById("intReplyBtn");
-  if (!btn) return;
-
-  btn.addEventListener("click", async () => {
-    await runReply();
   });
 }
 
-async function runReply() {
-  setText("intReplyError", "");
-  setText("intReply", "");
-  setText("intReplyFR", "");
+/* -------------------- Reply (generate) -------------------- */
 
-  const goal = (document.getElementById("intReplyGoal")?.value || "").trim();
-  if (!goal) {
-    setText("intReplyError", "Décrivez l’intention de réponse.");
-    return;
-  }
+function setupReplySubmit() {
+  const btn = document.getElementById("replySubmit");
+  if (!btn) return;
 
-  const btn = document.getElementById("intReplyBtn");
-  const originalLabel = btn ? btn.textContent : "";
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-  // On s'appuie sur la dernière interprétation
-  const last = window.__CL_LAST_INTERPRET__ || {};
-  const originalText = last.originalText || (document.getElementById("intText")?.value || "").trim();
+    setText("replyError", "");
+    setText("replyOrig", "");
+    setText("replyFR", "");
 
-  if (!originalText) {
-    setText("intReplyError", "Collez d’abord un texte et lancez l’interprétation.");
-    return;
-  }
+    const intent = (document.getElementById("replyIntent")?.value || "").trim();
+    const originalMsg = (document.getElementById("intText")?.value || "").trim();
+    const ctx = (document.getElementById("intContext")?.value || "").trim();
 
-  // Langue d'origine : si backend la renvoie on l’utilise, sinon fallback = "auto" puis on force au moins "en"
-  // (si ton backend ne gère pas "auto" dans generate, il ignorera; c’est juste un fallback)
-  const srcCode = last.sourceLangCode || "auto";
-  const srcName = last.sourceLangName || "Langue d’origine";
-
-  // 1) Génération de réponse (dans la langue d’origine)
-  const payloadGenerate = {
-    input: {
-      tone: "professionnel, clair, naturel",
-      objective: "répondre au message ci-dessous",
-      recipient: "interlocuteur du message reçu",
-      draft: "",
-      context:
-        `Message reçu (original) :\n${originalText}\n\n` +
-        `Ce que je veux répondre :\n${goal}\n\n` +
-        `Contraintes : réponse courte, factuelle, polie. Si une question est nécessaire, 1 question max.`,
-    },
-    meta: {
-      format: "email",
-      targetLangName: srcName,
-      targetLangCode: srcCode,
-      userLang: "fr",
-    },
-  };
-
-  try {
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "Camille répond…";
+    if (!intent) {
+      setText("replyError", "Décrivez au moins l’intention de réponse.");
+      return;
+    }
+    if (!originalMsg) {
+      setText("replyError", "Collez d’abord le message à interpréter.");
+      return;
     }
 
-    const gen = await apiRequest("/ai/generate", "POST", payloadGenerate);
-    const replyText = safeString(gen?.result?.text ?? gen?.result ?? gen?.text ?? "");
+    // ✅ LANGUE D’ORIGINE = détectée lors de l’interprétation
+    // fallback: si pas détecté, on reste en FR pour ne pas bloquer
+    const targetLangCode = LAST_DETECTED.code || "fr";
+    const targetLangName = LAST_DETECTED.name || "Langue d’origine";
 
-    if (!replyText) throw new Error("Réponse inattendue du moteur de génération.");
-    setText("intReply", replyText);
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Camille rédige…";
 
-    // 2) FR contrôle
-    setText("intReplyFR", "Traduction FR en cours…");
     try {
-      const frData = await apiRequest("/ai/interpret", "POST", {
-        language: "fr",
-        languageName: "Français",
-        depth: "quick",
-        textToInterpret: replyText,
-        context: "",
-        userLang: "fr",
-      });
-      const parsedFR = parseInterpretResponse(frData);
-      setText("intReplyFR", parsedFR.translationText || "(FR indisponible)");
-    } catch (e) {
-      setText("intReplyFR", "(Contrôle FR indisponible)");
-    }
-  } catch (err) {
-    console.error("[interpret.js] reply error:", err);
-    setText("intReplyError", err.message || "Erreur lors de la génération de la réponse.");
-  } finally {
-    if (btn) {
+      // 1) Générer la réponse dans la langue d'origine
+      const genPayload = {
+        input: {
+          tone: "professionnel",
+          objective: "répondre au message reçu",
+          recipient: "interlocuteur",
+          draft: "",
+          context:
+            (ctx ? `Contexte : ${ctx}\n\n` : "") +
+            `Message reçu (à traiter) :\n${originalMsg}\n\n` +
+            `Intention de réponse : ${intent}`,
+        },
+        meta: {
+          format: "email",
+          targetLangName,
+          targetLangCode,
+          userLang: "fr",
+        },
+      };
+
+      const genData = await apiRequest("/ai/generate", "POST", genPayload);
+      const replyText = genData?.result?.text ?? genData?.result ?? genData?.text ?? "";
+      if (!replyText) throw new Error("Réponse inattendue lors de la génération.");
+
+      setText("replyOrig", replyText);
+
+      // 2) Contrôle FR (traduire la réponse générée vers FR)
+      setText("replyFR", "Traduction FR en cours…");
+      try {
+        const frData = await apiRequest("/ai/interpret", "POST", {
+          language: "fr",
+          languageName: "Français",
+          depth: "quick",
+          textToInterpret: replyText,
+          context: "",
+        });
+
+        const frRes = frData?.result ?? frData;
+        const frText =
+          pick(frRes, ["text", "translation", "translatedText", "result.text"]) ||
+          pick(frData, ["result.text", "text"]) ||
+          "";
+
+        setText("replyFR", frText || "(Contrôle FR indisponible)");
+      } catch (e2) {
+        setText("replyFR", "(Contrôle FR indisponible)");
+      }
+    } catch (err) {
+      console.error("[interpret.js] reply error:", err);
+      setText("replyError", err.message || "Erreur lors de la génération de la réponse.");
+    } finally {
       btn.disabled = false;
       btn.textContent = originalLabel || "Générer une réponse";
     }
-  }
+  });
+}
+
+/* -------------------- Copy buttons -------------------- */
+
+function setupCopyButtons() {
+  document.getElementById("btnCopyTranslation")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("intTranslation")?.textContent || "");
+    } catch {}
+  });
+
+  document.getElementById("btnCopyReplyOrig")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("replyOrig")?.textContent || "");
+    } catch {}
+  });
+
+  document.getElementById("btnCopyReplyFR")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("replyFR")?.textContent || "");
+    } catch {}
+  });
 }
