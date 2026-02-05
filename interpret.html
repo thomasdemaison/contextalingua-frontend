@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
 
-  <body>
+  <body class="page">
+    <!-- HEADER -->
     <header class="site-header">
       <div class="container header-inner">
         <a href="index.html" class="header-logo">
@@ -37,173 +38,41 @@
       </div>
     </header>
 
+    <!-- MAIN -->
     <main>
       <section class="hero">
-        <div class="container hero-grid hero-grid-simple">
-          <div class="card" style="width:100%;">
-            <h2 style="margin-bottom:8px;color:var(--text-strong);">
-              Camille — Interprétation (traduction contextuelle)
-            </h2>
-            <p style="color:var(--text-muted);font-size:.95rem;margin-bottom:18px;">
-              Collez un message reçu. Camille détecte automatiquement la langue d’origine, traduit (FR par défaut) et vous aide à comprendre.
-            </p>
-
-            <!-- Langue cible (réponse) -->
-            <div class="form-field">
-              <span>Langue de traduction</span>
-
-              <input
-                id="intLanguageSearch"
-                type="text"
-                placeholder="Tapez une langue (ex : Français, Chinois, Arabe...) ou cliquez sur un drapeau"
-                style="margin-bottom:10px;"
-              />
-
-              <input type="hidden" id="intLanguageCode" value="fr" />
-              <input type="hidden" id="intLanguageName" value="Français" />
-
-              <div
-                id="intLanguageGrid"
-                style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;"
-              ></div>
-
-              <p style="margin-top:8px;color:var(--text-muted);font-size:.85rem;">
-                Sélection actuelle : <strong id="intLanguageSelectedLabel">🇫🇷 Français</strong>
-                <span style="opacity:.7;"> — </span>
-                <span style="opacity:.9;">Langue détectée :</span>
-                <strong id="intDetectedLangLabel">—</strong>
+        <div class="container hero-inner hero-grid hero-grid-simple">
+          <div class="grid grid-2" style="gap:12px; align-items:start; width:100%;">
+            <!-- COLONNE GAUCHE (FORM) -->
+            <div class="card">
+              <h2 style="margin-bottom:6px;">Camille — Interprétation</h2>
+              <p style="color:var(--text-muted); margin-bottom:14px;">
+                Collez un message reçu. Camille détecte automatiquement la langue d’origine et traduit en <strong>français</strong> (par défaut).
               </p>
-            </div>
 
-            <div class="form-field">
-              <span>Niveau de réponse</span>
-              <select id="intDepth">
-                <option value="quick" selected>Rapide (traduction + micro-analyse)</option>
-                <option value="detailed">Approfondi (ton, intention, risques, pistes de réponse)</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <span>Texte à interpréter</span>
-              <textarea
-                id="intText"
-                rows="8"
-                placeholder="Collez le mail, le message ou l’extrait de document à analyser."
-              ></textarea>
-            </div>
-
-            <div class="form-field">
-              <span>Contexte (optionnel)</span>
-              <textarea
-                id="intContext"
-                rows="3"
-                placeholder="Relation, historique, enjeux, objectif, ce que vous voulez éviter..."
-              ></textarea>
-            </div>
-
-            <p id="intError" style="color:var(--danger);font-size:.9rem;min-height:1.2em;margin-bottom:8px;"></p>
-
-            <button id="intSubmit" class="btn btn-primary btn-full">Traduire & interpréter</button>
-
-            <!-- Résultats -->
-            <div class="grid grid-2" style="gap:12px;margin-top:12px;width:100%;">
-              <div class="card" style="padding:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <h3 style="margin:0;">Traduction</h3>
-                  <button type="button" class="btn btn-ghost" id="btnCopyTranslation">Copier</button>
-                </div>
-                <pre
-                  id="intTranslation"
-                  style="white-space:pre-wrap;margin-top:10px;background:#020617;border-radius:12px;padding:12px;border:1px solid var(--border-subtle);min-height:160px;"
-                ></pre>
-              </div>
-
-              <div class="card" style="padding:12px;">
-                <h3 style="margin:0;">Lecture rapide</h3>
-
-                <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
-                  <div class="card" style="padding:10px;">
-                    <strong>Ton :</strong> <span id="intQuickTone">(non détecté)</span>
-                  </div>
-                  <div class="card" style="padding:10px;">
-                    <strong>Intention :</strong> <span id="intQuickIntent">(non détectée)</span>
-                  </div>
-                  <div class="card" style="padding:10px;">
-                    <strong>Point d’attention :</strong> <span id="intQuickRisk">(non détecté)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Répondre (accordion) -->
-            <details id="replyPanel" style="margin-top:12px;">
-              <summary style="cursor:pointer;list-style:none;">
-                <div class="card" style="padding:12px;display:flex;justify-content:space-between;align-items:center;">
-                  <strong>Répondre (optionnel)</strong>
-                  <span style="color:var(--text-muted);">— 1 crédit</span>
-                </div>
-              </summary>
-
-              <div class="card" style="padding:12px;margin-top:10px;">
-                <p style="margin-top:0;color:var(--text-muted);font-size:.95rem;">
-                  Décrivez ce que vous souhaitez répondre. Camille génère une réponse dans la <strong>langue d’origine</strong>,
-                  et une <strong>version FR</strong> de contrôle.
-                </p>
-
+              <form id="interpretForm" autocomplete="off">
+                <!-- Toggle + autocomplete (comme generate) -->
                 <div class="form-field">
-                  <span>Votre intention de réponse</span>
-                  <textarea
-                    id="replyIntent"
-                    rows="3"
-                    placeholder="Ex : remercier, demander une précision, accepter un rendez-vous..."
-                  ></textarea>
-                </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <span>Langue de traduction</span>
 
-                <p id="replyError" style="color:var(--danger);font-size:.9rem;min-height:1.2em;margin-bottom:8px;"></p>
-
-                <button id="replySubmit" class="btn btn-secondary">Générer une réponse</button>
-
-                <div class="grid grid-2" style="gap:12px;margin-top:12px;">
-                  <div class="card" style="padding:12px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                      <strong>Réponse (langue d’origine)</strong>
-                      <button type="button" class="btn btn-ghost" id="btnCopyReplyOrig">Copier</button>
-                    </div>
-                    <pre
-                      id="replyOrig"
-                      style="white-space:pre-wrap;margin-top:10px;background:#020617;border-radius:12px;padding:12px;border:1px solid var(--border-subtle);min-height:160px;"
-                    ></pre>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text-muted); font-size:.9rem;">
+                      <input id="intToggleTargetLang" type="checkbox" />
+                      Choisir une autre langue
+                    </label>
                   </div>
 
-                  <div class="card" style="padding:12px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                      <strong>FR (contrôle)</strong>
-                      <button type="button" class="btn btn-ghost" id="btnCopyReplyFR">Copier</button>
-                    </div>
-                    <pre
-                      id="replyFR"
-                      style="white-space:pre-wrap;margin-top:10px;background:#020617;border-radius:12px;padding:12px;border:1px solid var(--border-subtle);min-height:160px;"
-                    ></pre>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-      </section>
-    </main>
+                  <div id="intTargetLangWrap" style="display:none; position:relative; margin-top:10px;">
+                    <input
+                      id="intTargetLanguageLabel"
+                      type="text"
+                      placeholder="Ex : italien, allemand, arabe…"
+                      autocomplete="off"
+                    />
+                    <input id="intTargetLanguageCode" type="hidden" value="fr" />
 
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <span>© ContextaLingua</span>
-        <nav class="footer-nav">
-          <a href="contact.html">Contact</a>
-        </nav>
-      </div>
-    </footer>
-
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/interpret.js"></script>
-  </body>
-</html>
+                    <div
+                      id="intLangSuggest"
+                      style="display:none; position:absolute; z-index:20; left:0; right:0; top:100%;
+                        background:rgba(2,6,23,.98); border:1px solid var(--border-subtle);
+                        border-radius:12px; padding:6px; margin-top:6px;
