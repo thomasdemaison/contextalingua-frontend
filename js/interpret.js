@@ -91,6 +91,11 @@ function normalizeResult(data) {
     if (maybe && !result) result = maybe;
   }
 
+  // ✅ IMPORTANT : certaines réponses sont encapsulées dans result.text (objet)
+  if (result && typeof result === "object" && result.text && typeof result.text === "object") {
+    return result.text;
+  }
+
   return result;
 }
 
@@ -101,6 +106,7 @@ function normalizeResult(data) {
 function parseInterpretResponse(data) {
   const ok = data?.ok;
 
+  // ✅ normalizeResult retourne directement le "coeur" (inclut support result.text)
   const result = normalizeResult(data);
 
   // --- 1) Traduction texte (priorité MAX pour éviter l'affichage JSON)
@@ -131,15 +137,15 @@ function parseInterpretResponse(data) {
 
   // --- 2) Langue détectée (codes/noms)
   const detected =
-    (result && typeof result === "object" && (
-      result.detectedLanguage ||
-      result.detected_language ||
-      result.sourceLangName ||
-      result.detectedLangName ||
-      result.languageDetectedName ||
-      result.source_language_name ||
-      result.source_language
-    )) ||
+    (result &&
+      typeof result === "object" &&
+      (result.detectedLanguage ||
+        result.detected_language ||
+        result.sourceLangName ||
+        result.detectedLangName ||
+        result.languageDetectedName ||
+        result.source_language_name ||
+        result.source_language)) ||
     data?.detectedLanguage ||
     data?.detected_language ||
     data?.sourceLangName ||
@@ -160,9 +166,15 @@ function parseInterpretResponse(data) {
     null;
 
   if (Array.isArray(cand)) {
-    insights = cand.map((x) => safeString(x) || String(x)).filter(Boolean);
+    insights = cand
+      .map((x) => safeString(x) || String(x))
+      .filter(Boolean);
   } else if (typeof cand === "string") {
-    insights = cand.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 8);
+    insights = cand
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .slice(0, 8);
   } else if (cand && typeof cand === "object") {
     // objet -> on prend quelques clés
     const keys = Object.keys(cand).slice(0, 6);
@@ -200,18 +212,15 @@ function fillQuickFromInsights(insights) {
 
   // Ton
   let tone =
-    findBy(["ton est", "ton:", "tone", "professionnel", "respectueux", "agressif", "polie", "chaleureux"]) ||
-    "";
+    findBy(["ton est", "ton:", "tone", "professionnel", "respectueux", "agressif", "polie", "chaleureux"]) || "";
 
   // Intention
   let intent =
-    findBy(["intention", "vise", "objectif", "demande", "propose", "invitation", "souhaite", "relance"]) ||
-    "";
+    findBy(["intention", "vise", "objectif", "demande", "propose", "invitation", "souhaite", "relance"]) || "";
 
   // Risque / point d’attention
   let risk =
-    findBy(["attention", "risque", "point d’attention", "à éviter", "prudence", "sensible"]) ||
-    "";
+    findBy(["attention", "risque", "point d’attention", "à éviter", "prudence", "sensible"]) || "";
 
   // Fallbacks si analysis = liste générique
   if (!tone && arr[2]) tone = arr[2];
