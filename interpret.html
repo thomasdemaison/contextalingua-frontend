@@ -51,7 +51,6 @@
               </p>
 
               <form id="interpretForm" autocomplete="off">
-                <!-- Toggle + autocomplete (comme generate) -->
                 <div class="form-field">
                   <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
                     <span>Langue de traduction</span>
@@ -152,11 +151,9 @@
               <h3 style="margin:0;">Lecture rapide</h3>
 
               <div style="margin-top:10px; display:flex; flex-direction:column; gap:10px;">
-                <!-- ✅ NOUVELLE BULLE -->
                 <div class="card" style="padding:10px;">
                   <strong>Langue d’origine :</strong> <span id="intQuickLang">(non détectée)</span>
                 </div>
-
                 <div class="card" style="padding:10px;">
                   <strong>Ton :</strong> <span id="intQuickTone">(non détecté)</span>
                 </div>
@@ -182,7 +179,7 @@
             <div class="card" style="padding:12px; margin-top:10px;">
               <p style="margin-top:0; color:var(--text-muted); font-size:.95rem;">
                 Décrivez ce que vous souhaitez répondre. Camille génère une réponse dans la <strong>langue d’origine</strong>,
-                et une <strong>version FR</strong> de contrôle.
+                et une <strong>version de contrôle</strong> dans la langue de traduction choisie.
               </p>
 
               <div class="form-field">
@@ -213,7 +210,7 @@
 
                 <div class="card" style="padding:12px;">
                   <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                    <strong>FR (contrôle)</strong>
+                    <strong>Contrôle</strong>
                     <button type="button" class="btn btn-ghost" id="btnCopyReplyFR">Copier</button>
                   </div>
                   <pre
