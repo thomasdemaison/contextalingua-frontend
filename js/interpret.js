@@ -1,9 +1,8 @@
-// js/interpret.js (MINIMAL + PREMIUM + ROBUSTE)
-// - FR par défaut
-// - Checkbox => choisir une autre langue via autocomplete (CL_LANG)
-// - Parse anti JSON affiché : extrait translation + detected language + analysis
-// - Lecture rapide : Langue d'origine / Ton / Intention / Point d’attention
-// - Option Répondre : /ai/generate + /ai/interpret (contrôle dans la langue choisie)
+// js/interpret.js
+// V1 robuste:
+// - Traduction dans la langue choisie (FR par defaut)
+// - Langue d'origine affichee
+// - Repondre: generation dans la langue d'origine + controle dans la langue de traduction choisie
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -24,12 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
   attachInterpretHandlers();
   attachReplyHandlers();
 
-  // Defaults UI
   setSelectedLanguageUI("fr", "Français", "🇫🇷");
-  setText("intQuickLang", "(non détectée)");
+  setText("intQuickLang", "(non detectee)");
 });
-
-/* ---------------- Helpers ---------------- */
 
 function getUserLanguageFallback() {
   const nav = (navigator.language || "fr").toLowerCase();
@@ -77,22 +73,18 @@ function parseMaybeJsonString(s) {
 }
 
 function normalizeResult(data) {
-  // Certaines APIs renvoient { ok, result: ... }, d'autres renvoient directement ...
   let result = data?.result ?? data ?? null;
 
-  // Parfois result est une string JSON : "{...}"
   if (typeof result === "string") {
     const maybe = parseMaybeJsonString(result);
     if (maybe) result = maybe;
   }
 
-  // Parfois data.text contient un JSON string
   if (typeof data?.text === "string") {
     const maybe = parseMaybeJsonString(data.text);
     if (maybe && !result) result = maybe;
   }
 
-  // ✅ IMPORTANT : certaines réponses sont encapsulées dans result.text (objet)
   if (result && typeof result === "object" && result.text && typeof result.text === "object") {
     return result.text;
   }
@@ -100,15 +92,10 @@ function normalizeResult(data) {
   return result;
 }
 
-/**
- * Parse /ai/interpret (robuste)
- * Cherche translation + langue détectée + bullets/analysis
- */
 function parseInterpretResponse(data) {
   const ok = data?.ok;
   const result = normalizeResult(data);
 
-  // --- 1) Traduction texte
   let translationText = "";
 
   if (result && typeof result === "object") {
@@ -131,7 +118,6 @@ function parseInterpretResponse(data) {
     translationText = result;
   }
 
-  // --- 2) Langue détectée
   const detected =
     (result &&
       typeof result === "object" &&
@@ -151,7 +137,6 @@ function parseInterpretResponse(data) {
     data?.source_language ||
     "";
 
-  // --- 3) Analysis / insights
   let insights = [];
   const cand =
     (result && typeof result === "object" && (result.analysis || result.insights || result.bullets || result.summary)) ||
@@ -167,7 +152,7 @@ function parseInterpretResponse(data) {
     insights = cand.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 8);
   } else if (cand && typeof cand === "object") {
     const keys = Object.keys(cand).slice(0, 6);
-    insights = keys.map((k) => `${k} : ${safeString(cand[k])}`).filter(Boolean);
+    insights = keys.map((k) => k + " : " + safeString(cand[k])).filter(Boolean);
   }
 
   return {
@@ -179,11 +164,9 @@ function parseInterpretResponse(data) {
   };
 }
 
-/* ---------------- UI helpers ---------------- */
-
 function setSelectedLanguageUI(code, name, flag) {
   const lbl = document.getElementById("intLanguageSelectedLabel");
-  if (lbl) lbl.textContent = `${flag || "🏳️"} ${name || code || ""}`.trim();
+  if (lbl) lbl.textContent = (flag || "🏳️") + " " + (name || code || "");
 }
 
 function fillQuickFromInsights(insights) {
@@ -200,23 +183,19 @@ function fillQuickFromInsights(insights) {
 
   let tone =
     findBy(["ton est", "ton:", "tone", "professionnel", "respectueux", "agressif", "polie", "chaleureux"]) || "";
-
   let intent =
     findBy(["intention", "vise", "objectif", "demande", "propose", "invitation", "souhaite", "relance"]) || "";
-
   let risk =
-    findBy(["attention", "risque", "point d’attention", "à éviter", "prudence", "sensible"]) || "";
+    findBy(["attention", "risque", "point d’attention", "a eviter", "prudence", "sensible"]) || "";
 
   if (!tone && arr[2]) tone = arr[2];
   if (!intent && arr[0]) intent = arr[0];
   if (!risk && arr[1]) risk = arr[1];
 
-  setText("intQuickTone", tone ? tone.replace(/^ton\s*:?\s*/i, "") : "(non détecté)");
-  setText("intQuickIntent", intent ? intent.replace(/^intention\s*:?\s*/i, "") : "(non détectée)");
-  setText("intQuickRisk", risk ? risk.replace(/^(point d’attention|risques?)\s*:?\s*/i, "") : "(non détecté)");
+  setText("intQuickTone", tone ? tone.replace(/^ton\s*:?\s*/i, "") : "(non detecte)");
+  setText("intQuickIntent", intent ? intent.replace(/^intention\s*:?\s*/i, "") : "(non detectee)");
+  setText("intQuickRisk", risk ? risk.replace(/^(point d’attention|risques?)\s*:?\s*/i, "") : "(non detecte)");
 }
-
-/* ---------------- UX : langue cible optionnelle ---------------- */
 
 function initTargetLangUX() {
   const toggle = document.getElementById("intToggleTargetLang");
@@ -241,8 +220,6 @@ function initTargetLangUX() {
   });
 }
 
-/* ---------------- Autocomplete langues (CL_LANG) ---------------- */
-
 function initLanguageAutocompleteInterpret() {
   const labelInput = document.getElementById("intTargetLanguageLabel");
   const codeInput = document.getElementById("intTargetLanguageCode");
@@ -251,7 +228,7 @@ function initLanguageAutocompleteInterpret() {
   if (!labelInput || !codeInput || !suggestBox) return;
 
   if (!window.CL_LANG || typeof window.CL_LANG.searchLanguages !== "function") {
-    console.warn("[interpret.js] window.CL_LANG absent → autocomplete désactivé");
+    console.warn("[interpret.js] window.CL_LANG absent -> autocomplete desactive");
     return;
   }
 
@@ -274,7 +251,8 @@ function initLanguageAutocompleteInterpret() {
     suggestBox.innerHTML = "";
 
     if (!results.length) {
-      suggestBox.innerHTML = `<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun résultat.</div>`;
+      suggestBox.innerHTML =
+        '<div style="padding:8px;color:var(--text-muted);font-size:.9rem;">Aucun resultat.</div>';
       suggestBox.style.display = "block";
       return;
     }
@@ -289,7 +267,14 @@ function initLanguageAutocompleteInterpret() {
       row.style.width = "100%";
       row.style.textAlign = "left";
       row.style.padding = "8px";
-      row.innerHTML = `<span>${lang.flag || "🏳️"} ${lang.name}</span><span style="opacity:.7;">${lang.code}</span>`;
+      row.innerHTML =
+        "<span>" +
+        (lang.flag || "🏳️") +
+        " " +
+        lang.name +
+        '</span><span style="opacity:.7;">' +
+        lang.code +
+        "</span>";
 
       row.addEventListener("click", () => {
         labelInput.value = lang.name;
@@ -313,8 +298,6 @@ function initLanguageAutocompleteInterpret() {
   });
 }
 
-/* ---------------- Copy buttons ---------------- */
-
 function setupCopyButtons() {
   const bindCopy = (btnId, sourceId) => {
     const btn = document.getElementById(btnId);
@@ -324,7 +307,7 @@ function setupCopyButtons() {
       const old = btn.textContent;
       try {
         await navigator.clipboard.writeText(document.getElementById(sourceId)?.textContent || "");
-        btn.textContent = "Copié ✓";
+        btn.textContent = "Copie ✓";
       } catch {
         btn.textContent = "Copie impossible";
       } finally {
@@ -337,8 +320,6 @@ function setupCopyButtons() {
   bindCopy("btnCopyReply", "intReply");
   bindCopy("btnCopyReplyFR", "intReplyFR");
 }
-
-/* ---------------- Interpréter ---------------- */
 
 function attachInterpretHandlers() {
   const form = document.getElementById("interpretForm");
@@ -356,7 +337,7 @@ async function runInterpret() {
   setText("intTranslation", "");
   setText("intMeta", "");
   setText("intDetectedLangLabel", "—");
-  setText("intQuickLang", "(non détectée)");
+  setText("intQuickLang", "(non detectee)");
   fillQuickFromInsights([]);
 
   const btn = document.getElementById("intSubmit");
@@ -364,71 +345,66 @@ async function runInterpret() {
 
   const textToInterpret = (document.getElementById("intText")?.value || "").trim();
   const context = (document.getElementById("intContext")?.value || "").trim();
-  const depth = (document.getElementById("intDepth")?.value || "quick").trim() || "quick";
+  const depth = ((document.getElementById("intDepth")?.value || "quick") + "").trim() || "quick";
 
   if (!textToInterpret) {
-    setText("intError", "Collez un texte à interpréter.");
+    setText("intError", "Collez un texte a interpreter.");
     return;
   }
 
-  // langue cible : FR par défaut sauf si checkbox
   const toggle = document.getElementById("intToggleTargetLang");
   const forceTarget = !!(toggle && toggle.checked);
 
-  const targetLangCode = (document.getElementById("intTargetLanguageCode")?.value || "fr").trim() || "fr";
-  const targetLangName = (document.getElementById("intTargetLanguageLabel")?.value || "Français").trim() || "Français";
+  const targetLangCode = ((document.getElementById("intTargetLanguageCode")?.value || "fr") + "").trim() || "fr";
+  const targetLangName = ((document.getElementById("intTargetLanguageLabel")?.value || "Français") + "").trim() || "Français";
 
-  // ✅ Langue de contrôle (ce que l'utilisateur choisit comme langue de traduction)
   const controlLangCode = forceTarget ? targetLangCode : "fr";
   const controlLangName = forceTarget ? targetLangName : "Français";
 
   const payload = {
     language: controlLangCode,
     languageName: controlLangName,
-    depth,
-    textToInterpret,
-    context,
+    depth: depth,
+    textToInterpret: textToInterpret,
+    context: context,
     userLang: getUserLanguageFallback(),
   };
 
   try {
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Camille analyse…";
+      btn.textContent = "Camille analyse...";
     }
 
     const data = await apiRequest("/ai/interpret", "POST", payload);
     const parsed = parseInterpretResponse(data);
 
-    // Stocke pour "Répondre"
     window.__CL_LAST_INTERPRET__ = {
       originalText: textToInterpret,
       detectedLanguage: parsed.detectedLanguage || "",
-      controlLangCode,
-      controlLangName,
+      controlLangCode: controlLangCode,
+      controlLangName: controlLangName,
     };
 
-    setText("intQuickLang", parsed.detectedLanguage || "(non détectée)");
+    setText("intQuickLang", parsed.detectedLanguage || "(non detectee)");
     setText("intTranslation", parsed.translationText || "(traduction vide)");
     setText("intDetectedLangLabel", parsed.detectedLanguage || "auto");
     fillQuickFromInsights(parsed.insights);
 
     const metaBits = [];
-    metaBits.push(`Langue détectée : ${parsed.detectedLanguage || "auto"}`);
-    if (parsed.creditBalance != null) metaBits.push(`Crédits restants : ${parsed.creditBalance}`);
+    metaBits.push("Langue detectee : " + (parsed.detectedLanguage || "auto"));
+    if (parsed.creditBalance != null) metaBits.push("Credits restants : " + parsed.creditBalance);
     setText("intMeta", metaBits.join(" · "));
   } catch (err) {
     console.error("[interpret.js] /ai/interpret error:", err);
-    setText("intError", err.message || "Erreur lors de l’interprétation.");
+    setText("intError", err.message || "Erreur lors de l'interpretation.");
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = originalLabel || "Traduire & interpréter";
+      btn.textContent = originalLabel || "Traduire & interpreter";
     }
   }
 }
-
-/* ---------------- Répondre ---------------- */
 
 function attachReplyHandlers() {
   const btn = document.getElementById("intReplyBtn");
@@ -446,7 +422,7 @@ async function runReply() {
 
   const goal = (document.getElementById("intReplyGoal")?.value || "").trim();
   if (!goal) {
-    setText("intReplyError", "Décrivez l’intention de réponse.");
+    setText("intReplyError", "Decrivez l'intention de reponse.");
     return;
   }
 
@@ -457,51 +433,50 @@ async function runReply() {
   const originalText = last.originalText || (document.getElementById("intText")?.value || "").trim();
 
   if (!originalText) {
-    setText("intReplyError", "Collez d’abord un texte et lancez l’interprétation.");
+    setText("intReplyError", "Collez d'abord un texte et lancez l'interpretation.");
     return;
   }
 
-  // Langue de contrôle = langue choisie par l’utilisateur (traduction)
   const controlLangCode = last.controlLangCode || "fr";
   const controlLangName = last.controlLangName || "Français";
 
-  // On demande la réponse dans la langue d’origine (si backend comprend), sinon il fera au mieux
-  const detectedLangName = last.detectedLanguage || "Langue d’origine";
+  const detectedLangName = last.detectedLanguage || "Langue d'origine";
   const detectedLangCode = "auto";
 
   const payloadGenerate = {
     input: {
       tone: "professionnel, clair, naturel",
-      objective: "répondre au message ci-dessous",
-      recipient: "interlocuteur du message reçu",
+      objective: "repondre au message ci-dessous",
+      recipient: "interlocuteur du message recu",
       draft: "",
       context:
-        `Message reçu (original) :\n${originalText}\n\n` +
-        `Ce que je veux répondre :\n${goal}\n\n` +
-        `Contraintes : réponse courte, factuelle, polie. Si une question est nécessaire, 1 question max.`,
+        "Message recu (original) :\n" +
+        originalText +
+        "\n\nCe que je veux repondre :\n" +
+        goal +
+        "\n\nContraintes : reponse courte, factuelle, polie. Si une question est necessaire, 1 question max.",
     },
     meta: {
       format: "email",
       targetLangName: detectedLangName,
       targetLangCode: detectedLangCode,
-      userLang: controlLangCode, // ✅ cohérent avec l'utilisateur
+      userLang: controlLangCode,
     },
   };
 
   try {
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Camille répond…";
+      btn.textContent = "Camille repond...";
     }
 
     const gen = await apiRequest("/ai/generate", "POST", payloadGenerate);
     const replyText = safeString(gen?.result?.text ?? gen?.result ?? gen?.text ?? "");
 
-    if (!replyText) throw new Error("Réponse inattendue du moteur de génération.");
+    if (!replyText) throw new Error("Reponse inattendue du moteur de generation.");
     setText("intReply", replyText);
 
-    // ✅ Contrôle dans la langue choisie (pas forcément FR)
-    setText("intReplyFR", `Contrôle (${controlLangName}) en cours…`);
+    setText("intReplyFR", "Controle (" + controlLangName + ") en cours...");
     try {
       const ctrlData = await apiRequest("/ai/interpret", "POST", {
         language: controlLangCode,
@@ -513,17 +488,17 @@ async function runReply() {
       });
 
       const parsedCTRL = parseInterpretResponse(ctrlData);
-      setText("intReplyFR", parsedCTRL.translationText || `(Contrôle ${controlLangName} indisponible)`);
+      setText("intReplyFR", parsedCTRL.translationText || "(Controle indisponible)");
     } catch {
-      setText("intReplyFR", `(Contrôle ${controlLangName} indisponible)`);
+      setText("intReplyFR", "(Controle indisponible)");
     }
   } catch (err) {
     console.error("[interpret.js] reply error:", err);
-    setText("intReplyError", err.message || "Erreur lors de la génération de la réponse.");
+    setText("intReplyError", err.message || "Erreur lors de la generation de la reponse.");
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = originalLabel || "Générer une réponse";
+      btn.textContent = originalLabel || "Generer une reponse";
     }
   }
 }
