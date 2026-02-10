@@ -1,7 +1,5 @@
 // js/reset-password.js
-// Réinitialise le mot de passe via token URL
-// Attendu backend: POST /auth/reset-password { token, newPassword }
-// Réponse idéale: { ok:true, message?:string }
+// Réinitialise le mot de passe via token + email (URL)
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("resetPasswordForm");
@@ -13,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const url = new URL(window.location.href);
   const token = (url.searchParams.get("token") || "").trim();
+  const email = (url.searchParams.get("email") || "").trim();
 
   const setMsg = (text, type = "info") => {
     if (!msgEl) return;
@@ -23,9 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "var(--text-muted)";
   };
 
-  // Si pas de token, on bloque
-  if (!token) {
-    setMsg("Lien invalide : token manquant.", "error");
+  // Sécurité minimale
+  if (!token || !email) {
+    setMsg("Lien invalide ou incomplet.", "error");
     if (btn) btn.disabled = true;
     return;
   }
@@ -34,8 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     setMsg("");
 
-    const newPassword = (passwordInput?.value || "").trim();
-    if (!newPassword || newPassword.length < 8) {
+    const password = (passwordInput?.value || "").trim();
+    if (!password || password.length < 8) {
       setMsg("Le mot de passe doit contenir au moins 8 caractères.", "error");
       return;
     }
@@ -47,26 +46,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await apiRequest("/auth/reset-password", "POST", {
+        email,
         token,
-        newPassword,
+        password,
       });
 
-      setMsg(data?.message || "Mot de passe mis à jour ✅ Vous pouvez vous connecter.", "success");
+      setMsg(
+        data?.message ||
+        "Mot de passe mis à jour ✅ Vous pouvez vous connecter.",
+        "success"
+      );
 
-      // UX: redirige vers login après 1.2s
       setTimeout(() => {
         window.location.href = "login.html";
       }, 1200);
     } catch (err) {
       console.error("[reset-password.js] error:", err);
-
-      if (err.status === 404) {
-        setMsg("La route /auth/reset-password n’est pas encore active côté serveur (404).", "error");
-        return;
-      }
-
-      // backend idéal: 400 "Lien invalide ou expiré"
-      setMsg(err.message || "Erreur lors de la réinitialisation.", "error");
+      setMsg(
+        err.message || "Lien invalide ou expiré.",
+        "error"
+      );
     } finally {
       if (btn) {
         btn.disabled = false;
