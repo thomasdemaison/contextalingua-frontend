@@ -1,7 +1,5 @@
 // js/forgot-password.js
-// Envoie la demande de reset par email
-// Attendu backend: POST /auth/forgot-password { email }
-// Réponse idéale: { ok:true, message?:string }
+// Envoie l'email de réinitialisation
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("forgotPasswordForm");
@@ -12,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btn = form.querySelector('button[type="submit"]');
 
   const setMsg = (text, type = "info") => {
-    if (!msgEl) return;
     msgEl.textContent = text || "";
     msgEl.style.color =
       type === "success" ? "#22c55e" :
@@ -24,47 +21,32 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     setMsg("");
 
-    const email = (emailInput?.value || "").trim().toLowerCase();
+    const email = (emailInput?.value || "").trim();
     if (!email) {
-      setMsg("Veuillez saisir votre email.", "error");
+      setMsg("Email requis.", "error");
       return;
     }
 
     try {
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = "Envoi…";
-      }
+      btn.disabled = true;
+      btn.textContent = "Envoi…";
 
-      // Important: on ne révèle jamais si le compte existe ou non.
       const data = await apiRequest("/auth/forgot-password", "POST", { email });
 
       setMsg(
         data?.message ||
-          "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.",
+        "Si cet email existe, un lien de réinitialisation a été envoyé.",
         "success"
       );
-
-      // UX: on peut vider le champ
-      if (emailInput) emailInput.value = "";
     } catch (err) {
       console.error("[forgot-password.js] error:", err);
-
-      // 404 = route pas encore en place
-      if (err.status === 404) {
-        setMsg(
-          "La fonctionnalité de réinitialisation n’est pas encore active côté serveur (404).",
-          "error"
-        );
-        return;
-      }
-
-      setMsg(err.message || "Erreur lors de la demande.", "error");
+      setMsg(
+        err.message || "Impossible d’envoyer le lien pour le moment.",
+        "error"
+      );
     } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = "Envoyer le lien";
-      }
+      btn.disabled = false;
+      btn.textContent = "Envoyer le lien";
     }
   });
 });
