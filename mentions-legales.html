@@ -1,52 +1,96 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mentions légales – ContextaLingua</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-<body>
 
-<h1>Mentions légales</h1>
+<body class="page page-legal">
 
-<h2>Éditeur du site</h2>
-<p>
-ContextaLingua est édité par :<br><br>
-<strong>DEMAIN – Solution Finance</strong><br>
-Entreprise individuelle<br>
-253 Rue du Butecrot<br>
-69220 Dracé – France<br><br>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <span class="contexta">Contexta</span>
+      <span class="lingua">Lingua</span>
+    </a>
 
-SIRET : 792 783 433 00065<br>
-TVA intracommunautaire : FR36792783433<br><br>
+    <nav class="main-nav">
+      <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-Directeur de la publication : Thomas DEMAISON<br>
-Email : contact@contextalingua.fr
-</p>
+      <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
+      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+    </nav>
 
-<h2>Hébergement</h2>
-<p>
-Infrastructure serveur : VPS sous Ubuntu (France)<br>
-Fournisseur d’infrastructure : OVHcloud<br>
-2 rue Kellermann – 59100 Roubaix – France<br><br>
+    <div class="header-actions">
+      <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-Code versionné via GitHub.<br>
-Certaines infrastructures peuvent être situées hors Union Européenne.
-</p>
+      <a href="login.html" class="btn btn-ghost nav-public-only js-go-login">Se connecter</a>
+      <a href="register.html" class="btn btn-primary nav-public-only js-go-register">Tester gratuitement</a>
+    </div>
+  </div>
+</header>
 
-<h2>Propriété intellectuelle</h2>
-<p>
-L’ensemble des contenus du site ContextaLingua (textes, design, code, logo) est protégé par le droit d’auteur.
-Toute reproduction ou exploitation non autorisée est interdite.
-</p>
+<main>
+  <section class="hero hero-inner">
+    <div class="container hero-grid hero-grid-simple">
+      <div class="hero-content">
+        <p class="eyebrow">Informations</p>
+        <h1>Mentions légales</h1>
+        <p class="hero-subtitle">
+          Informations relatives à l’éditeur du site et à l’hébergement.
+        </p>
+      </div>
+    </div>
+  </section>
 
-<h2>Responsabilité</h2>
-<p>
-L’éditeur s’efforce d’assurer l’exactitude des informations publiées.
-Toutefois, aucune garantie n’est apportée quant à l’absence d’erreur ou d’omission.
-</p>
+  <section class="section">
+    <div class="container">
+      <article class="card" style="padding:22px;">
+        <h2>Éditeur du site</h2>
+        <p>
+          ContextaLingua est édité par :<br><br>
+          <strong>DEMAIN – Solution Finance</strong><br>
+          Entreprise individuelle<br>
+          253 Rue du Butecrot<br>
+          69220 Dracé – France<br><br>
 
-</body>
+          SIRET : 792 783 433 00065<br>
+          TVA intracommunautaire : FR36792783433<br><br>
+
+          Directeur de la publication : Thomas DEMAISON<br>
+          Email : <strong>thomas@demain-solutionfinance.fr</strong>
+        </p>
+
+        <h2>Hébergement</h2>
+        <p>
+          Infrastructure serveur : VPS sous Ubuntu (France)<br>
+          Code versionné via GitHub.<br>
+          Certaines infrastructures peuvent être situées hors Union Européenne.
+        </p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>
+          L’ensemble des contenus du site ContextaLingua (textes, design, code, logo) est protégé par le droit d’auteur.
+          Toute reproduction ou exploitation non autorisée est interdite.
+        </p>
+
+        <h2>Responsabilité</h2>
+        <p>
+          L’éditeur s’efforce d’assurer l’exactitude des informations publiées.
+          Toutefois, aucune garantie n’est apportée quant à l’absence d’erreur ou d’omission.
+        </p>
+      </article>
+    </div>
+  </section>
+</main>
 
 <footer class="site-footer">
   <div class="container footer-inner">
@@ -59,5 +103,8 @@ Toutefois, aucune garantie n’est apportée quant à l’absence d’erreur ou 
     </nav>
   </div>
 </footer>
-  
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
 </html>
