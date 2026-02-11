@@ -63,33 +63,46 @@
 
     <section class="section">
         <div class="container contact-grid">
-            <form class="card contact-form">
-                <h2>Écrire à Camille</h2>
-                <label class="form-field">
-                    <span>Nom / Prénom</span>
-                    <input type="text" name="name" required>
-                </label>
-                <label class="form-field">
-                    <span>Organisation</span>
-                    <input type="text" name="company">
-                </label>
-                <label class="form-field">
-                    <span>E-mail</span>
-                    <input type="email" name="email" required>
-                </label>
-                <label class="form-field">
-                    <span>Objet</span>
-                    <input type="text" name="subject" placeholder="Projet, question, partenariat…">
-                </label>
-                <label class="form-field">
-                    <span>Message</span>
-                    <textarea name="message" rows="6" placeholder="Décrivez votre contexte, vos langues cibles, vos volumes…"></textarea>
-                </label>
-                <button type="submit" class="btn btn-primary btn-full">Envoyer le message</button>
-                <p class="form-note">
-                    Les informations transmises servent uniquement à répondre à votre message.
-                </p>
-            </form>
+            <form id="contactForm" class="card contact-form" autocomplete="off">
+  <h2>Écrire à Camille</h2>
+
+  <label class="form-field">
+    <span>Nom / Prénom</span>
+    <input type="text" name="name" required>
+  </label>
+
+  <label class="form-field">
+    <span>Organisation</span>
+    <input type="text" name="company">
+  </label>
+
+  <label class="form-field">
+    <span>E-mail</span>
+    <input type="email" name="email" required>
+  </label>
+
+  <label class="form-field">
+    <span>Objet</span>
+    <input type="text" name="subject" placeholder="Projet, question, partenariat…">
+  </label>
+
+  <label class="form-field">
+    <span>Message</span>
+    <textarea name="message" rows="6" required
+      placeholder="Décrivez votre contexte, vos langues cibles, vos volumes…"></textarea>
+  </label>
+
+  <p id="contactMsg" style="min-height:1.2em;margin:8px 0 0;color:var(--text-muted);"></p>
+
+  <button id="contactSubmit" type="submit" class="btn btn-primary btn-full">
+    Envoyer le message
+  </button>
+
+  <p class="form-note">
+    Les informations transmises servent uniquement à répondre à votre message.
+  </p>
+</form>
+
 
             <aside class="card contact-aside">
                 <h3>Quelques exemples de demandes</h3>
@@ -122,5 +135,7 @@
     <!-- Scripts communs -->
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/contact.js"></script>
+
   </body>
 </html>
