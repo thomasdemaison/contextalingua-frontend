@@ -1,47 +1,94 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Politique de confidentialité – ContextaLingua</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Politique de confidentialité – ContextaLingua</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-<body>
 
-<h1>Politique de confidentialité</h1>
+<body class="page page-legal">
 
-<h2>Données collectées</h2>
-<ul>
-<li>Adresse email</li>
-<li>Données techniques (IP, logs)</li>
-<li>Données de paiement via Mollie</li>
-</ul>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <span class="contexta">Contexta</span>
+      <span class="lingua">Lingua</span>
+    </a>
 
-<h2>Finalités</h2>
-<p>
-Gestion du compte, facturation, sécurité et fonctionnement du service.
-</p>
+    <nav class="main-nav">
+      <a href="produit.html" class="nav-link nav-public-only">Produit</a>
+      <a href="tarifs.html"  class="nav-link nav-public-only">Tarifs</a>
+      <a href="faq.html"     class="nav-link nav-public-only">FAQ</a>
 
-<h2>Sous-traitants</h2>
-<ul>
-<li>OpenAI (traitement IA)</li>
-<li>Mollie (paiement)</li>
-<li>OVHcloud (hébergement)</li>
-<li>GitHub (versionnement)</li>
-</ul>
+      <a href="index.html"       class="nav-link nav-auth-only">Accueil</a>
+      <a href="dashboard.html"   class="nav-link nav-auth-only">Tableau de bord</a>
+      <a href="generate.html"    class="nav-link nav-auth-only">Rédaction</a>
+      <a href="interpret.html"   class="nav-link nav-auth-only">Interprétation</a>
+      <a href="accompanied.html" class="nav-link nav-auth-only">Mode accompagné</a>
+    </nav>
 
-<h2>Durée de conservation</h2>
-<p>
-Les données sont conservées pendant la durée d’activité du compte.
-Les données de facturation sont conservées 10 ans conformément à la législation française.
-</p>
+    <div class="header-actions">
+      <span id="headerUserEmail" class="nav-link nav-auth-only"></span>
+      <button id="btnLogout" class="btn btn-ghost nav-auth-only">Déconnexion</button>
 
-<h2>Droits RGPD</h2>
-<p>
-Conformément au RGPD, l’utilisateur dispose d’un droit d’accès, de rectification, d’effacement et d’opposition.
-Toute demande doit être adressée à contact@contextalingua.fr.
-</p>
+      <a href="login.html" class="btn btn-ghost nav-public-only js-go-login">Se connecter</a>
+      <a href="register.html" class="btn btn-primary nav-public-only js-go-register">Tester gratuitement</a>
+    </div>
+  </div>
+</header>
 
-</body>
+<main>
+  <section class="hero hero-inner">
+    <div class="container hero-grid hero-grid-simple">
+      <div class="hero-content">
+        <p class="eyebrow">Informations</p>
+        <h1>Politique de confidentialité</h1>
+        <p class="hero-subtitle">
+          Cette page explique quelles données sont traitées et dans quel but, conformément au RGPD.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <article class="card" style="padding:22px;">
+        <h2>Données collectées</h2>
+        <ul>
+          <li>Adresse email</li>
+          <li>Données techniques (IP, logs)</li>
+          <li>Données de paiement via Mollie</li>
+        </ul>
+
+        <h2>Finalités</h2>
+        <p>
+          Gestion du compte, facturation, sécurité et fonctionnement du service.
+        </p>
+
+        <h2>Sous-traitants</h2>
+        <ul>
+          <li>OpenAI (traitement IA)</li>
+          <li>Mollie (paiement)</li>
+          <li>VPS Ubuntu (hébergement)</li>
+          <li>GitHub (versionnement)</li>
+        </ul>
+
+        <h2>Durée de conservation</h2>
+        <p>
+          Les données sont conservées pendant la durée d’activité du compte.
+          Les données de facturation sont conservées 10 ans conformément à la législation française.
+        </p>
+
+        <h2>Droits RGPD</h2>
+        <p>
+          Conformément au RGPD, l’utilisateur dispose d’un droit d’accès, de rectification, d’effacement et d’opposition.
+          Toute demande peut être adressée à : <strong>thomas@demain-solutionfinance.fr</strong>.
+        </p>
+      </article>
+    </div>
+  </section>
+</main>
 
 <footer class="site-footer">
   <div class="container footer-inner">
@@ -54,5 +101,8 @@ Toute demande doit être adressée à contact@contextalingua.fr.
     </nav>
   </div>
 </footer>
-  
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
 </html>
