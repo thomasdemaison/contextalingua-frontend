@@ -1,4 +1,9 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /dashboard.html
+Disallow: /generate.html
+Disallow: /interpret.html
+Disallow: /accompanied.html
 
 Sitemap: https://contextalingua.fr/sitemap.xml
