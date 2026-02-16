@@ -115,12 +115,22 @@ function setupRegisterForm() {
       });
 
       saveAuth(data.token, data.user);
+
+      // ✅ Umami conversion: signup success
+      if (window.umami && typeof window.umami.track === "function") {
+        window.umami.track("signup_success", {
+          method: "email",
+          lang: (languageInput.value || "fr"),
+        });
+      }
+
       window.location.href = "dashboard.html";
     } catch (err) {
       errorEl.textContent = "Erreur lors de la création du compte.";
     }
   });
 }
+
 
 // ---------- Forgot password ----------
 function setupForgotPasswordForm() {
