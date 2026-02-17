@@ -163,6 +163,7 @@ async function initDashboard() {
   // ----- Chargement des données -----
   await loadCreditBalance();
   await loadCreditTransactions();
+  await loadPacks();
 
   // 3) Si on revient de paiement success, re-check une deuxième fois 1s après
   // (webhook Mollie peut arriver juste après la redirection)
@@ -170,7 +171,7 @@ async function initDashboard() {
     setTimeout(async () => {
       await loadCreditBalance();
       await loadCreditTransactions();
-      await loadPacks();
+      
 
     }, 1000);
   }
