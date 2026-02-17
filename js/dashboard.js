@@ -170,6 +170,8 @@ async function initDashboard() {
     setTimeout(async () => {
       await loadCreditBalance();
       await loadCreditTransactions();
+      await loadPacks();
+
     }, 1000);
   }
 
