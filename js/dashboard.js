@@ -4,6 +4,10 @@
 // + Nettoyage de l'URL (suppression du param pay=...)
 
 document.addEventListener("DOMContentLoaded", () => {
+   // Tracking conversion retour paiement
+  const params = new URLSearchParams(location.search);
+  if (params.get("pay") === "success") {
+    if (window.umami) window.umami.track("purchase_success");
   initDashboard().catch((err) => {
     console.error("Erreur initDashboard :", err);
   });
@@ -190,6 +194,75 @@ async function loadCreditBalance() {
     valueEl.textContent = "—";
   }
 }
+
+async function loadPacks() {
+  const grid = document.getElementById("packsGrid");
+  const errEl = document.getElementById("packsError");
+  if (!grid) return;
+
+  errEl.textContent = "";
+  grid.innerHTML = "Chargement…";
+
+  try {
+    const r = await apiRequest("/payments/packs", "GET");
+    const packs = r?.packs || [];
+
+    if (!packs.length) {
+      grid.innerHTML = "";
+      errEl.textContent = "Aucun pack disponible.";
+      return;
+    }
+
+    grid.innerHTML = packs.map(p => `
+      <div class="card" style="padding:16px;border:1px solid rgba(148,163,184,.25);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div>
+            <div style="font-weight:700;font-size:1.05rem;">${escapeHtml(p.name)}</div>
+            <div style="margin-top:6px;opacity:.85;">${escapeHtml(p.credits)} crédits</div>
+          </div>
+          <div style="font-weight:800;font-size:1.1rem;">${escapeHtml(p.amountEUR)} €</div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;margin-top:14px;"
+          data-pack-id="${escapeHtml(p.id)}">
+          Acheter
+        </button>
+      </div>
+    `).join("");
+
+    grid.querySelectorAll("button[data-pack-id]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const packId = btn.getAttribute("data-pack-id");
+        btn.disabled = true;
+        btn.textContent = "Redirection…";
+        try {
+          const out = await apiRequest("/payments/mollie/create-checkout", "POST", { packId });
+          if (!out?.checkoutUrl) throw new Error("checkoutUrl manquante");
+          window.location.href = out.checkoutUrl;
+        } catch (e) {
+          btn.disabled = false;
+          btn.textContent = "Acheter";
+          errEl.textContent = "Impossible de démarrer le paiement. Réessayez.";
+        }
+      });
+    });
+
+  } catch (e) {
+    grid.innerHTML = "";
+    errEl.textContent = "Erreur de chargement des packs.";
+  }
+}
+
+// Petit helper anti-XSS si tu n’en as pas déjà un
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 
 // ---------- Dernières opérations ----------
 
