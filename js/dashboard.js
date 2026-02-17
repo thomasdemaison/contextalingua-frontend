@@ -4,14 +4,17 @@
 // + Nettoyage de l'URL (suppression du param pay=...)
 
 document.addEventListener("DOMContentLoaded", () => {
-   // Tracking conversion retour paiement
+  // Tracking conversion retour paiement
   const params = new URLSearchParams(location.search);
   if (params.get("pay") === "success") {
     if (window.umami) window.umami.track("purchase_success");
+  }
+
   initDashboard().catch((err) => {
     console.error("Erreur initDashboard :", err);
   });
 });
+
 
 // -------------------- Toast helpers --------------------
 
